@@ -1,0 +1,145 @@
+/*
+ * OpenRegistro design tokens.
+ *
+ * Palette: "Harbor" ink-blue as the confident primary, paired with warm
+ * neutrals (a stone scale with a slight amber undertone, not cold slate) so
+ * the dense data screens stay calm instead of clinical. Deliberately not
+ * purple/indigo and not glassmorphic.
+ *
+ * Fonts: Fraunces (display, used for marketing headings and the wordmark)
+ * paired with Geist Sans (UI/data) for maximum legibility in dense tables.
+ *
+ * Both are consumed by Tailwind v4 via `@theme`, which turns every custom
+ * property below into a utility (e.g. `--color-primary-600` becomes
+ * `bg-primary-600` / `text-primary-600` / `border-primary-600`).
+ */
+
+@theme {
+  --font-display: 'Fraunces', ui-serif, Georgia, serif;
+  --font-ui: 'Geist Sans', 'Geist', ui-sans-serif, system-ui, sans-serif;
+  --font-mono: 'Geist Mono', ui-monospace, monospace;
+
+  --color-primary-50: #eef4fb;
+  --color-primary-100: #d9e6f5;
+  --color-primary-200: #b3cceb;
+  --color-primary-300: #83aed9;
+  --color-primary-400: #5790c4;
+  --color-primary-500: #3672a8;
+  --color-primary-600: #285a87;
+  --color-primary-700: #20486c;
+  --color-primary-800: #1b3c59;
+  --color-primary-900: #16304a;
+  --color-primary-950: #0e1f30;
+
+  --color-neutral-50: #faf9f7;
+  --color-neutral-100: #f3f1ec;
+  --color-neutral-200: #e7e2d9;
+  --color-neutral-300: #d3cbbb;
+  --color-neutral-400: #afa38e;
+  --color-neutral-500: #897c68;
+  --color-neutral-600: #6a5f4f;
+  --color-neutral-700: #52493d;
+  --color-neutral-800: #392f28;
+  --color-neutral-900: #241e19;
+  --color-neutral-950: #15110e;
+
+  --color-success-500: #1f7a4d;
+  --color-success-600: #186039;
+  --color-warning-500: #a1600a;
+  --color-warning-600: #824c08;
+  --color-danger-500: #b3261e;
+  --color-danger-600: #8c1e18;
+
+  --radius-sm: 0.25rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 0.75rem;
+  --radius-xl: 1rem;
+
+  --shadow-soft: 0 1px 2px 0 rgb(36 30 25 / 0.06), 0 1px 3px 0 rgb(36 30 25 / 0.08);
+  --shadow-raised: 0 2px 4px -1px rgb(36 30 25 / 0.08), 0 4px 8px -2px rgb(36 30 25 / 0.1);
+}
+
+:root {
+  --color-background: var(--color-neutral-50);
+  --color-foreground: var(--color-neutral-900);
+  --color-surface: #ffffff;
+  --color-surface-foreground: var(--color-neutral-900);
+  --color-muted: var(--color-neutral-100);
+  --color-muted-foreground: var(--color-neutral-600);
+  --color-border: var(--color-neutral-200);
+  --color-ring: var(--color-primary-500);
+
+  --color-primary: var(--color-primary-700);
+  --color-primary-foreground: #ffffff;
+  --color-accent: var(--color-neutral-100);
+  --color-accent-foreground: var(--color-neutral-900);
+
+  --color-destructive: var(--color-danger-600);
+  --color-destructive-foreground: #ffffff;
+  --color-success: var(--color-success-600);
+  --color-success-foreground: #ffffff;
+  --color-warning: var(--color-warning-600);
+  --color-warning-foreground: #ffffff;
+}
+
+.dark {
+  --color-background: var(--color-neutral-950);
+  --color-foreground: var(--color-neutral-100);
+  --color-surface: var(--color-neutral-900);
+  --color-surface-foreground: var(--color-neutral-100);
+  --color-muted: var(--color-neutral-800);
+  --color-muted-foreground: var(--color-neutral-400);
+  --color-border: var(--color-neutral-800);
+  --color-ring: var(--color-primary-400);
+
+  --color-primary: var(--color-primary-400);
+  --color-primary-foreground: var(--color-neutral-950);
+  --color-accent: var(--color-neutral-800);
+  --color-accent-foreground: var(--color-neutral-100);
+
+  --color-destructive: #e35c53;
+  --color-destructive-foreground: var(--color-neutral-950);
+  --color-success: #3fa876;
+  --color-success-foreground: var(--color-neutral-950);
+  --color-warning: #d9972f;
+  --color-warning-foreground: var(--color-neutral-950);
+}
+
+@theme inline {
+  --color-background: var(--color-background);
+  --color-foreground: var(--color-foreground);
+  --color-surface: var(--color-surface);
+  --color-surface-foreground: var(--color-surface-foreground);
+  --color-muted: var(--color-muted);
+  --color-muted-foreground: var(--color-muted-foreground);
+  --color-border: var(--color-border);
+  --color-ring: var(--color-ring);
+  --color-primary: var(--color-primary);
+  --color-primary-foreground: var(--color-primary-foreground);
+  --color-accent: var(--color-accent);
+  --color-accent-foreground: var(--color-accent-foreground);
+  --color-destructive: var(--color-destructive);
+  --color-destructive-foreground: var(--color-destructive-foreground);
+  --color-success: var(--color-success);
+  --color-success-foreground: var(--color-success-foreground);
+  --color-warning: var(--color-warning);
+  --color-warning-foreground: var(--color-warning-foreground);
+}
+
+@layer base {
+  * {
+    border-color: var(--color-border);
+    outline-color: var(--color-ring);
+  }
+
+  body {
+    background-color: var(--color-background);
+    color: var(--color-foreground);
+    font-family: var(--font-ui);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-ring);
+    outline-offset: 2px;
+  }
+}
