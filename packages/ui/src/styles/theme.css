@@ -15,9 +15,15 @@
  */
 
 @theme {
-  --font-display: 'Fraunces', ui-serif, Georgia, serif;
-  --font-ui: 'Geist Sans', 'Geist', ui-sans-serif, system-ui, sans-serif;
-  --font-mono: 'Geist Mono', ui-monospace, monospace;
+  /*
+   * These reference the CSS variables next/font injects in each app's root
+   * layout (see apps/web/app/layout.tsx and apps/website/app/layout.tsx), so
+   * this file never needs to know the actual @font-face names next/font
+   * generates - only the fallback stack if a font fails to load.
+   */
+  --font-display: var(--font-fraunces), ui-serif, Georgia, serif;
+  --font-ui: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, monospace;
 
   --color-primary-50: #eef4fb;
   --color-primary-100: #d9e6f5;

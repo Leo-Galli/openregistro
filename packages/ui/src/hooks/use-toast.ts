@@ -1,3 +1,5 @@
+'use client';
+
 import { useEffect, useState, type ReactNode } from 'react';
 import type { ToastActionElement } from '../components/toast';
 
