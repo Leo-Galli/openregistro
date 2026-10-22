@@ -91,6 +91,7 @@ import type {
 } from '../domain/report-card';
 import type { AuditLogEntry, CreateAuditLogEntryInput } from '../domain/audit';
 import type { InstallerState } from '../domain/installer';
+import type { AppSettings, UpdateAppSettingsInput } from '../domain/settings';
 
 export interface ReadRepository<T, Id> {
   findById(id: Id): Promise<T | null>;
@@ -124,6 +125,11 @@ export interface InstallerStateRepository {
   complete(storageDriver: 'json' | 'postgres'): Promise<InstallerState>;
 }
 
+export interface AppSettingsRepository {
+  get(): Promise<AppSettings>;
+  update(input: UpdateAppSettingsInput): Promise<AppSettings>;
+}
+
 /**
  * The single contract both the `json` and `postgres` drivers implement.
  * Every method must behave identically for the shared Vitest contract suite
@@ -137,6 +143,7 @@ export interface StorageDriver {
   healthCheck(): Promise<boolean>;
 
   installer: InstallerStateRepository;
+  settings: AppSettingsRepository;
   users: CrudRepository<User, UserId, UserRecordInput, UpdateUserInput>;
   schools: CrudRepository<School, SchoolId, CreateSchoolInput, UpdateSchoolInput>;
   schoolYears: CrudRepository<

@@ -9,6 +9,7 @@ export * from './domain/announcements';
 export * from './domain/report-card';
 export * from './domain/audit';
 export * from './domain/installer';
+export * from './domain/settings';
 
 export * from './rbac/roles';
 export * from './rbac/scope';

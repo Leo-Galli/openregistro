@@ -57,6 +57,16 @@ export const installerStateTable = pgTable('installer_state', {
   storageDriver: storageDriverEnum('storage_driver'),
 });
 
+export const appSettingsTable = pgTable('app_settings', {
+  id: integer('id').primaryKey().default(1),
+  smtpHost: text('smtp_host'),
+  smtpPort: integer('smtp_port'),
+  smtpUser: text('smtp_user'),
+  smtpPassword: text('smtp_password'),
+  smtpFrom: text('smtp_from'),
+  updatedAt: timestamp('updated_at', { withTimezone: true, mode: 'string' }).notNull(),
+});
+
 export const schoolsTable = pgTable('schools', {
   id: uuid('id').primaryKey(),
   name: text('name').notNull(),

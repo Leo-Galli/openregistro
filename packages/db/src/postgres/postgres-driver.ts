@@ -62,9 +62,11 @@ import {
   type UpdateTermEvaluationInput,
   type AuditLogEntry,
   type CreateAuditLogEntryInput,
+  type AppSettings,
   NotFoundError,
   DEFAULT_INSTALLER_STATE,
   installerStateSchema,
+  appSettingsSchema,
   userSchema,
   schoolSchema,
   schoolYearSchema,
@@ -94,6 +96,7 @@ import {
   absenceJustificationsTable,
   announcementReadReceiptsTable,
   announcementsTable,
+  appSettingsTable,
   attendanceRecordsTable,
   auditLogTable,
   calendarEventsTable,
@@ -128,6 +131,7 @@ export interface PostgresDriverOptions {
 }
 
 const INSTALLER_ROW_ID = 1;
+const SETTINGS_ROW_ID = 1;
 
 async function ensureInstallerRow(db: Database): Promise<void> {
   const existing = await db
@@ -145,6 +149,57 @@ async function ensureInstallerRow(db: Database): Promise<void> {
   }
 }
 
+async function ensureAppSettingsRow(db: Database): Promise<void> {
+  const existing = await db
+    .select()
+    .from(appSettingsTable)
+    .where(eq(appSettingsTable.id, SETTINGS_ROW_ID))
+    .limit(1);
+  if (existing.length === 0) {
+    await db.insert(appSettingsTable).values({
+      id: SETTINGS_ROW_ID,
+      smtpHost: null,
+      smtpPort: null,
+      smtpUser: null,
+      smtpPassword: null,
+      smtpFrom: null,
+      updatedAt: new Date().toISOString(),
+    });
+  }
+}
+
+const EMPTY_SETTINGS_ROW = {
+  smtpHost: null,
+  smtpPort: null,
+  smtpUser: null,
+  smtpPassword: null,
+  smtpFrom: null,
+  updatedAt: new Date(0).toISOString(),
+};
+
+function rowToAppSettings(row: {
+  smtpHost: string | null;
+  smtpPort: number | null;
+  smtpUser: string | null;
+  smtpPassword: string | null;
+  smtpFrom: string | null;
+  updatedAt: string;
+}): AppSettings {
+  return appSettingsSchema.parse({
+    smtp:
+      row.smtpHost && row.smtpPort && row.smtpFrom
+        ? {
+            host: row.smtpHost,
+            port: row.smtpPort,
+            user: row.smtpUser,
+            password: row.smtpPassword,
+            from: row.smtpFrom,
+          }
+        : null,
+    updatedAt: row.updatedAt,
+  });
+}
+
 export function createPostgresStorageDriver(options: PostgresDriverOptions): StorageDriver {
   let client: ReturnType<typeof createPostgresClient> | null = null;
 
@@ -159,6 +214,7 @@ export function createPostgresStorageDriver(options: PostgresDriverOptions): Sto
     async connect() {
       client = createPostgresClient(options.connectionString);
       await ensureInstallerRow(client.db);
+      await ensureAppSettingsRow(client.db);
     },
 
     async disconnect() {
@@ -199,6 +255,35 @@ export function createPostgresStorageDriver(options: PostgresDriverOptions): Sto
           .where(eq(installerStateTable.id, INSTALLER_ROW_ID))
           .returning();
         return installerStateSchema.parse(row);
+      },
+    },
+
+    settings: {
+      async get() {
+        const db = requireDb();
+        const [row] = await db
+          .select()
+          .from(appSettingsTable)
+          .where(eq(appSettingsTable.id, SETTINGS_ROW_ID))
+          .limit(1);
+        return rowToAppSettings(row ?? EMPTY_SETTINGS_ROW);
+      },
+      async update(input) {
+        const db = requireDb();
+        const now = new Date().toISOString();
+        const [row] = await db
+          .update(appSettingsTable)
+          .set({
+            smtpHost: input.smtp?.host ?? null,
+            smtpPort: input.smtp?.port ?? null,
+            smtpUser: input.smtp?.user ?? null,
+            smtpPassword: input.smtp?.password ?? null,
+            smtpFrom: input.smtp?.from ?? null,
+            updatedAt: now,
+          })
+          .where(eq(appSettingsTable.id, SETTINGS_ROW_ID))
+          .returning();
+        return rowToAppSettings(row ?? EMPTY_SETTINGS_ROW);
       },
     },
 

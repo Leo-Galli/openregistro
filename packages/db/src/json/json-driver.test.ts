@@ -37,6 +37,33 @@ describe('json storage driver', () => {
     expect(await driver.installer.get()).toEqual(state);
   });
 
+  it('starts with no SMTP settings configured', async () => {
+    const settings = await driver.settings.get();
+    expect(settings.smtp).toBeNull();
+  });
+
+  it('persists SMTP settings', async () => {
+    const settings = await driver.settings.update({
+      smtp: { host: 'smtp.example.com', port: 587, user: 'relay', password: 'secret', from: 'OpenRegistro <no-reply@example.com>' },
+    });
+    expect(settings.smtp).toEqual({
+      host: 'smtp.example.com',
+      port: 587,
+      user: 'relay',
+      password: 'secret',
+      from: 'OpenRegistro <no-reply@example.com>',
+    });
+    expect(await driver.settings.get()).toEqual(settings);
+  });
+
+  it('clears SMTP settings', async () => {
+    await driver.settings.update({
+      smtp: { host: 'smtp.example.com', port: 587, user: null, password: null, from: 'no-reply@example.com' },
+    });
+    const cleared = await driver.settings.update({ smtp: null });
+    expect(cleared.smtp).toBeNull();
+  });
+
   it('creates and retrieves a school', async () => {
     const school = await driver.schools.create({
       name: 'Liceo Galilei',

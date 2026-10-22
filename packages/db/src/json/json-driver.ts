@@ -64,9 +64,12 @@ import {
   type AuditLogEntry,
   type CreateAuditLogEntryInput,
   type InstallerState,
+  type AppSettings,
   NotFoundError,
   DEFAULT_INSTALLER_STATE,
+  DEFAULT_APP_SETTINGS,
   installerStateSchema,
+  appSettingsSchema,
   userSchema,
   schoolSchema,
   schoolYearSchema,
@@ -110,6 +113,10 @@ export function createJsonStorageDriver(options: JsonDriverOptions): StorageDriv
   const installerFilePath = path.join(dataDir, 'installer-state.json');
   const installerStore = new JsonFileStore<InstallerState>(installerFilePath, DEFAULT_INSTALLER_STATE);
   const installerLockPath = `${installerFilePath}.lock`;
+
+  const settingsFilePath = path.join(dataDir, 'app-settings.json');
+  const settingsStore = new JsonFileStore<AppSettings>(settingsFilePath, DEFAULT_APP_SETTINGS);
+  const settingsLockPath = `${settingsFilePath}.lock`;
 
   const collections = {
     users: new JsonCollection<User>(dataDir, 'users'),
@@ -172,6 +179,22 @@ export function createJsonStorageDriver(options: JsonDriverOptions): StorageDriv
             storageDriver,
           });
           await installerStore.write(next);
+          return next;
+        });
+      },
+    },
+
+    settings: {
+      async get() {
+        return appSettingsSchema.parse(await settingsStore.read());
+      },
+      async update(input) {
+        return withFileLock(settingsLockPath, async () => {
+          const next = appSettingsSchema.parse({
+            smtp: input.smtp,
+            updatedAt: new Date().toISOString(),
+          });
+          await settingsStore.write(next);
           return next;
         });
       },

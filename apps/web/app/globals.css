@@ -1,0 +1,8 @@
+@import 'tailwindcss';
+@import '@openregistro/ui/theme.css';
+
+@layer base {
+  html {
+    font-family: var(--font-ui);
+  }
+}

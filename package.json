@@ -41,7 +41,8 @@
     "onlyBuiltDependencies": [
       "esbuild",
       "@node-rs/argon2",
-      "sharp"
+      "sharp",
+      "unrs-resolver"
     ]
   }
 }
