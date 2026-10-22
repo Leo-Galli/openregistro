@@ -1,0 +1,61 @@
+# Persistent AI project memory - must never be tracked
+CLAUDE.md
+
+# Dependencies
+node_modules/
+.pnpm-store/
+
+# Build outputs
+.next/
+out/
+dist/
+build/
+*.tsbuildinfo
+.turbo/
+
+# Environment and secrets
+.env
+.env.local
+.env.*.local
+!.env.example
+
+# JSON driver data (may contain personal data of minors)
+data/
+!data/.gitkeep
+
+# Demo / seed generated data
+apps/web/data/
+apps/web/.demo-reset-lock
+
+# Installer lock flag (runtime state, not source)
+apps/web/.installer-lock.json
+
+# Logs
+*.log
+npm-debug.log*
+pnpm-debug.log*
+
+# Test artifacts
+coverage/
+playwright-report/
+test-results/
+blob-report/
+
+# Editor / OS
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+.idea/
+.DS_Store
+Thumbs.db
+
+# Prisma / Drizzle
+packages/db/drizzle/meta/
+*.sqlite
+
+# Vercel
+.vercel/
+
+# Misc
+*.pem
+.eslintcache

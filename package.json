@@ -1,0 +1,40 @@
+{
+  "name": "openregistro",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Open source, self-hosted school electronic register (gradebook).",
+  "license": "AGPL-3.0-only",
+  "engines": {
+    "node": ">=20.9.0",
+    "pnpm": ">=9.0.0"
+  },
+  "packageManager": "pnpm@10.29.3",
+  "scripts": {
+    "dev": "turbo run dev",
+    "dev:json": "cross-env STORAGE_DRIVER=json turbo run dev --filter=@openregistro/web",
+    "build": "turbo run build",
+    "lint": "turbo run lint",
+    "format": "prettier --write \"**/*.{ts,tsx,md,mdx,json,yml,yaml,css}\" --ignore-path .gitignore",
+    "format:check": "prettier --check \"**/*.{ts,tsx,md,mdx,json,yml,yaml,css}\" --ignore-path .gitignore",
+    "typecheck": "turbo run typecheck",
+    "test": "turbo run test",
+    "test:e2e": "turbo run test:e2e --filter=@openregistro/web",
+    "seed:demo": "pnpm --filter @openregistro/web run seed:demo",
+    "backup": "bash scripts/backup.sh",
+    "restore": "bash scripts/restore.sh",
+    "migrate:json-to-postgres": "bash scripts/migrate-json-to-postgres.sh",
+    "demo:reset": "bash scripts/demo-reset.sh",
+    "release": "bash scripts/release.sh",
+    "prepare": "husky"
+  },
+  "devDependencies": {
+    "@commitlint/cli": "19.6.1",
+    "@commitlint/config-conventional": "19.6.0",
+    "cross-env": "7.0.3",
+    "husky": "9.1.7",
+    "lint-staged": "15.3.0",
+    "prettier": "3.4.2",
+    "turbo": "2.3.3",
+    "typescript": "5.7.3"
+  }
+}

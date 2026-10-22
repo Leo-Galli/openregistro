@@ -1,0 +1,3 @@
+#!/usr/bin/env sh
+bash scripts/guard-commit-message.sh "$1"
+pnpm exec commitlint --edit "$1"

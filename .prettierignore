@@ -1,0 +1,8 @@
+.next/
+dist/
+build/
+coverage/
+.turbo/
+pnpm-lock.yaml
+data/
+CLAUDE.md
