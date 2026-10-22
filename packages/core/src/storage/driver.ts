@@ -1,4 +1,4 @@
-import type { User, UserId, CreateUserInput, UpdateUserInput } from '../domain/user';
+import type { User, UserId, UserRecordInput, UpdateUserInput } from '../domain/user';
 import type {
   School,
   SchoolId,
@@ -137,7 +137,7 @@ export interface StorageDriver {
   healthCheck(): Promise<boolean>;
 
   installer: InstallerStateRepository;
-  users: CrudRepository<User, UserId, CreateUserInput, UpdateUserInput>;
+  users: CrudRepository<User, UserId, UserRecordInput, UpdateUserInput>;
   schools: CrudRepository<School, SchoolId, CreateSchoolInput, UpdateSchoolInput>;
   schoolYears: CrudRepository<
     SchoolYear,

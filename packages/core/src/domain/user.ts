@@ -36,6 +36,18 @@ export const createUserInputSchema = userSchema
 
 export type CreateUserInput = z.infer<typeof createUserInputSchema>;
 
+/**
+ * Storage-layer input: the password has already been hashed by the auth
+ * service before reaching the StorageDriver. Driver implementations must
+ * never hash passwords themselves.
+ */
+export const userRecordInputSchema = userSchema.omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+export type UserRecordInput = z.infer<typeof userRecordInputSchema>;
+
 export const updateUserInputSchema = userSchema
   .pick({
     fullName: true,

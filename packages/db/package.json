@@ -1,0 +1,34 @@
+{
+  "name": "@openregistro/db",
+  "version": "0.1.0",
+  "private": true,
+  "license": "AGPL-3.0-only",
+  "type": "module",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "lint": "eslint .",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "tsx src/postgres/migrate.ts"
+  },
+  "dependencies": {
+    "@openregistro/core": "workspace:*",
+    "drizzle-orm": "0.38.3",
+    "postgres": "3.4.5",
+    "zod": "3.24.1"
+  },
+  "devDependencies": {
+    "@openregistro/config": "workspace:*",
+    "@types/node": "22.10.5",
+    "drizzle-kit": "0.30.1",
+    "eslint": "9.17.0",
+    "tsx": "4.19.2",
+    "typescript": "5.7.3",
+    "vitest": "2.1.8"
+  }
+}

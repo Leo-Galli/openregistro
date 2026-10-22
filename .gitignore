@@ -49,8 +49,8 @@ blob-report/
 .DS_Store
 Thumbs.db
 
-# Prisma / Drizzle
-packages/db/drizzle/meta/
+# Drizzle migrations are committed (they are source, not build output);
+# only ad hoc local sqlite files are ignored here.
 *.sqlite
 
 # Vercel
