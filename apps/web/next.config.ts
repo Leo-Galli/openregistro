@@ -2,6 +2,9 @@ import type { NextConfig } from 'next';
 
 const nextConfig: NextConfig = {
   reactStrictMode: true,
+  // Required for docker/Dockerfile's runtime stage, which copies
+  // .next/standalone rather than shipping the full node_modules tree.
+  output: 'standalone',
   transpilePackages: ['@openregistro/core', '@openregistro/db', '@openregistro/ui'],
   async headers() {
     return [

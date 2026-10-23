@@ -1,0 +1,31 @@
+# App-only stack using the JSON driver - no database required, matching the
+# `pnpm dev:json` story. Data persists in a named volume at /app/data.
+#
+# Usage:
+#   cp apps/web/.env.example .env   # then fill in AUTH_SECRET at minimum
+#   docker compose -f docker-compose.json.yml up
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+    restart: unless-stopped
+    ports:
+      - '3000:3000'
+    environment:
+      STORAGE_DRIVER: json
+      DATA_DIR: /app/data
+      AUTH_SECRET: '${AUTH_SECRET:?set AUTH_SECRET in .env, e.g. via: openssl rand -base64 32}'
+      AUTH_URL: ${AUTH_URL:-http://localhost:3000}
+      NODE_ENV: production
+      SMTP_HOST: ${SMTP_HOST:-}
+      SMTP_PORT: ${SMTP_PORT:-587}
+      SMTP_USER: ${SMTP_USER:-}
+      SMTP_PASSWORD: ${SMTP_PASSWORD:-}
+      SMTP_FROM: ${SMTP_FROM:-OpenRegistro <no-reply@example.com>}
+    volumes:
+      - json-data:/app/data
+
+volumes:
+  json-data:
