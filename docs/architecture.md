@@ -67,9 +67,11 @@ sequenceDiagram
 
 Key points:
 
-- There is no `middleware.ts`. Both storage drivers use Node-only APIs (`fs`, the Postgres
-  driver) that may not be available in every middleware runtime, so all gating (installer
-  lock, session requirement) happens in server layouts/pages via `lib/guards.ts` instead.
+- `apps/web/proxy.ts` (Next.js's `middleware.ts` convention, renamed to `proxy.ts` in Next.js 16)
+  exists only to generate a per-request Content-Security-Policy nonce. It does not perform
+  auth/installer gating: both storage drivers use Node-only APIs (`fs`, the Postgres driver) that
+  may not be available in every proxy runtime, so that gating happens in server layouts/pages via
+  `lib/guards.ts` instead.
 - Every mutating Server Action re-checks permissions and re-validates input server-side via
   `requirePermission()` and a Zod schema from `packages/core`, even when the UI already hid
   the triggering control from unauthorized roles.

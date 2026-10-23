@@ -7,6 +7,8 @@ const nextConfig: NextConfig = {
   output: 'standalone',
   transpilePackages: ['@openregistro/core', '@openregistro/db', '@openregistro/ui'],
   async headers() {
+    // Content-Security-Policy is set per-request in middleware.ts instead,
+    // since it needs a fresh nonce on every request for script-src.
     return [
       {
         source: '/:path*',

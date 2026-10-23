@@ -12,7 +12,12 @@ const announcementFormSchema = z.object({
   title: z.string().min(1, 'Required').max(200),
   body: z.string().min(1, 'Required').max(20000),
   attachmentFileName: z.string().max(255).optional().or(z.literal('')),
-  attachmentUrl: z.string().url().optional().or(z.literal('')),
+  attachmentUrl: z
+    .string()
+    .url()
+    .refine((url) => /^https?:\/\//i.test(url), { message: 'Must be an http or https link' })
+    .optional()
+    .or(z.literal('')),
 });
 
 export interface AnnouncementFormState {
