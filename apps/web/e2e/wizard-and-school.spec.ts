@@ -283,6 +283,21 @@ test('completes setup, then exercises school management, register, and gradebook
   await expect(page.getByRole('dialog')).toBeHidden();
   await expect(page.getByText('Exercises 1-10')).toBeVisible();
 
+  // --- Teacher records a disciplinary note ---
+  await page.goto('/dashboard/discipline');
+  await page.getByRole('link', { name: '3A' }).click();
+  await expect(page.getByRole('heading', { name: /3A disciplinary notes/ })).toBeVisible({
+    timeout: 30_000,
+  });
+  await page.getByRole('button', { name: 'Add note' }).click();
+  await expect(
+    page.getByRole('dialog', { name: /Disciplinary note for Sara Rossi/ }),
+  ).toBeVisible();
+  await page.getByLabel('Description').fill('Talked during the test.');
+  await page.getByRole('button', { name: 'Save' }).click();
+  await expect(page.getByRole('dialog')).toBeHidden();
+  await expect(page.getByText('Talked during the test.')).toBeVisible();
+
   // --- Student justifies her own absence ---
   await signIn(page, STUDENT_EMAIL, STUDENT_PASSWORD);
 
@@ -305,6 +320,9 @@ test('completes setup, then exercises school management, register, and gradebook
 
   await page.goto('/dashboard/announcements');
   await expect(page.getByRole('heading', { name: 'Welcome back' })).toBeVisible();
+
+  await page.goto('/dashboard/discipline');
+  await expect(page.getByText('Talked during the test.')).toBeVisible();
 
   // --- Student downloads her own report card PDF and data export ---
   // Fetched directly (not via clicking the target="_blank" link) since

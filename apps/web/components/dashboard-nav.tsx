@@ -19,6 +19,7 @@ const NAV_ITEMS: NavItem[] = [
   { href: '/dashboard/gradebook', label: 'Gradebook', permission: 'grades:write' },
   { href: '/dashboard/grades', label: 'Grades', permission: 'grades:read' },
   { href: '/dashboard/attendance', label: 'Attendance', permission: 'attendance:read' },
+  { href: '/dashboard/discipline', label: 'Discipline', permission: 'register:read' },
   { href: '/dashboard/homework', label: 'Homework', permission: 'homework:read' },
   { href: '/dashboard/timetable', label: 'Timetable', permission: 'calendar:read' },
   { href: '/dashboard/announcements', label: 'Announcements', permission: 'announcements:read' },
