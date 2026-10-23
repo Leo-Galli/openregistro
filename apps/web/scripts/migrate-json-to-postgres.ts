@@ -385,6 +385,9 @@ async function migrate(source: StorageDriver, target: StorageDriver): Promise<vo
 }
 
 main().catch((error: unknown) => {
-  console.error('Migration from JSON to Postgres failed:', error);
+  console.error(
+    'Migration from JSON to Postgres failed:',
+    error instanceof Error ? error.stack : error,
+  );
   process.exitCode = 1;
 });

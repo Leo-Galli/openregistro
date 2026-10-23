@@ -124,6 +124,7 @@ import {
   createPgCreateDeleteRepository,
   createPgCreateOnlyRepository,
   createPgCrudRepository,
+  normalizeTimestamps,
 } from './repository-factory';
 
 export interface PostgresDriverOptions {
@@ -196,7 +197,7 @@ function rowToAppSettings(row: {
             from: row.smtpFrom,
           }
         : null,
-    updatedAt: row.updatedAt,
+    updatedAt: normalizeTimestamps({ updatedAt: row.updatedAt }).updatedAt,
   });
 }
 
@@ -241,7 +242,7 @@ export function createPostgresStorageDriver(options: PostgresDriverOptions): Sto
           .from(installerStateTable)
           .where(eq(installerStateTable.id, INSTALLER_ROW_ID))
           .limit(1);
-        return installerStateSchema.parse(row ?? DEFAULT_INSTALLER_STATE);
+        return installerStateSchema.parse(normalizeTimestamps(row ?? DEFAULT_INSTALLER_STATE));
       },
       async complete(storageDriver) {
         const db = requireDb();
@@ -254,7 +255,7 @@ export function createPostgresStorageDriver(options: PostgresDriverOptions): Sto
           })
           .where(eq(installerStateTable.id, INSTALLER_ROW_ID))
           .returning();
-        return installerStateSchema.parse(row);
+        return installerStateSchema.parse(normalizeTimestamps(row));
       },
     },
 
@@ -437,7 +438,7 @@ export function createPostgresStorageDriver(options: PostgresDriverOptions): Sto
             .where(eq(absenceJustificationsTable.id, id))
             .returning();
           if (!row) throw new NotFoundError('AbsenceJustification', id);
-          return absenceJustificationSchema.parse(row);
+          return absenceJustificationSchema.parse(normalizeTimestamps(row));
         },
       };
     },

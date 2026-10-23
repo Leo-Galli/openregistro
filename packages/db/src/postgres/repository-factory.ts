@@ -43,6 +43,37 @@ function nowIso(): string {
   return new Date().toISOString();
 }
 
+/**
+ * postgres.js (via Drizzle's `mode: 'string'` timestamp columns) returns
+ * Postgres's own text format for timestamp(tz) - e.g.
+ * "2026-10-23 15:05:36.832+00" (space separator, short offset) - not strict
+ * ISO 8601. The shared StorageDriver contract validates every timestamp with
+ * Zod's `z.string().datetime({ offset: true })`, which requires a "T"
+ * separator and a full "+HH:MM"/"Z" offset and rejects Postgres's format
+ * outright. This normalizes any row read back from the database before it
+ * reaches that validation - the JSON driver never needs this since it always
+ * stores the exact ISO string it was given.
+ */
+const POSTGRES_TIMESTAMP_PATTERN =
+  /^(\d{4}-\d{2}-\d{2}) (\d{2}:\d{2}:\d{2}(?:\.\d+)?)([+-]\d{2}(?::?\d{2})?)?$/;
+
+function toIsoTimestamp(value: string): string {
+  const match = POSTGRES_TIMESTAMP_PATTERN.exec(value);
+  if (!match) return value;
+  const [, date, time, rawOffset] = match;
+  const offset = rawOffset ? (rawOffset.length === 3 ? `${rawOffset}:00` : rawOffset) : 'Z';
+  return `${date}T${time}${offset}`;
+}
+
+export function normalizeTimestamps<R>(row: R): R {
+  if (row === null || typeof row !== 'object') return row;
+  const normalized: Record<string, unknown> = { ...(row as Record<string, unknown>) };
+  for (const [key, value] of Object.entries(normalized)) {
+    if (typeof value === 'string') normalized[key] = toIsoTimestamp(value);
+  }
+  return normalized as R;
+}
+
 interface WithId {
   id: string;
 }
@@ -72,13 +103,13 @@ export function createPgCrudRepository<T extends WithId, CreateInput, UpdateInpu
         .from(table)
         .where(eq(idColumn(table), id))
         .limit(1);
-      return rows[0] ? schema.parse(rows[0]) : null;
+      return rows[0] ? schema.parse(normalizeTimestamps(rows[0])) : null;
     },
     async findMany(filter?: Partial<T>): Promise<T[]> {
       const where = buildWhere(table, filter);
       const query = db.select().from(table);
       const rows = where ? await query.where(where) : await query;
-      return rows.map((row) => schema.parse(row));
+      return rows.map((row) => schema.parse(normalizeTimestamps(row)));
     },
     async create(input: CreateInput): Promise<T> {
       const candidate = mapCreate(input, { id: randomUUID(), now: nowIso() });
@@ -87,7 +118,7 @@ export function createPgCrudRepository<T extends WithId, CreateInput, UpdateInpu
         .insert(table)
         .values(entity as Record<string, unknown>)
         .returning();
-      return schema.parse(row);
+      return schema.parse(normalizeTimestamps(row));
     },
     async update(id: string, patch: UpdateInput): Promise<T> {
       const existingRows = await db
@@ -95,7 +126,7 @@ export function createPgCrudRepository<T extends WithId, CreateInput, UpdateInpu
         .from(table)
         .where(eq(idColumn(table), id))
         .limit(1);
-      const existing = existingRows[0] ? schema.parse(existingRows[0]) : null;
+      const existing = existingRows[0] ? schema.parse(normalizeTimestamps(existingRows[0])) : null;
       if (!existing) throw new NotFoundError(entityName, id);
       const now = nowIso();
       const merged = mapUpdate
@@ -107,7 +138,7 @@ export function createPgCrudRepository<T extends WithId, CreateInput, UpdateInpu
         .set(entity as Record<string, unknown>)
         .where(eq(idColumn(table), id))
         .returning();
-      return schema.parse(row);
+      return schema.parse(normalizeTimestamps(row));
     },
     async delete(id: string): Promise<void> {
       await db.delete(table).where(eq(idColumn(table), id));
@@ -130,13 +161,13 @@ export function createPgCreateOnlyRepository<T extends WithId, CreateInput>(opti
         .from(table)
         .where(eq(idColumn(table), id))
         .limit(1);
-      return rows[0] ? schema.parse(rows[0]) : null;
+      return rows[0] ? schema.parse(normalizeTimestamps(rows[0])) : null;
     },
     async findMany(filter?: Partial<T>): Promise<T[]> {
       const where = buildWhere(table, filter);
       const query = db.select().from(table);
       const rows = where ? await query.where(where) : await query;
-      return rows.map((row) => schema.parse(row));
+      return rows.map((row) => schema.parse(normalizeTimestamps(row)));
     },
     async create(input: CreateInput): Promise<T> {
       const candidate = mapCreate(input, { id: randomUUID(), now: nowIso() });
@@ -145,7 +176,7 @@ export function createPgCreateOnlyRepository<T extends WithId, CreateInput>(opti
         .insert(table)
         .values(entity as Record<string, unknown>)
         .returning();
-      return schema.parse(row);
+      return schema.parse(normalizeTimestamps(row));
     },
   };
 }

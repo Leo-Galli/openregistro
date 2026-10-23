@@ -46,6 +46,20 @@ export async function seedDemoData(storage: StorageDriver): Promise<void> {
 
   const demoPasswordHash = await hashPassword(DEMO_PASSWORD);
 
+  const existingAdmin = await storage.users.findMany({ email: 'admin@demo.openregistro.local' });
+  if (existingAdmin.length === 0) {
+    await storage.users.create({
+      schoolId: school.id,
+      role: 'school_admin',
+      email: 'admin@demo.openregistro.local',
+      fullName: 'Admin Demo',
+      passwordHash: demoPasswordHash,
+      totpSecret: null,
+      isActive: true,
+      lastLoginAt: null,
+    });
+  }
+
   const klass =
     (await storage.classes.findMany({ schoolId: school.id }))[0] ??
     (await storage.classes.create({

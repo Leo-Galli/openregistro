@@ -8,6 +8,6 @@ async function main(): Promise<void> {
 }
 
 main().catch((error: unknown) => {
-  console.error('Failed to seed demo data:', error);
+  console.error('Failed to seed demo data:', error instanceof Error ? error.stack : error);
   process.exitCode = 1;
 });

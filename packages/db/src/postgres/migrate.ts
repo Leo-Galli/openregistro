@@ -1,3 +1,4 @@
+import { fileURLToPath } from 'node:url';
 import { migrate } from 'drizzle-orm/postgres-js/migrator';
 import { createPostgresClient } from './client';
 
@@ -9,7 +10,9 @@ async function main(): Promise<void> {
 
   const client = createPostgresClient(connectionString);
   try {
-    await migrate(client.db, { migrationsFolder: new URL('./drizzle', import.meta.url).pathname });
+    await migrate(client.db, {
+      migrationsFolder: fileURLToPath(new URL('./drizzle', import.meta.url)),
+    });
     console.warn('Migrations applied successfully.');
   } finally {
     await client.close();
@@ -17,6 +20,6 @@ async function main(): Promise<void> {
 }
 
 main().catch((error: unknown) => {
-  console.error('Migration failed:', error);
+  console.error('Migration failed:', error instanceof Error ? error.stack : error);
   process.exitCode = 1;
 });
