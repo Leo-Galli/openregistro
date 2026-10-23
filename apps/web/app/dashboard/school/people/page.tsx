@@ -1,5 +1,6 @@
 import {
   Badge,
+  Button,
   Table,
   TableBody,
   TableCell,
@@ -8,9 +9,10 @@ import {
   TableRow,
 } from '@openregistro/ui';
 import { auth } from '@/auth';
-import { schoolIdOf } from '@/lib/authz';
+import { schoolIdOf, userIdOf } from '@/lib/authz';
 import { getStorage } from '@/lib/storage';
 import { CreatePersonDialog } from '@/components/school/create-person-dialog';
+import { setUserActive } from './actions';
 
 const ROLE_LABELS: Record<string, string> = {
   school_admin: 'School admin',
@@ -24,6 +26,7 @@ const ROLE_LABELS: Record<string, string> = {
 export default async function PeoplePage() {
   const session = await auth();
   const schoolId = schoolIdOf(session!);
+  const viewerId = userIdOf(session!);
   const storage = await getStorage();
   const people = await storage.users.findMany({ schoolId });
   const students = people
@@ -45,6 +48,7 @@ export default async function PeoplePage() {
             <TableHead>Email</TableHead>
             <TableHead>Role</TableHead>
             <TableHead>Status</TableHead>
+            <TableHead />
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -57,6 +61,17 @@ export default async function PeoplePage() {
                 <Badge variant={person.isActive ? 'success' : 'secondary'}>
                   {person.isActive ? 'Active' : 'Inactive'}
                 </Badge>
+              </TableCell>
+              <TableCell>
+                {person.id === viewerId ? null : (
+                  <form action={setUserActive}>
+                    <input type="hidden" name="userId" value={person.id} />
+                    <input type="hidden" name="isActive" value={(!person.isActive).toString()} />
+                    <Button type="submit" size="sm" variant="outline">
+                      {person.isActive ? 'Deactivate' : 'Reactivate'}
+                    </Button>
+                  </form>
+                )}
               </TableCell>
             </TableRow>
           ))}

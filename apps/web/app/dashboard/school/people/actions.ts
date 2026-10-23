@@ -89,3 +89,33 @@ export async function createPerson(
     };
   }
 }
+
+export async function setUserActive(formData: FormData): Promise<void> {
+  const session = await auth();
+  requirePermission(session!, 'records:manage');
+  const actorId = userIdOf(session!);
+
+  const targetId = userIdSchema.parse(formData.get('userId'));
+  const nextActive = formData.get('isActive') === 'true';
+
+  if (targetId === actorId && !nextActive) {
+    return;
+  }
+
+  const storage = await getStorage();
+  const target = await storage.users.findById(targetId);
+  if (!target || target.schoolId !== schoolIdOf(session!)) return;
+
+  const updated = await storage.users.update(targetId, { isActive: nextActive });
+
+  await logAudit(storage, {
+    actorId,
+    action: 'update',
+    entityKind: 'user',
+    entityId: updated.id,
+    before: { isActive: target.isActive },
+    after: { isActive: updated.isActive },
+  });
+
+  revalidatePath('/dashboard/school/people');
+}

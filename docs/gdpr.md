@@ -30,22 +30,29 @@ placeholder (e.g. a school's address/logo, a user's TOTP secret), and the demo s
 
 Being direct about where this stands:
 
-- **Access/export**: there is no self-service "export my data" feature in the app yet. An
-  administrator with direct access to the storage backend can extract a user's records (the
-  JSON driver stores plain files per entity type; the Postgres driver is a normal relational
-  database queryable with SQL), but there is no in-app button for this. Tracked as a gap, not
-  silently assumed to exist.
-- **Erasure**: there is no in-app "delete this user and their data" action yet.
-  `users: CrudRepository` does expose a `delete()` method, but nothing in the UI calls it, and
-  deleting a user without deciding what happens to their historical grades/attendance records
-  (which reference the user id as a foreign key) needs a deliberate retention policy, not just
-  a row delete. This is a known gap, not a built feature.
+- **Access/export**: every signed-in user can download their own data from `/dashboard/account`
+  ("Download my data", served by `GET /api/account/export`) - a JSON file containing their
+  profile (password hash and TOTP secret excluded) and every record where they are the subject:
+  guardianship links, absence justifications they submitted, announcement read receipts, and (role
+  -dependent) grades, attendance records, term evaluations, authored lesson logs, and teacher
+  assignments. This is self-service only - the endpoint always exports the caller's own session,
+  never another user's id, and is not an admin bulk-export tool.
+- **Erasure**: there is still no full "delete this user and their data" action, and that remains
+  a deliberate gap rather than an oversight - deleting a user without deciding what happens to
+  their historical grades/attendance records (which reference the user id as a foreign key) needs
+  a retention-policy decision a school, not this software, has to make. What _is_ built: an admin
+  can deactivate an account from `/dashboard/school/people` (the existing "Active/Inactive" status
+  badge previously had no control behind it - it does now), which immediately blocks that user
+  from signing in (`authorize()` already checked `isActive`) without deleting any historical
+  academic record. This is the practical middle ground for "this person should no longer have
+  access" without making an erasure-vs-retention call on the school's behalf.
 - **Rectification**: covered for most editable fields through normal admin UI (editing a
   person's details) where that UI exists; not yet audited field-by-field.
 
-If your deployment has a legal obligation to honor these requests today, the data access
-paths above (direct storage access) are the only mechanism available until a self-service
-flow is built.
+If your deployment has a legal obligation to fully erase a user's historical records, direct
+storage access (the JSON driver's plain files, or SQL against the Postgres driver) remains the
+only mechanism until your school has decided on, and this software implements, a retention
+policy for that case.
 
 ## Record of processing (template)
 
