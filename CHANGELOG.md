@@ -33,11 +33,41 @@ All notable changes to this project are documented in this file. The format is b
   GHCR image publish workflow.
 - Project documentation under `docs/` (installation, configuration, architecture, backups,
   GDPR notes) and community files (`CONTRIBUTING.md`, `CODE_OF_CONDUCT.md`, `SECURITY.md`).
+- Marketing/docs site (`apps/website`): static Next.js export covering the product pitch,
+  features, install quick-start, OSS/license rationale, and an FAQ.
+- Student/guardian read views for grades and homework; teacher-managed homework per
+  class/subject.
+- Announcements: school-wide or class-scoped, with per-user read receipts and an optional
+  link attachment.
+- Term evaluations (separate from the gradebook's computed average) and PDF report card
+  export, downloadable by the student, their guardian, or staff.
+- Audit log covering account creation, grade entry, absence-justification review, and term
+  evaluation changes, with an admin/principal viewer.
+- Weekly timetable: a per-class grid editor for staff, read views for teachers/students/
+  guardians.
+- Disciplinary notes: an immutable per-student record, visible to the student/guardian it
+  concerns and to staff for the relevant class.
+- School-wide calendar (tests, events, holidays) and parent-teacher meeting booking (staff
+  offer time-boxed slots with a capacity, guardians book one for their child).
+- TOTP two-factor authentication enrollment UI (`/dashboard/account`) - generate a QR code,
+  confirm a code, enable or disable.
+- Self-service personal data export (`/dashboard/account`, GDPR-style) and account
+  deactivation (blocks sign-in without deleting historical records).
+- A Content-Security-Policy with a per-request nonce for `script-src`, generated in
+  `apps/web/proxy.ts`.
+
+### Fixed
+
+- A stored-XSS vector in announcement attachment links (`z.string().url()` alone accepts
+  `javascript:` URIs; now restricted to `http(s)`).
+- The Docker image build, which failed in CI against real Docker infrastructure
+  (`apps/web/public` was referenced by the Dockerfile but never existed).
 
 ### Known gaps
 
-- Student/guardian read-only views, announcements, report card PDF export, the audit log
-  viewer, and the timetable are tracked as in-progress or not-yet-started work - see the
-  project roadmap for current status.
-- TOTP enrollment has no settings-page UI yet (the backend and login-time verification are
-  done).
+- No in-app account/data erasure flow - deactivation (above) blocks access without deleting
+  historical academic records, which needs a retention-policy decision left to each school.
+  See [GDPR notes](./docs/gdpr.md).
+- Full calendar-event scoping to a specific class/subject, and meeting cancellation/
+  reschedule, are not built - today's calendar is school-wide only and meeting bookings
+  cannot be cancelled once made.

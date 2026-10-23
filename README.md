@@ -5,7 +5,24 @@
 
 Open source, self-hosted school electronic register (gradebook).
 
-> Status: early development. See `docs/` for installation and architecture.
+> Status: core feature set complete (school records, register, gradebook, absence
+> justifications, homework, announcements, report cards, audit log, timetable, disciplinary
+> notes, calendar, and parent-teacher meeting booking) and running behind CI. See `docs/`
+> for installation and architecture, and [CHANGELOG.md](./CHANGELOG.md) for what's shipped
+> so far and what's deliberately still a gap.
+
+## Features
+
+- Role-based access for school admins, secretary staff, principals, teachers, students, and
+  guardians, enforced server-side on every action.
+- Class register: lesson logs with sign-off, attendance tracking, absence justifications.
+- Gradebook with weighted averages, separate end-of-term evaluations, and PDF report cards.
+- Homework, school-wide or class-scoped announcements with read receipts, a weekly
+  timetable, disciplinary notes, a shared calendar, and parent-teacher meeting booking.
+- An audit log for sensitive changes, TOTP two-factor authentication, and a self-service
+  personal data export.
+- Two storage backends behind one interface: JSON files (no database required) or
+  PostgreSQL, selected at install time.
 
 ## Monorepo layout
 
