@@ -185,6 +185,40 @@ test('completes setup, then exercises school management, register, and gradebook
   await expect(page.getByRole('dialog')).toBeHidden();
   await expect(page.getByText('Luigi Bianchi')).toBeVisible();
 
+  // --- Admin publishes an announcement ---
+  await page.goto('/dashboard/announcements');
+  await page.getByRole('button', { name: 'New announcement' }).click();
+  await expect(page.getByRole('dialog', { name: 'New announcement' })).toBeVisible();
+  await page.getByLabel('Title').fill('Welcome back');
+  await page.getByLabel('Message').fill('First trimester starts today.');
+  await page.getByRole('button', { name: 'Publish' }).click();
+  await expect(page.getByRole('dialog')).toBeHidden();
+  await expect(page.getByRole('heading', { name: 'Welcome back' })).toBeVisible();
+
+  // --- Admin deactivates, then reactivates, the teacher's account ---
+  await page.goto('/dashboard/school/people');
+  const teacherRow = page.getByRole('row').filter({ hasText: 'Luigi Bianchi' });
+  await teacherRow.getByRole('button', { name: 'Deactivate' }).click();
+  await expect(teacherRow.getByText('Inactive')).toBeVisible();
+  await teacherRow.getByRole('button', { name: 'Reactivate' }).click();
+  await expect(teacherRow.getByText('Active')).toBeVisible();
+
+  // --- Admin decides a term evaluation, separate from the gradebook average ---
+  await page.goto('/dashboard/report-cards');
+  await page.getByRole('link', { name: /3A/ }).click();
+  await expect(page.getByRole('heading', { name: /Mathematics/ })).toBeVisible({ timeout: 30_000 });
+  await page.getByRole('button', { name: 'Set grade' }).click();
+  await expect(page.getByRole('dialog', { name: /Term evaluation for Sara Rossi/ })).toBeVisible();
+  await page.getByLabel('Final grade').fill('8.5');
+  await page.getByRole('button', { name: 'Save' }).click();
+  await expect(page.getByRole('dialog')).toBeHidden();
+  await expect(page.getByText('8.50')).toBeVisible();
+
+  // --- Admin checks the audit log reflects the mutations above ---
+  await page.goto('/dashboard/audit-log');
+  await expect(page.getByRole('heading', { name: 'Audit log' })).toBeVisible();
+  await expect(page.getByText('No audit entries recorded yet.')).not.toBeVisible();
+
   // --- Teacher takes the class register ---
   await signIn(page, TEACHER_EMAIL, TEACHER_PASSWORD);
 
@@ -218,6 +252,17 @@ test('completes setup, then exercises school management, register, and gradebook
   await expect(page.getByRole('dialog')).toBeHidden();
   await expect(page.getByText('8.00')).toBeVisible();
 
+  // --- Teacher assigns homework ---
+  await page.goto('/dashboard/homework');
+  await page.getByRole('link', { name: /3A/ }).click();
+  await expect(page.getByRole('heading', { name: /Mathematics/ })).toBeVisible({ timeout: 30_000 });
+  await page.getByRole('button', { name: 'New homework' }).click();
+  await expect(page.getByRole('dialog', { name: 'New homework' })).toBeVisible();
+  await page.getByLabel('Title').fill('Exercises 1-10');
+  await page.getByRole('button', { name: 'Save' }).click();
+  await expect(page.getByRole('dialog')).toBeHidden();
+  await expect(page.getByText('Exercises 1-10')).toBeVisible();
+
   // --- Student justifies her own absence ---
   await signIn(page, STUDENT_EMAIL, STUDENT_PASSWORD);
 
@@ -229,6 +274,34 @@ test('completes setup, then exercises school management, register, and gradebook
   await page.getByRole('button', { name: 'Submit' }).click();
   await expect(page.getByRole('dialog')).toBeHidden();
   await expect(page.getByText('pending')).toBeVisible();
+
+  // --- Student checks her own read-only views ---
+  await page.goto('/dashboard/grades');
+  await expect(page.getByText('Mathematics')).toBeVisible();
+  await expect(page.getByText('8.00')).toBeVisible();
+
+  await page.goto('/dashboard/homework');
+  await expect(page.getByText('Exercises 1-10')).toBeVisible();
+
+  await page.goto('/dashboard/announcements');
+  await expect(page.getByRole('heading', { name: 'Welcome back' })).toBeVisible();
+
+  // --- Student downloads her own report card PDF and data export ---
+  // Fetched directly (not via clicking the target="_blank" link) since
+  // opening a second page/tab reliably crashes this sandbox's Chromium -
+  // see the single-test() note above.
+  await page.goto('/dashboard/report-cards');
+  const reportCardHref = await page
+    .getByRole('link', { name: /Download PDF/ })
+    .getAttribute('href');
+  const reportCardResponse = await page.request.get(reportCardHref!);
+  expect(reportCardResponse.ok()).toBe(true);
+  expect(reportCardResponse.headers()['content-type']).toContain('application/pdf');
+
+  const exportResponse = await page.request.get('/api/account/export');
+  expect(exportResponse.ok()).toBe(true);
+  const exportPayload = await exportResponse.json();
+  expect(exportPayload.profile.email).toBe(STUDENT_EMAIL);
 
   // --- Admin reviews and approves the justification ---
   await signIn(page, ADMIN_EMAIL, ADMIN_PASSWORD);
