@@ -1,4 +1,5 @@
 import { Hero } from '@/components/hero';
+import { DemoSection } from '@/components/demo-section';
 import { FeaturesSection } from '@/components/features-section';
 import { InstallSection } from '@/components/install-section';
 import { OssSection } from '@/components/oss-section';
@@ -8,6 +9,7 @@ export default function HomePage() {
   return (
     <>
       <Hero />
+      <DemoSection />
       <FeaturesSection />
       <InstallSection />
       <OssSection />

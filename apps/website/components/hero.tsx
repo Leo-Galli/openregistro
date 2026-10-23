@@ -1,7 +1,8 @@
-import { ArrowRight, Github } from 'lucide-react';
+import { ArrowRight, ExternalLink, Github } from 'lucide-react';
 import { Button } from '@openregistro/ui';
 
 const REPO_URL = 'https://github.com/Leo-Galli/openregistro';
+const DEMO_URL = 'https://openregistro-demo.vercel.app';
 
 export function Hero() {
   return (
@@ -20,6 +21,12 @@ export function Hero() {
       </p>
       <div className="flex flex-wrap items-center gap-3 sm:justify-center">
         <Button asChild size="lg">
+          <a href={DEMO_URL} target="_blank" rel="noreferrer">
+            <ExternalLink className="h-4 w-4" />
+            Try the live demo
+          </a>
+        </Button>
+        <Button asChild size="lg" variant="outline">
           <a href={REPO_URL} target="_blank" rel="noreferrer">
             <Github className="h-4 w-4" />
             View on GitHub
