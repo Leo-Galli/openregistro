@@ -9,9 +9,15 @@ export default defineConfig({
   fullyParallel: false,
   workers: 1,
   reporter: 'list',
+  // Dev-mode Turbopack cold-compiles each route on first visit and this
+  // sandbox's CPU is sometimes under heavy contention from other tooling
+  // running concurrently; the default 5s assertion timeout is too tight.
+  timeout: 60_000,
+  expect: { timeout: 20_000 },
   use: {
     baseURL: `http://localhost:${PORT}`,
     trace: 'retain-on-failure',
+    navigationTimeout: 20_000,
   },
   projects: [{ name: 'chromium', use: { ...devices['Desktop Chrome'] } }],
   webServer: {

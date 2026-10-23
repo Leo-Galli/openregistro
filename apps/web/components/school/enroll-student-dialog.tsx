@@ -41,7 +41,7 @@ export function EnrollStudentDialog({
 
   useEffect(() => {
     if (state.ok) setOpen(false);
-  }, [state.ok]);
+  }, [state]);
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>

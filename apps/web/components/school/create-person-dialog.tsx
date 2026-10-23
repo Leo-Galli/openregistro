@@ -43,7 +43,7 @@ export function CreatePersonDialog({ students }: { students: StudentOption[] }) 
 
   useEffect(() => {
     if (state.ok) setOpen(false);
-  }, [state.ok]);
+  }, [state]);
 
   return (
     <Dialog
