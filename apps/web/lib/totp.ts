@@ -1,4 +1,5 @@
 import { Secret, TOTP } from 'otpauth';
+import QRCode from 'qrcode';
 
 export interface TotpEnrollment {
   secret: string;
@@ -16,6 +17,10 @@ export function generateTotpEnrollment(accountName: string): TotpEnrollment {
     secret,
   });
   return { secret: secret.base32, otpauthUrl: totp.toString() };
+}
+
+export function generateQrCodeDataUrl(otpauthUrl: string): Promise<string> {
+  return QRCode.toDataURL(otpauthUrl);
 }
 
 export function verifyTotpToken(secretBase32: string, token: string): boolean {

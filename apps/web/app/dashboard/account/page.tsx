@@ -8,6 +8,9 @@ import {
 } from '@openregistro/ui';
 import { Download } from 'lucide-react';
 import { auth } from '@/auth';
+import { userIdOf } from '@/lib/authz';
+import { getStorage } from '@/lib/storage';
+import { TotpSection } from '@/components/account/totp-section';
 
 export const dynamic = 'force-dynamic';
 
@@ -22,6 +25,8 @@ const ROLE_LABELS: Record<string, string> = {
 
 export default async function AccountPage() {
   const session = await auth();
+  const storage = await getStorage();
+  const user = await storage.users.findById(userIdOf(session!));
 
   return (
     <div className="flex flex-col gap-6">
@@ -46,6 +51,8 @@ export default async function AccountPage() {
           </p>
         </CardContent>
       </Card>
+
+      <TotpSection initiallyEnabled={user?.totpSecret !== null && user?.totpSecret !== undefined} />
 
       <Card>
         <CardHeader>

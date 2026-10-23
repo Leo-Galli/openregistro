@@ -1,6 +1,6 @@
 import { TOTP, Secret } from 'otpauth';
 import { describe, expect, it } from 'vitest';
-import { generateTotpEnrollment, verifyTotpToken } from './totp';
+import { generateQrCodeDataUrl, generateTotpEnrollment, verifyTotpToken } from './totp';
 
 describe('TOTP enrollment', () => {
   it('generates a base32 secret and a matching otpauth URL', () => {
@@ -25,5 +25,11 @@ describe('TOTP enrollment', () => {
   it('rejects an incorrect token', () => {
     const enrollment = generateTotpEnrollment('admin@example.com');
     expect(verifyTotpToken(enrollment.secret, '000000')).toBe(false);
+  });
+
+  it('renders the otpauth URL as a scannable QR code data URL', async () => {
+    const enrollment = generateTotpEnrollment('admin@example.com');
+    const dataUrl = await generateQrCodeDataUrl(enrollment.otpauthUrl);
+    expect(dataUrl).toMatch(/^data:image\/png;base64,/);
   });
 });

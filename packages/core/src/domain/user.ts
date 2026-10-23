@@ -53,6 +53,7 @@ export const updateUserInputSchema = userSchema
     fullName: true,
     email: true,
     isActive: true,
+    totpSecret: true,
   })
   .partial();
 

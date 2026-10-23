@@ -1,4 +1,5 @@
 import { test, expect, type Page } from '@playwright/test';
+import { Secret, TOTP } from 'otpauth';
 
 /**
  * Radix's Select is a custom listbox, not a native <select>: clicking the
@@ -218,6 +219,25 @@ test('completes setup, then exercises school management, register, and gradebook
   await page.goto('/dashboard/audit-log');
   await expect(page.getByRole('heading', { name: 'Audit log' })).toBeVisible();
   await expect(page.getByText('No audit entries recorded yet.')).not.toBeVisible();
+
+  // --- Admin enables, then disables, two-factor authentication ---
+  await page.goto('/dashboard/account');
+  await page.getByRole('button', { name: 'Enable two-factor authentication' }).click();
+  await expect(page.getByLabel('6-digit code')).toBeVisible({ timeout: 10_000 });
+  const secretText = await page.locator('code').innerText();
+  const totp = new TOTP({
+    algorithm: 'SHA1',
+    digits: 6,
+    period: 30,
+    secret: Secret.fromBase32(secretText),
+  });
+  await page.getByLabel('6-digit code').fill(totp.generate());
+  await page.getByRole('button', { name: 'Confirm' }).click();
+  await expect(page.getByText('Two-factor authentication is enabled.')).toBeVisible();
+  await page.getByRole('button', { name: 'Disable' }).click();
+  await expect(
+    page.getByRole('button', { name: 'Enable two-factor authentication' }),
+  ).toBeVisible();
 
   // --- Teacher takes the class register ---
   await signIn(page, TEACHER_EMAIL, TEACHER_PASSWORD);
