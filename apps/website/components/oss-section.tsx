@@ -22,17 +22,23 @@ export function OssSection() {
             students&apos; data, run it anywhere, and modify it to fit your own policies.
           </p>
         </div>
-        <div className="flex flex-col gap-4 rounded-lg border border-border bg-surface p-6">
+        <div className="flex flex-col gap-4 rounded-xl border border-border bg-surface p-6 shadow-soft">
           <div className="flex items-center gap-3">
-            <Scale className="h-5 w-5 text-primary" />
+            <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary/10 text-primary">
+              <Scale className="h-5 w-5" />
+            </span>
             <span className="font-medium">AGPL-3.0 licensed</span>
           </div>
           <div className="flex items-center gap-3">
-            <GitPullRequest className="h-5 w-5 text-primary" />
+            <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary/10 text-primary">
+              <GitPullRequest className="h-5 w-5" />
+            </span>
             <span className="font-medium">Contributions welcome</span>
           </div>
           <div className="flex items-center gap-3">
-            <Heart className="h-5 w-5 text-primary" />
+            <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary/10 text-primary">
+              <Heart className="h-5 w-5" />
+            </span>
             <span className="font-medium">No per-student fees, ever</span>
           </div>
           <Button asChild variant="outline" className="mt-2">

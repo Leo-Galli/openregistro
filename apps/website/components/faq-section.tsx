@@ -1,3 +1,5 @@
+import { ChevronDown } from 'lucide-react';
+
 const FAQ_ITEMS = [
   {
     question: 'What do I need to self-host it?',
@@ -25,12 +27,15 @@ export function FaqSection() {
   return (
     <section id="faq" className="border-t border-border">
       <div className="mx-auto max-w-3xl px-6 py-20">
-        <h2 className="font-display text-3xl font-semibold">Frequently asked questions</h2>
+        <h2 className="font-display text-3xl font-semibold tracking-tight">
+          Frequently asked questions
+        </h2>
         <div className="mt-8 flex flex-col divide-y divide-border">
           {FAQ_ITEMS.map((item) => (
             <details key={item.question} className="group py-4">
-              <summary className="cursor-pointer list-none font-medium marker:content-none">
+              <summary className="flex cursor-pointer list-none items-center justify-between font-medium marker:content-none">
                 {item.question}
+                <ChevronDown className="h-4 w-4 shrink-0 text-muted-foreground transition-transform group-open:rotate-180" />
               </summary>
               <p className="mt-3 text-muted-foreground">{item.answer}</p>
             </details>

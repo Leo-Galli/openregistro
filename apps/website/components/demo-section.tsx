@@ -1,5 +1,5 @@
 import { ExternalLink } from 'lucide-react';
-import { Button } from '@openregistro/ui';
+import { Badge, Button } from '@openregistro/ui';
 
 const DEMO_URL = 'https://openregistro-demo.vercel.app';
 const DEMO_PASSWORD = 'DemoPassword123!';
@@ -32,7 +32,7 @@ export function DemoSection() {
     <section id="demo" className="border-t border-border">
       <div className="mx-auto max-w-6xl px-6 py-20">
         <div className="mb-12 max-w-2xl">
-          <h2 className="font-display text-3xl font-semibold">Try the live demo</h2>
+          <h2 className="font-display text-3xl font-semibold tracking-tight">Try the live demo</h2>
           <p className="mt-3 text-muted-foreground">
             This is the real application, not a mockup - a running instance seeded with fictional
             data, with one login per role so you can see what each kind of user actually sees. It is
@@ -50,7 +50,7 @@ export function DemoSection() {
           </Button>
         </div>
 
-        <div className="overflow-x-auto rounded-lg border border-border">
+        <div className="overflow-x-auto rounded-xl border border-border shadow-soft">
           <table className="w-full border-collapse text-left text-sm">
             <thead>
               <tr className="border-b border-border bg-muted/40">
@@ -63,7 +63,11 @@ export function DemoSection() {
             <tbody>
               {DEMO_ACCOUNTS.map((account) => (
                 <tr key={account.email} className="border-b border-border last:border-0">
-                  <td className="px-4 py-3 font-medium">{account.role}</td>
+                  <td className="px-4 py-3">
+                    <Badge variant="outline" className="font-medium">
+                      {account.role}
+                    </Badge>
+                  </td>
                   <td className="px-4 py-3 font-mono text-xs">{account.email}</td>
                   <td className="px-4 py-3 font-mono text-xs">{DEMO_PASSWORD}</td>
                   <td className="px-4 py-3 text-muted-foreground">{account.description}</td>

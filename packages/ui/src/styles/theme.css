@@ -6,8 +6,10 @@
  * the dense data screens stay calm instead of clinical. Deliberately not
  * purple/indigo and not glassmorphic.
  *
- * Fonts: Fraunces (display, used for marketing headings and the wordmark)
- * paired with Geist Sans (UI/data) for maximum legibility in dense tables.
+ * Fonts: Space Grotesk (display, used for marketing headings and the
+ * wordmark - a geometric grotesk with enough character to stay distinctive
+ * without reading as old-fashioned) paired with Geist Sans (UI/data) for
+ * maximum legibility in dense tables.
  *
  * Both are consumed by Tailwind v4 via `@theme`, which turns every custom
  * property below into a utility (e.g. `--color-primary-600` becomes
@@ -21,7 +23,7 @@
    * this file never needs to know the actual @font-face names next/font
    * generates - only the fallback stack if a font fails to load.
    */
-  --font-display: var(--font-fraunces), ui-serif, Georgia, serif;
+  --font-display: var(--font-space-grotesk), ui-sans-serif, system-ui, sans-serif;
   --font-ui: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
   --font-mono: var(--font-geist-mono), ui-monospace, monospace;
 
@@ -56,13 +58,14 @@
   --color-danger-500: #b3261e;
   --color-danger-600: #8c1e18;
 
-  --radius-sm: 0.25rem;
-  --radius-md: 0.5rem;
-  --radius-lg: 0.75rem;
-  --radius-xl: 1rem;
+  --radius-sm: 0.375rem;
+  --radius-md: 0.625rem;
+  --radius-lg: 0.875rem;
+  --radius-xl: 1.25rem;
+  --radius-2xl: 1.75rem;
 
   --shadow-soft: 0 1px 2px 0 rgb(36 30 25 / 0.06), 0 1px 3px 0 rgb(36 30 25 / 0.08);
-  --shadow-raised: 0 2px 4px -1px rgb(36 30 25 / 0.08), 0 4px 8px -2px rgb(36 30 25 / 0.1);
+  --shadow-raised: 0 4px 10px -2px rgb(36 30 25 / 0.1), 0 10px 24px -6px rgb(36 30 25 / 0.12);
 }
 
 :root {

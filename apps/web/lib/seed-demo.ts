@@ -17,7 +17,9 @@ export async function seedDemoData(storage: StorageDriver): Promise<void> {
       address: 'Via Esempio 1, 00100 Roma',
       contactEmail: 'segreteria@demo.openregistro.local',
       logoUrl: null,
-      primaryColor: '#16304a',
+      // Deliberately distinct from the default ink-blue so the public demo
+      // visibly demonstrates per-school brand color customization.
+      primaryColor: '#0d7a6b',
     });
   }
 

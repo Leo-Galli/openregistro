@@ -27,7 +27,7 @@ export const ToastViewport = forwardRef<
 ToastViewport.displayName = ToastPrimitive.Viewport.displayName;
 
 export const toastVariants = cva(
-  'pointer-events-auto relative flex w-full items-start gap-3 rounded-md border p-4 shadow-raised data-[state=open]:animate-in data-[state=closed]:animate-out data-[swipe=end]:animate-out data-[state=closed]:fade-out-80',
+  'pointer-events-auto relative flex w-full items-start gap-3 rounded-xl border p-4 shadow-raised data-[state=open]:animate-in data-[state=closed]:animate-out data-[swipe=end]:animate-out data-[state=closed]:fade-out-80',
   {
     variants: {
       variant: {

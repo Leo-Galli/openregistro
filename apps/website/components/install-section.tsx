@@ -3,11 +3,11 @@ const DOCKER_COMMAND = 'docker compose up';
 
 function CodeBlock({ lines }: { lines: string[] }) {
   return (
-    <pre className="overflow-x-auto rounded-lg border border-border bg-surface p-4 font-mono text-sm">
+    <pre className="overflow-x-auto rounded-xl bg-neutral-900 p-5 font-mono text-sm text-neutral-100 shadow-raised">
       <code>
         {lines.map((line) => (
           <div key={line}>
-            <span className="select-none text-muted-foreground">$ </span>
+            <span className="select-none text-neutral-500">$ </span>
             {line}
           </div>
         ))}
@@ -21,7 +21,7 @@ export function InstallSection() {
     <section id="install" className="border-t border-border bg-muted/40">
       <div className="mx-auto max-w-6xl px-6 py-20">
         <div className="mb-12 max-w-2xl">
-          <h2 className="font-display text-3xl font-semibold">Install in minutes</h2>
+          <h2 className="font-display text-3xl font-semibold tracking-tight">Install in minutes</h2>
           <p className="mt-3 text-muted-foreground">
             No database required to try it out - the JSON driver stores everything as plain files on
             disk.
