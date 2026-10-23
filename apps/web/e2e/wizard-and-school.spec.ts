@@ -172,6 +172,19 @@ test('completes setup, then exercises school management, register, and gradebook
   await expect(page.getByRole('dialog')).toBeHidden();
   await expect(page.getByRole('cell', { name: 'First trimester' })).toBeVisible();
 
+  // --- Admin schedules a lesson on the timetable ---
+  await page.goto('/dashboard/timetable');
+  await page.getByRole('link', { name: '3A' }).click();
+  await expect(page.getByRole('heading', { name: /3A timetable/ })).toBeVisible({
+    timeout: 30_000,
+  });
+
+  await page.getByRole('button', { name: 'Add lesson' }).first().click();
+  await expect(page.getByRole('dialog', { name: 'Add a lesson' })).toBeVisible();
+  await page.getByRole('button', { name: 'Add' }).click();
+  await expect(page.getByRole('dialog')).toBeHidden();
+  await expect(page.getByText('Luigi Bianchi')).toBeVisible();
+
   // --- Teacher takes the class register ---
   await signIn(page, TEACHER_EMAIL, TEACHER_PASSWORD);
 
