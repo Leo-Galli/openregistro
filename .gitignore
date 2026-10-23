@@ -60,3 +60,9 @@ Thumbs.db
 # Misc
 *.pem
 .eslintcache
+
+# AI agent-skill files installed by Vercel marketplace integrations (e.g.
+# `vercel integration add neon`) - vendor documentation, not project source.
+.agents/
+.claude/
+skills-lock.json

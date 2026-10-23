@@ -1,0 +1,16 @@
+node_modules
+.pnpm-store
+.next
+.turbo
+out
+dist
+build
+coverage
+playwright-report
+test-results
+blob-report
+apps/web/.e2e-data
+apps/web/data
+data
+*.tsbuildinfo
+.git
