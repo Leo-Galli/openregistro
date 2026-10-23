@@ -39,6 +39,8 @@ const TEACHER_EMAIL = 'luigi.bianchi@scuolaplaywright.it';
 const TEACHER_PASSWORD = 'TeacherPass123!';
 const STUDENT_EMAIL = 'sara.rossi@scuolaplaywright.it';
 const STUDENT_PASSWORD = 'StudentPass123!';
+const GUARDIAN_EMAIL = 'anna.rossi@scuolaplaywright.it';
+const GUARDIAN_PASSWORD = 'GuardianPass123!';
 
 // A single test, not several: this sandbox's Chromium reliably crashes
 // (`browserContext.newPage: Target crashed`) the moment Playwright opens a
@@ -142,6 +144,18 @@ test('completes setup, then exercises school management, register, and gradebook
   await expect(page.getByRole('dialog')).toBeHidden();
   await expect(page.getByRole('cell', { name: 'Sara Rossi' })).toBeVisible();
 
+  await page.getByRole('button', { name: 'New person' }).click();
+  await expect(page.getByRole('dialog', { name: 'New account' })).toBeVisible();
+  await chooseOption(page, 'Role', 'Guardian');
+  await page.getByLabel('Full name').fill('Anna Rossi');
+  await page.getByLabel('Email').fill(GUARDIAN_EMAIL);
+  await page.getByLabel('Temporary password').fill(GUARDIAN_PASSWORD);
+  await page.getByLabel('Confirm').fill(GUARDIAN_PASSWORD);
+  await chooseOption(page, 'Link to student', 'Sara Rossi');
+  await page.getByRole('button', { name: 'Create account' }).click();
+  await expect(page.getByRole('dialog')).toBeHidden();
+  await expect(page.getByRole('cell', { name: 'Anna Rossi' })).toBeVisible();
+
   // --- Admin enrolls the student and assigns the teacher ---
   await page.goto('/dashboard/school/classes');
   await page.getByRole('link', { name: 'Manage' }).click();
@@ -195,6 +209,16 @@ test('completes setup, then exercises school management, register, and gradebook
   await page.getByRole('button', { name: 'Publish' }).click();
   await expect(page.getByRole('dialog')).toBeHidden();
   await expect(page.getByRole('heading', { name: 'Welcome back' })).toBeVisible();
+
+  // --- Admin adds a calendar event ---
+  await page.goto('/dashboard/calendar');
+  await page.getByRole('button', { name: 'New event' }).click();
+  await expect(page.getByRole('dialog', { name: 'New calendar event' })).toBeVisible();
+  await page.getByLabel('Title').fill('Open day');
+  await page.getByLabel('Date').fill('2025-11-15');
+  await page.getByRole('button', { name: 'Save' }).click();
+  await expect(page.getByRole('dialog')).toBeHidden();
+  await expect(page.getByText('Open day')).toBeVisible();
 
   // --- Admin deactivates, then reactivates, the teacher's account ---
   await page.goto('/dashboard/school/people');
@@ -297,6 +321,27 @@ test('completes setup, then exercises school management, register, and gradebook
   await page.getByRole('button', { name: 'Save' }).click();
   await expect(page.getByRole('dialog')).toBeHidden();
   await expect(page.getByText('Talked during the test.')).toBeVisible();
+
+  // --- Teacher offers a parent-teacher meeting slot ---
+  await page.goto('/dashboard/meetings');
+  await page.getByRole('button', { name: 'New meeting slot' }).click();
+  await expect(page.getByRole('dialog', { name: 'New meeting slot' })).toBeVisible();
+  await page.getByLabel('Starts at').fill('2025-11-20T15:00');
+  await page.getByLabel('Ends at').fill('2025-11-20T15:15');
+  await page.getByRole('button', { name: 'Save' }).click();
+  await expect(page.getByRole('dialog')).toBeHidden();
+  await expect(page.getByText(/0\/1 booked/)).toBeVisible();
+
+  // --- Guardian books the meeting slot for her child ---
+  await signIn(page, GUARDIAN_EMAIL, GUARDIAN_PASSWORD);
+
+  await page.goto('/dashboard/meetings');
+  await expect(page.getByText(/1 spot\(s\) left/)).toBeVisible();
+  await page.getByRole('button', { name: 'Book' }).click();
+  await expect(page.getByRole('dialog', { name: 'Book this meeting' })).toBeVisible();
+  await page.getByRole('button', { name: 'Confirm booking' }).click();
+  await expect(page.getByRole('dialog')).toBeHidden();
+  await expect(page.getByText('No meeting slots available right now.')).toBeVisible();
 
   // --- Student justifies her own absence ---
   await signIn(page, STUDENT_EMAIL, STUDENT_PASSWORD);
