@@ -19,7 +19,17 @@ export default defineConfig({
     trace: 'retain-on-failure',
     navigationTimeout: 20_000,
   },
-  projects: [{ name: 'chromium', use: { ...devices['Desktop Chrome'] } }],
+  projects: [
+    {
+      name: 'chromium',
+      use: {
+        ...devices['Desktop Chrome'],
+        launchOptions: {
+          args: ['--disable-dev-shm-usage', '--disable-gpu', '--no-sandbox'],
+        },
+      },
+    },
+  ],
   webServer: {
     command: 'pnpm exec next dev --port ' + PORT,
     url: `http://localhost:${PORT}`,

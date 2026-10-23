@@ -1,7 +1,5 @@
 import { test, expect, type Page } from '@playwright/test';
 
-test.describe.configure({ mode: 'serial' });
-
 /**
  * Radix's Select is a custom listbox, not a native <select>: clicking the
  * trigger opens an animated popover, and this sandbox's dev server can be
@@ -35,7 +33,17 @@ const TEACHER_PASSWORD = 'TeacherPass123!';
 const STUDENT_EMAIL = 'sara.rossi@scuolaplaywright.it';
 const STUDENT_PASSWORD = 'StudentPass123!';
 
-test('completes the setup wizard and logs in', async ({ page }) => {
+// A single test, not several: this sandbox's Chromium reliably crashes
+// (`browserContext.newPage: Target crashed`) the moment Playwright opens a
+// second page/context in the same run, regardless of launch flags or
+// available memory. One long test keeps everything on the one page Playwright
+// opens for the run. See CLAUDE.md Phase 5c notes before re-splitting this.
+test('completes setup, then exercises school management, register, and gradebook', async ({
+  page,
+}) => {
+  test.setTimeout(180_000);
+
+  // --- Setup wizard ---
   await page.goto('/');
   await expect(page).toHaveURL(/\/setup\/welcome$/);
   await expect(page.getByText(/Node\.js \d/)).toBeVisible();
@@ -73,11 +81,8 @@ test('completes the setup wizard and logs in', async ({ page }) => {
   // Revisiting the wizard must be permanently blocked.
   await page.goto('/setup/welcome');
   await expect(page).toHaveURL(/\/dashboard$/);
-});
 
-test('admin manages a class through the UI', async ({ page }) => {
-  await signIn(page, ADMIN_EMAIL, ADMIN_PASSWORD);
-
+  // --- Admin manages a class ---
   await page.goto('/dashboard/school/classes');
   await expect(page.getByText('No classes yet.')).toBeVisible();
 
@@ -96,11 +101,8 @@ test('admin manages a class through the UI', async ({ page }) => {
   // cold-compiles it on demand in dev mode, which can take several seconds.
   await expect(page.getByRole('heading', { name: /3A/ })).toBeVisible({ timeout: 30_000 });
   await expect(page.getByText('No students enrolled yet.')).toBeVisible();
-});
 
-test('admin creates a subject, a teacher, and a student', async ({ page }) => {
-  await signIn(page, ADMIN_EMAIL, ADMIN_PASSWORD);
-
+  // --- Admin creates a subject, a teacher, and a student ---
   await page.goto('/dashboard/school/subjects');
   await page.getByRole('button', { name: 'New subject' }).click();
   await page.getByLabel('Name').fill('Mathematics');
@@ -132,11 +134,8 @@ test('admin creates a subject, a teacher, and a student', async ({ page }) => {
   await page.getByRole('button', { name: 'Create account' }).click();
   await expect(page.getByRole('dialog')).toBeHidden();
   await expect(page.getByRole('cell', { name: 'Sara Rossi' })).toBeVisible();
-});
 
-test('admin enrolls the student and assigns the teacher', async ({ page }) => {
-  await signIn(page, ADMIN_EMAIL, ADMIN_PASSWORD);
-
+  // --- Admin enrolls the student and assigns the teacher ---
   await page.goto('/dashboard/school/classes');
   await page.getByRole('link', { name: 'Manage' }).click();
   await expect(page.getByRole('heading', { name: /3A/ })).toBeVisible({ timeout: 30_000 });
@@ -155,9 +154,19 @@ test('admin enrolls the student and assigns the teacher', async ({ page }) => {
   await page.getByRole('button', { name: 'Assign' }).click();
   await expect(page.getByRole('dialog')).toBeHidden();
   await expect(page.getByText(/Mathematics.*Luigi Bianchi/)).toBeVisible();
-});
 
-test('teacher takes the class register', async ({ page }) => {
+  // --- Admin creates a term ---
+  await page.goto('/dashboard/school/terms');
+  await page.getByRole('button', { name: 'New term' }).click();
+  await expect(page.getByRole('dialog', { name: 'New term' })).toBeVisible();
+  await page.getByLabel('Label').fill('First trimester');
+  await page.getByLabel('Starts on').fill('2025-09-01');
+  await page.getByLabel('Ends on').fill('2025-12-20');
+  await page.getByRole('button', { name: 'Create' }).click();
+  await expect(page.getByRole('dialog')).toBeHidden();
+  await expect(page.getByRole('cell', { name: 'First trimester' })).toBeVisible();
+
+  // --- Teacher takes the class register ---
   await signIn(page, TEACHER_EMAIL, TEACHER_PASSWORD);
 
   await page.goto('/dashboard/register');
@@ -176,4 +185,17 @@ test('teacher takes the class register', async ({ page }) => {
   await page.getByRole('option', { name: 'Late' }).click();
   await page.getByRole('button', { name: 'Save attendance' }).click();
   await expect(page.getByText('Attendance saved.')).toBeVisible();
+
+  // --- Teacher enters a grade ---
+  await page.goto('/dashboard/gradebook');
+  await page.getByRole('link', { name: /3A/ }).click();
+  await expect(page).toHaveURL(/\/dashboard\/gradebook\//, { timeout: 30_000 });
+  await expect(page.getByRole('heading', { name: /Mathematics/ })).toBeVisible({ timeout: 30_000 });
+
+  await page.getByRole('button', { name: 'Add grade' }).click();
+  await expect(page.getByRole('dialog', { name: /New grade for Sara Rossi/ })).toBeVisible();
+  await page.getByLabel('Value').fill('8');
+  await page.getByRole('button', { name: 'Save grade' }).click();
+  await expect(page.getByRole('dialog')).toBeHidden();
+  await expect(page.getByText('8.00')).toBeVisible();
 });

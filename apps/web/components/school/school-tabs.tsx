@@ -8,6 +8,7 @@ const TABS = [
   { href: '/dashboard/school/classes', label: 'Classes' },
   { href: '/dashboard/school/subjects', label: 'Subjects' },
   { href: '/dashboard/school/people', label: 'People' },
+  { href: '/dashboard/school/terms', label: 'Terms' },
 ];
 
 export function SchoolTabs() {
