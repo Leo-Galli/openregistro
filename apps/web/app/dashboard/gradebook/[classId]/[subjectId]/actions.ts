@@ -13,6 +13,7 @@ import {
 import { auth } from '@/auth';
 import { requirePermission, userIdOf } from '@/lib/authz';
 import { getStorage } from '@/lib/storage';
+import { logAudit } from '@/lib/audit';
 
 const gradeFormSchema = z.object({
   classId: z.string().uuid(),
@@ -60,7 +61,7 @@ export async function createGrade(
       return { ok: false, formError: 'You are not assigned to teach this subject in this class.' };
     }
 
-    await storage.grades.create({
+    const grade = await storage.grades.create({
       studentId: userIdSchema.parse(parsed.data.studentId),
       classId,
       subjectId,
@@ -71,6 +72,19 @@ export async function createGrade(
       weight: parsed.data.weight,
       date: parsed.data.date,
       note: parsed.data.note || null,
+    });
+
+    await logAudit(storage, {
+      actorId: teacherId,
+      action: 'create',
+      entityKind: 'grade',
+      entityId: grade.id,
+      after: {
+        studentId: grade.studentId,
+        value: grade.value,
+        weight: grade.weight,
+        type: grade.type,
+      },
     });
 
     revalidatePath(`/dashboard/gradebook/${classId}/${subjectId}`);

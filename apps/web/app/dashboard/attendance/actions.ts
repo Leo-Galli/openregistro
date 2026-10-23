@@ -10,6 +10,7 @@ import {
 import { auth } from '@/auth';
 import { requirePermission, userIdOf } from '@/lib/authz';
 import { getStorage } from '@/lib/storage';
+import { logAudit } from '@/lib/audit';
 
 const justifySchema = z.object({
   attendanceRecordId: z.string().uuid(),
@@ -91,11 +92,21 @@ export async function reviewJustification(
 
   try {
     const storage = await getStorage();
-    await storage.absenceJustifications.review(
-      absenceJustificationIdSchema.parse(parsed.data.justificationId),
+    const justificationId = absenceJustificationIdSchema.parse(parsed.data.justificationId);
+    const justification = await storage.absenceJustifications.review(
+      justificationId,
       parsed.data.decision,
       reviewerId,
     );
+
+    await logAudit(storage, {
+      actorId: reviewerId,
+      action: 'update',
+      entityKind: 'absence_justification',
+      entityId: justification.id,
+      after: { status: justification.status },
+    });
+
     revalidatePath('/dashboard/attendance');
     return { ok: true };
   } catch (error) {

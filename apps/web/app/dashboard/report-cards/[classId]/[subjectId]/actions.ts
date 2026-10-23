@@ -12,6 +12,7 @@ import {
 import { auth } from '@/auth';
 import { requirePermission, userIdOf } from '@/lib/authz';
 import { getStorage } from '@/lib/storage';
+import { logAudit } from '@/lib/audit';
 
 const evaluationFormSchema = z.object({
   classId: z.string().uuid(),
@@ -70,18 +71,33 @@ export async function saveTermEvaluation(
     const [existingEvaluation] = existing;
 
     if (existingEvaluation) {
-      await storage.termEvaluations.update(existingEvaluation.id, {
+      const updated = await storage.termEvaluations.update(existingEvaluation.id, {
         finalGrade: parsed.data.finalGrade,
         comment: parsed.data.comment || null,
       });
+      await logAudit(storage, {
+        actorId: decidedBy,
+        action: 'update',
+        entityKind: 'term_evaluation',
+        entityId: updated.id,
+        before: { finalGrade: existingEvaluation.finalGrade, comment: existingEvaluation.comment },
+        after: { finalGrade: updated.finalGrade, comment: updated.comment },
+      });
     } else {
-      await storage.termEvaluations.create({
+      const created = await storage.termEvaluations.create({
         studentId,
         subjectId,
         termId,
         finalGrade: parsed.data.finalGrade,
         comment: parsed.data.comment || null,
         decidedBy,
+      });
+      await logAudit(storage, {
+        actorId: decidedBy,
+        action: 'create',
+        entityKind: 'term_evaluation',
+        entityId: created.id,
+        after: { studentId: created.studentId, finalGrade: created.finalGrade },
       });
     }
 

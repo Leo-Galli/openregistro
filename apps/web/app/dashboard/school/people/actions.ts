@@ -4,9 +4,10 @@ import { z } from 'zod';
 import { revalidatePath } from 'next/cache';
 import { userIdSchema } from '@openregistro/core';
 import { auth } from '@/auth';
-import { requirePermission, schoolIdOf } from '@/lib/authz';
+import { requirePermission, schoolIdOf, userIdOf } from '@/lib/authz';
 import { getStorage } from '@/lib/storage';
 import { hashPassword } from '@/lib/password';
+import { logAudit } from '@/lib/audit';
 
 const personFormSchema = z
   .object({
@@ -70,6 +71,14 @@ export async function createPerson(
         isPrimaryContact: true,
       });
     }
+
+    await logAudit(storage, {
+      actorId: userIdOf(session!),
+      action: 'create',
+      entityKind: 'user',
+      entityId: user.id,
+      after: { role: user.role, email: user.email, fullName: user.fullName },
+    });
 
     revalidatePath('/dashboard/school/people');
     return { ok: true };
