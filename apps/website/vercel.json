@@ -3,5 +3,7 @@
   "buildCommand": "cd ../.. && pnpm --filter @openregistro/website build",
   "outputDirectory": "out",
   "installCommand": "cd ../.. && pnpm install --frozen-lockfile",
-  "framework": null
+  "framework": null,
+  "cleanUrls": true,
+  "trailingSlash": false
 }
