@@ -3,7 +3,7 @@
 # packages/* it depends on), not the whole monorepo (apps/website, e2e specs,
 # other packages' devDependencies, etc).
 
-FROM node:22-alpine AS base
+FROM node:25-alpine AS base
 RUN corepack enable
 WORKDIR /app
 
@@ -29,7 +29,7 @@ ENV AUTH_SECRET=build-time-placeholder-not-used-at-runtime
 RUN pnpm turbo run build --filter=@openregistro/web
 
 # --- Runtime ---
-FROM node:22-alpine AS runner
+FROM node:25-alpine AS runner
 RUN corepack enable
 WORKDIR /app
 ENV NODE_ENV=production
