@@ -19,6 +19,12 @@ async function chooseOption(page: Page, triggerLabel: string, optionName: string
 
 async function signIn(page: Page, email: string, password: string) {
   await page.goto('/login');
+  // /login redirects an already-authenticated session straight to /dashboard,
+  // so switching users mid-test must sign out of the previous session first.
+  if (new URL(page.url()).pathname === '/dashboard') {
+    await page.getByRole('button', { name: 'Sign out' }).click();
+    await expect(page).toHaveURL(/\/login$/);
+  }
   await expect(page).toHaveURL(/\/login$/);
   await page.getByLabel('Email').fill(email);
   await page.getByLabel('Password').fill(password);
@@ -182,7 +188,7 @@ test('completes setup, then exercises school management, register, and gradebook
   const studentRow = page.getByRole('row').filter({ hasText: 'Sara Rossi' });
   await studentRow.getByRole('combobox').click();
   await expect(page.getByRole('listbox')).toBeVisible();
-  await page.getByRole('option', { name: 'Late' }).click();
+  await page.getByRole('option', { name: 'Absent', exact: true }).click();
   await page.getByRole('button', { name: 'Save attendance' }).click();
   await expect(page.getByText('Attendance saved.')).toBeVisible();
 
@@ -198,4 +204,25 @@ test('completes setup, then exercises school management, register, and gradebook
   await page.getByRole('button', { name: 'Save grade' }).click();
   await expect(page.getByRole('dialog')).toBeHidden();
   await expect(page.getByText('8.00')).toBeVisible();
+
+  // --- Student justifies her own absence ---
+  await signIn(page, STUDENT_EMAIL, STUDENT_PASSWORD);
+
+  await page.goto('/dashboard/attendance');
+  await expect(page.getByRole('cell', { name: 'Absent' })).toBeVisible();
+  await page.getByRole('button', { name: 'Justify' }).click();
+  await expect(page.getByRole('dialog', { name: /Justify absence on/ })).toBeVisible();
+  await page.getByLabel('Reason').fill('Medical appointment.');
+  await page.getByRole('button', { name: 'Submit' }).click();
+  await expect(page.getByRole('dialog')).toBeHidden();
+  await expect(page.getByText('pending')).toBeVisible();
+
+  // --- Admin reviews and approves the justification ---
+  await signIn(page, ADMIN_EMAIL, ADMIN_PASSWORD);
+
+  await page.goto('/dashboard/attendance');
+  await expect(page.getByRole('heading', { name: 'Pending justifications' })).toBeVisible();
+  await expect(page.getByRole('cell', { name: 'Medical appointment.' })).toBeVisible();
+  await page.getByRole('button', { name: 'Approve' }).click();
+  await expect(page.getByText('No pending justifications.')).toBeVisible();
 });
