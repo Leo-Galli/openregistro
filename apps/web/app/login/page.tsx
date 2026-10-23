@@ -21,18 +21,24 @@ export default async function LoginPage() {
 
   return (
     <div
-      className="mx-auto flex min-h-screen w-full max-w-sm flex-col justify-center px-4"
+      className="relative flex min-h-screen w-full flex-col items-center justify-center overflow-hidden px-4"
       style={brandColorStyle(school?.primaryColor)}
     >
-      <Card>
-        <CardHeader>
-          <CardTitle className="font-display">OpenRegistro</CardTitle>
-          <CardDescription>Sign in to your school register.</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <LoginForm />
-        </CardContent>
-      </Card>
+      <div
+        aria-hidden
+        className="pointer-events-none absolute left-1/2 top-[-14rem] h-[30rem] w-[56rem] -translate-x-1/2 rounded-full bg-primary/15 blur-3xl"
+      />
+      <div className="relative w-full max-w-sm">
+        <Card className="shadow-raised">
+          <CardHeader>
+            <CardTitle className="font-display text-xl">{school?.name ?? 'OpenRegistro'}</CardTitle>
+            <CardDescription>Sign in to your school register.</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <LoginForm />
+          </CardContent>
+        </Card>
+      </div>
     </div>
   );
 }

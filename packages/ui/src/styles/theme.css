@@ -64,12 +64,18 @@
   --radius-xl: 1.25rem;
   --radius-2xl: 1.75rem;
 
-  --shadow-soft: 0 1px 2px 0 rgb(36 30 25 / 0.06), 0 1px 3px 0 rgb(36 30 25 / 0.08);
+  --shadow-soft: 0 1px 3px 0 rgb(36 30 25 / 0.08), 0 2px 6px 0 rgb(36 30 25 / 0.07);
   --shadow-raised: 0 4px 10px -2px rgb(36 30 25 / 0.1), 0 10px 24px -6px rgb(36 30 25 / 0.12);
 }
 
 :root {
-  --color-background: var(--color-neutral-50);
+  /*
+   * A visible step below --color-surface (pure white) - cards and other
+   * raised surfaces need actual contrast against the page to read as
+   * elevated, not just as a thin outline. --color-neutral-50 was too close
+   * to white for that.
+   */
+  --color-background: var(--color-neutral-100);
   --color-foreground: var(--color-neutral-900);
   --color-surface: #ffffff;
   --color-surface-foreground: var(--color-neutral-900);

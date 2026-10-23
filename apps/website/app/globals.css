@@ -1,6 +1,15 @@
 @import 'tailwindcss';
 @import '@openregistro/ui/theme.css';
 
+/*
+ * Tailwind's automatic content detection does not reliably reach into a
+ * workspace package's source - a utility class used only inside
+ * packages/ui/src (and not coincidentally duplicated in this app's own
+ * files) silently never gets generated, with no build error. This
+ * explicitly guarantees the shared design system is always scanned.
+ */
+@source '../../../packages/ui/src/**/*.{ts,tsx}';
+
 @layer base {
   html {
     font-family: var(--font-ui);
