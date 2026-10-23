@@ -7,7 +7,10 @@ export interface LoginState {
   error?: string;
 }
 
-export async function authenticate(_prevState: LoginState, formData: FormData): Promise<LoginState> {
+export async function authenticate(
+  _prevState: LoginState,
+  formData: FormData,
+): Promise<LoginState> {
   try {
     await signIn('credentials', {
       email: formData.get('email'),

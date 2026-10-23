@@ -40,7 +40,9 @@ export function AdminForm() {
       <div className="flex flex-col gap-1.5">
         <Label htmlFor="email">Email</Label>
         <Input id="email" name="email" type="email" autoComplete="email" required />
-        {state.fieldErrors?.email ? <p className="text-sm text-destructive">{state.fieldErrors.email}</p> : null}
+        {state.fieldErrors?.email ? (
+          <p className="text-sm text-destructive">{state.fieldErrors.email}</p>
+        ) : null}
       </div>
 
       <div className="flex flex-col gap-1.5">

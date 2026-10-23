@@ -29,9 +29,13 @@ export default async function DashboardPage() {
   return (
     <div className="flex flex-col gap-6">
       <div>
-        <h1 className="font-display text-2xl font-semibold">{overview.school?.name ?? 'Your school'}</h1>
+        <h1 className="font-display text-2xl font-semibold">
+          {overview.school?.name ?? 'Your school'}
+        </h1>
         <p className="text-sm text-muted-foreground">
-          {overview.schoolYear ? `School year ${overview.schoolYear.label}` : 'No active school year set'}
+          {overview.schoolYear
+            ? `School year ${overview.schoolYear.label}`
+            : 'No active school year set'}
         </p>
       </div>
 

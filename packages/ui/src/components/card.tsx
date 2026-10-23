@@ -5,7 +5,10 @@ export const Card = forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivElement>>(
   ({ className, ...props }, ref) => (
     <div
       ref={ref}
-      className={cn('rounded-lg border border-border bg-surface text-surface-foreground shadow-soft', className)}
+      className={cn(
+        'rounded-lg border border-border bg-surface text-surface-foreground shadow-soft',
+        className,
+      )}
       {...props}
     />
   ),
@@ -23,20 +26,27 @@ export const CardTitle = forwardRef<HTMLHeadingElement, HTMLAttributes<HTMLHeadi
   ({ className, ...props }, ref) => (
     // children (the actual heading content) always arrives via ...props from the caller.
     // eslint-disable-next-line jsx-a11y/heading-has-content
-    <h3 ref={ref} className={cn('font-display text-lg font-semibold leading-none', className)} {...props} />
+    <h3
+      ref={ref}
+      className={cn('font-display text-lg font-semibold leading-none', className)}
+      {...props}
+    />
   ),
 );
 CardTitle.displayName = 'CardTitle';
 
-export const CardDescription = forwardRef<HTMLParagraphElement, HTMLAttributes<HTMLParagraphElement>>(
-  ({ className, ...props }, ref) => (
-    <p ref={ref} className={cn('text-sm text-muted-foreground', className)} {...props} />
-  ),
-);
+export const CardDescription = forwardRef<
+  HTMLParagraphElement,
+  HTMLAttributes<HTMLParagraphElement>
+>(({ className, ...props }, ref) => (
+  <p ref={ref} className={cn('text-sm text-muted-foreground', className)} {...props} />
+));
 CardDescription.displayName = 'CardDescription';
 
 export const CardContent = forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivElement>>(
-  ({ className, ...props }, ref) => <div ref={ref} className={cn('p-6 pt-0', className)} {...props} />,
+  ({ className, ...props }, ref) => (
+    <div ref={ref} className={cn('p-6 pt-0', className)} {...props} />
+  ),
 );
 CardContent.displayName = 'CardContent';
 

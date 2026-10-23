@@ -19,7 +19,11 @@ import { getStorage } from '@/lib/storage';
 import { EnrollStudentDialog } from '@/components/school/enroll-student-dialog';
 import { AssignTeacherDialog } from '@/components/school/assign-teacher-dialog';
 
-export default async function ClassDetailPage({ params }: { params: Promise<{ classId: string }> }) {
+export default async function ClassDetailPage({
+  params,
+}: {
+  params: Promise<{ classId: string }>;
+}) {
   const { classId } = await params;
   const session = await auth();
   const schoolId = schoolIdOf(session!);
@@ -30,13 +34,15 @@ export default async function ClassDetailPage({ params }: { params: Promise<{ cl
   const klass = await storage.classes.findById(parsedClassId.data);
   if (!klass || klass.schoolId !== schoolId) notFound();
 
-  const [allEnrollments, allStudents, allSubjects, allTeachers, allAssignments] = await Promise.all([
-    storage.enrollments.findMany({ classId: klass.id }),
-    storage.users.findMany({ schoolId, role: 'student' }),
-    storage.subjects.findMany({ schoolId }),
-    storage.users.findMany({ schoolId, role: 'teacher' }),
-    storage.teacherAssignments.findMany({ classId: klass.id }),
-  ]);
+  const [allEnrollments, allStudents, allSubjects, allTeachers, allAssignments] = await Promise.all(
+    [
+      storage.enrollments.findMany({ classId: klass.id }),
+      storage.users.findMany({ schoolId, role: 'student' }),
+      storage.subjects.findMany({ schoolId }),
+      storage.users.findMany({ schoolId, role: 'teacher' }),
+      storage.teacherAssignments.findMany({ classId: klass.id }),
+    ],
+  );
 
   const activeEnrollments = allEnrollments.filter((enrollment) => !enrollment.withdrawnAt);
   const enrolledStudentIds = new Set(activeEnrollments.map((enrollment) => enrollment.studentId));
@@ -58,7 +64,10 @@ export default async function ClassDetailPage({ params }: { params: Promise<{ cl
           <CardTitle>Roster</CardTitle>
           <EnrollStudentDialog
             classId={klass.id}
-            students={availableStudents.map((student) => ({ id: student.id, fullName: student.fullName }))}
+            students={availableStudents.map((student) => ({
+              id: student.id,
+              fullName: student.fullName,
+            }))}
           />
         </CardHeader>
         <CardContent>
@@ -78,7 +87,9 @@ export default async function ClassDetailPage({ params }: { params: Promise<{ cl
                   const student = studentsById.get(enrollment.studentId);
                   return (
                     <TableRow key={enrollment.id}>
-                      <TableCell className="font-medium">{student?.fullName ?? 'Unknown'}</TableCell>
+                      <TableCell className="font-medium">
+                        {student?.fullName ?? 'Unknown'}
+                      </TableCell>
                       <TableCell>{student?.email}</TableCell>
                       <TableCell>{enrollment.enrolledAt}</TableCell>
                     </TableRow>
@@ -106,7 +117,8 @@ export default async function ClassDetailPage({ params }: { params: Promise<{ cl
             allAssignments.map((assignment) => (
               <Badge key={assignment.id} variant="secondary">
                 {subjectsById.get(assignment.subjectId)?.name ?? 'Unknown subject'} ·{' '}
-                {teachersById.get(assignment.teacherId)?.fullName ?? 'Unknown teacher'} ({assignment.weeklyHours}h)
+                {teachersById.get(assignment.teacherId)?.fullName ?? 'Unknown teacher'} (
+                {assignment.weeklyHours}h)
               </Badge>
             ))
           )}

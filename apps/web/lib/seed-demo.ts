@@ -57,7 +57,11 @@ export async function seedDemoData(storage: StorageDriver): Promise<void> {
 
   const mathSubject =
     (await storage.subjects.findMany({ schoolId: school.id, name: 'Mathematics' }))[0] ??
-    (await storage.subjects.create({ schoolId: school.id, name: 'Mathematics', shortCode: 'MATH' }));
+    (await storage.subjects.create({
+      schoolId: school.id,
+      name: 'Mathematics',
+      shortCode: 'MATH',
+    }));
 
   const literatureSubject =
     (await storage.subjects.findMany({ schoolId: school.id, name: 'Italian Literature' }))[0] ??
@@ -105,7 +109,8 @@ export async function seedDemoData(storage: StorageDriver): Promise<void> {
       }));
     students.push(student);
 
-    const alreadyEnrolled = (await storage.enrollments.findMany({ studentId: student.id })).length > 0;
+    const alreadyEnrolled =
+      (await storage.enrollments.findMany({ studentId: student.id })).length > 0;
     if (!alreadyEnrolled) {
       await storage.enrollments.create({
         studentId: student.id,
@@ -131,8 +136,8 @@ export async function seedDemoData(storage: StorageDriver): Promise<void> {
       }));
 
     const alreadyLinked =
-      (await storage.guardianships.findMany({ guardianId: guardian.id, studentId: student.id })).length >
-      0;
+      (await storage.guardianships.findMany({ guardianId: guardian.id, studentId: student.id }))
+        .length > 0;
     if (!alreadyLinked) {
       await storage.guardianships.create({
         guardianId: guardian.id,

@@ -1,5 +1,12 @@
 import Link from 'next/link';
-import { Button, Card, CardContent, CardDescription, CardHeader, CardTitle } from '@openregistro/ui';
+import {
+  Button,
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@openregistro/ui';
 
 export default function ForbiddenPage() {
   return (
@@ -7,7 +14,9 @@ export default function ForbiddenPage() {
       <Card>
         <CardHeader>
           <CardTitle>Access denied</CardTitle>
-          <CardDescription>Your account role does not have permission to view this page.</CardDescription>
+          <CardDescription>
+            Your account role does not have permission to view this page.
+          </CardDescription>
         </CardHeader>
         <CardContent>
           <Button asChild>

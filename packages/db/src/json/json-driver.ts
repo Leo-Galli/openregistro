@@ -111,7 +111,10 @@ export interface JsonDriverOptions {
 export function createJsonStorageDriver(options: JsonDriverOptions): StorageDriver {
   const { dataDir } = options;
   const installerFilePath = path.join(dataDir, 'installer-state.json');
-  const installerStore = new JsonFileStore<InstallerState>(installerFilePath, DEFAULT_INSTALLER_STATE);
+  const installerStore = new JsonFileStore<InstallerState>(
+    installerFilePath,
+    DEFAULT_INSTALLER_STATE,
+  );
   const installerLockPath = `${installerFilePath}.lock`;
 
   const settingsFilePath = path.join(dataDir, 'app-settings.json');
@@ -130,7 +133,10 @@ export function createJsonStorageDriver(options: JsonDriverOptions): StorageDriv
     guardianships: new JsonCollection<Guardianship>(dataDir, 'guardianships'),
     lessonLogs: new JsonCollection<LessonLog>(dataDir, 'lesson-logs'),
     attendanceRecords: new JsonCollection<AttendanceRecord>(dataDir, 'attendance-records'),
-    absenceJustifications: new JsonCollection<AbsenceJustification>(dataDir, 'absence-justifications'),
+    absenceJustifications: new JsonCollection<AbsenceJustification>(
+      dataDir,
+      'absence-justifications',
+    ),
     grades: new JsonCollection<Grade>(dataDir, 'grades'),
     disciplinaryNotes: new JsonCollection<DisciplinaryNote>(dataDir, 'disciplinary-notes'),
     homeworkAssignments: new JsonCollection<HomeworkAssignment>(dataDir, 'homework-assignments'),
@@ -217,11 +223,13 @@ export function createJsonStorageDriver(options: JsonDriverOptions): StorageDriv
       mapCreate: (input, { id, now }) => ({ ...input, id, createdAt: now, updatedAt: now }),
     }),
 
-    schoolYears: createJsonCrudRepository<SchoolYear, CreateSchoolYearInput, UpdateSchoolYearInput>({
-      collection: collections.schoolYears,
-      schema: schoolYearSchema,
-      mapCreate: (input, { id, now }) => ({ ...input, id, createdAt: now, updatedAt: now }),
-    }),
+    schoolYears: createJsonCrudRepository<SchoolYear, CreateSchoolYearInput, UpdateSchoolYearInput>(
+      {
+        collection: collections.schoolYears,
+        schema: schoolYearSchema,
+        mapCreate: (input, { id, now }) => ({ ...input, id, createdAt: now, updatedAt: now }),
+      },
+    ),
 
     terms: createJsonCrudRepository<Term, CreateTermInput, UpdateTermInput>({
       collection: collections.terms,
@@ -241,7 +249,10 @@ export function createJsonStorageDriver(options: JsonDriverOptions): StorageDriv
       mapCreate: (input, { id, now }) => ({ ...input, id, createdAt: now, updatedAt: now }),
     }),
 
-    teacherAssignments: createJsonCreateOnlyRepository<TeacherAssignment, CreateTeacherAssignmentInput>({
+    teacherAssignments: createJsonCreateOnlyRepository<
+      TeacherAssignment,
+      CreateTeacherAssignmentInput
+    >({
       collection: collections.teacherAssignments,
       schema: teacherAssignmentSchema,
       mapCreate: (input, { id, now }) => ({ ...input, id, createdAt: now, updatedAt: now }),
@@ -295,7 +306,11 @@ export function createJsonStorageDriver(options: JsonDriverOptions): StorageDriv
           updatedAt: now,
         }),
       }),
-      async review(id: AbsenceJustificationId, status: 'approved' | 'rejected', reviewedBy: string) {
+      async review(
+        id: AbsenceJustificationId,
+        status: 'approved' | 'rejected',
+        reviewedBy: string,
+      ) {
         const existing = await collections.absenceJustifications.findById(id);
         if (!existing) throw new NotFoundError('absenceJustifications', id);
         const now = new Date().toISOString();
@@ -316,7 +331,10 @@ export function createJsonStorageDriver(options: JsonDriverOptions): StorageDriv
       mapCreate: (input, { id, now }) => ({ ...input, id, createdAt: now, updatedAt: now }),
     }),
 
-    disciplinaryNotes: createJsonCreateOnlyRepository<DisciplinaryNote, CreateDisciplinaryNoteInput>({
+    disciplinaryNotes: createJsonCreateOnlyRepository<
+      DisciplinaryNote,
+      CreateDisciplinaryNoteInput
+    >({
       collection: collections.disciplinaryNotes,
       schema: disciplinaryNoteSchema,
       mapCreate: (input, { id, now }) => ({ ...input, id, createdAt: now, updatedAt: now }),
@@ -348,7 +366,11 @@ export function createJsonStorageDriver(options: JsonDriverOptions): StorageDriv
       mapCreate: (input, { id, now }) => ({ ...input, id, createdAt: now, updatedAt: now }),
     }),
 
-    meetingSlots: createJsonCrudRepository<MeetingSlot, CreateMeetingSlotInput, UpdateMeetingSlotInput>({
+    meetingSlots: createJsonCrudRepository<
+      MeetingSlot,
+      CreateMeetingSlotInput,
+      UpdateMeetingSlotInput
+    >({
       collection: collections.meetingSlots,
       schema: meetingSlotSchema,
       mapCreate: (input, { id, now }) => ({ ...input, id, createdAt: now, updatedAt: now }),

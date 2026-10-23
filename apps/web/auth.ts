@@ -32,7 +32,11 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         if (!parsed.success) return null;
         const { email, password, totp } = parsed.data;
 
-        const rateLimit = checkRateLimit(`login:${email.toLowerCase()}`, LOGIN_ATTEMPT_LIMIT, LOGIN_ATTEMPT_WINDOW_MS);
+        const rateLimit = checkRateLimit(
+          `login:${email.toLowerCase()}`,
+          LOGIN_ATTEMPT_LIMIT,
+          LOGIN_ATTEMPT_WINDOW_MS,
+        );
         if (!rateLimit.allowed) return null;
 
         const storage = await getStorage();

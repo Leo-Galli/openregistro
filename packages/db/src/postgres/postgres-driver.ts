@@ -406,7 +406,10 @@ export function createPostgresStorageDriver(options: PostgresDriverOptions): Sto
 
     get absenceJustifications() {
       const db = requireDb();
-      const base = createPgCreateOnlyRepository<AbsenceJustification, CreateAbsenceJustificationInput>({
+      const base = createPgCreateOnlyRepository<
+        AbsenceJustification,
+        CreateAbsenceJustificationInput
+      >({
         db,
         table: absenceJustificationsTable,
         schema: absenceJustificationSchema,
@@ -422,7 +425,11 @@ export function createPostgresStorageDriver(options: PostgresDriverOptions): Sto
       });
       return {
         ...base,
-        async review(id: AbsenceJustificationId, status: 'approved' | 'rejected', reviewedBy: string) {
+        async review(
+          id: AbsenceJustificationId,
+          status: 'approved' | 'rejected',
+          reviewedBy: string,
+        ) {
           const now = new Date().toISOString();
           const [row] = await db
             .update(absenceJustificationsTable)
@@ -511,27 +518,28 @@ export function createPostgresStorageDriver(options: PostgresDriverOptions): Sto
     },
 
     get announcements() {
-      return createPgCrudRepository<
-        Announcement,
-        CreateAnnouncementInput,
-        UpdateAnnouncementInput
-      >({
-        db: requireDb(),
-        table: announcementsTable,
-        schema: announcementSchema,
-        entityName: 'Announcement',
-        mapCreate: (input, { id, now }) => ({
-          ...input,
-          id,
-          publishedAt: now,
-          createdAt: now,
-          updatedAt: now,
-        }),
-      });
+      return createPgCrudRepository<Announcement, CreateAnnouncementInput, UpdateAnnouncementInput>(
+        {
+          db: requireDb(),
+          table: announcementsTable,
+          schema: announcementSchema,
+          entityName: 'Announcement',
+          mapCreate: (input, { id, now }) => ({
+            ...input,
+            id,
+            publishedAt: now,
+            createdAt: now,
+            updatedAt: now,
+          }),
+        },
+      );
     },
 
     get announcementReadReceipts() {
-      return createPgAppendOnlyRepository<AnnouncementReadReceipt, CreateAnnouncementReadReceiptInput>({
+      return createPgAppendOnlyRepository<
+        AnnouncementReadReceipt,
+        CreateAnnouncementReadReceiptInput
+      >({
         db: requireDb(),
         table: announcementReadReceiptsTable,
         schema: announcementReadReceiptSchema,

@@ -38,7 +38,9 @@ export function CreateSubjectDialog() {
           <div className="flex flex-col gap-1.5">
             <Label htmlFor="name">Name</Label>
             <Input id="name" name="name" placeholder="Mathematics" required />
-            {state.fieldErrors?.name ? <p className="text-sm text-destructive">{state.fieldErrors.name}</p> : null}
+            {state.fieldErrors?.name ? (
+              <p className="text-sm text-destructive">{state.fieldErrors.name}</p>
+            ) : null}
           </div>
           <div className="flex flex-col gap-1.5">
             <Label htmlFor="shortCode">Short code</Label>

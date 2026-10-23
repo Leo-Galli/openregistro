@@ -24,8 +24,8 @@ export function DriverTestPanel({ driver }: { driver: 'json' | 'postgres' }) {
           Detected storage driver: <span className="font-medium">{driver}</span>
         </p>
         <p className="mt-1 text-muted-foreground">
-          Set via the <code>STORAGE_DRIVER</code> environment variable. To use the other
-          driver, stop the app, change the environment, and restart.
+          Set via the <code>STORAGE_DRIVER</code> environment variable. To use the other driver,
+          stop the app, change the environment, and restart.
         </p>
       </div>
 
@@ -36,11 +36,7 @@ export function DriverTestPanel({ driver }: { driver: 'json' | 'postgres' }) {
 
       {result ? (
         <Alert variant={result.ok ? 'success' : 'destructive'}>
-          {result.ok ? (
-            <CheckCircle2 className="h-5 w-5" />
-          ) : (
-            <XCircle className="h-5 w-5" />
-          )}
+          {result.ok ? <CheckCircle2 className="h-5 w-5" /> : <XCircle className="h-5 w-5" />}
           <AlertDescription>{result.message}</AlertDescription>
         </Alert>
       ) : null}

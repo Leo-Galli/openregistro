@@ -13,7 +13,9 @@ export default async function SchoolPage() {
       <Card>
         <CardHeader>
           <CardTitle>Your school</CardTitle>
-          <CardDescription>This appears on report cards and in email notifications.</CardDescription>
+          <CardDescription>
+            This appears on report cards and in email notifications.
+          </CardDescription>
         </CardHeader>
         <CardContent>
           <SchoolForm

@@ -40,7 +40,9 @@ export function CreateClassDialog() {
           <div className="flex flex-col gap-1.5">
             <Label htmlFor="name">Name</Label>
             <Input id="name" name="name" placeholder="3A" required />
-            {state.fieldErrors?.name ? <p className="text-sm text-destructive">{state.fieldErrors.name}</p> : null}
+            {state.fieldErrors?.name ? (
+              <p className="text-sm text-destructive">{state.fieldErrors.name}</p>
+            ) : null}
           </div>
           <div className="flex flex-col gap-1.5">
             <Label htmlFor="gradeLevel">Grade level</Label>

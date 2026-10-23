@@ -18,7 +18,10 @@ import {
   SelectValue,
 } from '@openregistro/ui';
 import { SubmitButton } from '@/components/submit-button';
-import { assignTeacher, type SimpleActionState } from '@/app/dashboard/school/classes/[classId]/actions';
+import {
+  assignTeacher,
+  type SimpleActionState,
+} from '@/app/dashboard/school/classes/[classId]/actions';
 
 const initialState: SimpleActionState = { ok: false };
 
@@ -86,7 +89,16 @@ export function AssignTeacherDialog({
           </div>
           <div className="flex flex-col gap-1.5">
             <Label htmlFor="weeklyHours">Weekly hours</Label>
-            <Input id="weeklyHours" name="weeklyHours" type="number" step="0.5" min="0.5" max="40" defaultValue="2" required />
+            <Input
+              id="weeklyHours"
+              name="weeklyHours"
+              type="number"
+              step="0.5"
+              min="0.5"
+              max="40"
+              defaultValue="2"
+              required
+            />
           </div>
           {state.formError ? <p className="text-sm text-destructive">{state.formError}</p> : null}
           <DialogFooter>

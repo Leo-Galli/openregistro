@@ -46,7 +46,10 @@ export async function enrollStudent(
     revalidatePath(`/dashboard/school/classes/${classId}`);
     return { ok: true };
   } catch (error) {
-    return { ok: false, formError: error instanceof Error ? error.message : 'Could not enroll the student.' };
+    return {
+      ok: false,
+      formError: error instanceof Error ? error.message : 'Could not enroll the student.',
+    };
   }
 }
 
@@ -81,7 +84,9 @@ export async function assignTeacher(
     revalidatePath(`/dashboard/school/classes/${classId}`);
     return { ok: true };
   } catch (error) {
-    return { ok: false, formError: error instanceof Error ? error.message : 'Could not create the assignment.' };
+    return {
+      ok: false,
+      formError: error instanceof Error ? error.message : 'Could not create the assignment.',
+    };
   }
 }
-

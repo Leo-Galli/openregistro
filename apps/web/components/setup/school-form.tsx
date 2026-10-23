@@ -42,7 +42,9 @@ export function SchoolForm({ defaults }: { defaults: SchoolFormDefaults }) {
       <div className="flex flex-col gap-1.5">
         <Label htmlFor="name">School name</Label>
         <Input id="name" name="name" defaultValue={defaults.name} required />
-        {state.fieldErrors?.name ? <p className="text-sm text-destructive">{state.fieldErrors.name}</p> : null}
+        {state.fieldErrors?.name ? (
+          <p className="text-sm text-destructive">{state.fieldErrors.name}</p>
+        ) : null}
       </div>
 
       <div className="flex flex-col gap-1.5">
@@ -53,7 +55,12 @@ export function SchoolForm({ defaults }: { defaults: SchoolFormDefaults }) {
       <div className="grid grid-cols-2 gap-4">
         <div className="flex flex-col gap-1.5">
           <Label htmlFor="contactEmail">Contact email (optional)</Label>
-          <Input id="contactEmail" name="contactEmail" type="email" defaultValue={defaults.contactEmail} />
+          <Input
+            id="contactEmail"
+            name="contactEmail"
+            type="email"
+            defaultValue={defaults.contactEmail}
+          />
           {state.fieldErrors?.contactEmail ? (
             <p className="text-sm text-destructive">{state.fieldErrors.contactEmail}</p>
           ) : null}
@@ -74,7 +81,13 @@ export function SchoolForm({ defaults }: { defaults: SchoolFormDefaults }) {
 
       <div className="flex flex-col gap-1.5">
         <Label htmlFor="yearLabel">Current school year label</Label>
-        <Input id="yearLabel" name="yearLabel" placeholder="2025/2026" defaultValue={defaults.yearLabel} required />
+        <Input
+          id="yearLabel"
+          name="yearLabel"
+          placeholder="2025/2026"
+          defaultValue={defaults.yearLabel}
+          required
+        />
         {state.fieldErrors?.yearLabel ? (
           <p className="text-sm text-destructive">{state.fieldErrors.yearLabel}</p>
         ) : null}
@@ -83,7 +96,13 @@ export function SchoolForm({ defaults }: { defaults: SchoolFormDefaults }) {
       <div className="grid grid-cols-2 gap-4">
         <div className="flex flex-col gap-1.5">
           <Label htmlFor="startDate">Starts on</Label>
-          <Input id="startDate" name="startDate" type="date" defaultValue={defaults.startDate} required />
+          <Input
+            id="startDate"
+            name="startDate"
+            type="date"
+            defaultValue={defaults.startDate}
+            required
+          />
         </div>
         <div className="flex flex-col gap-1.5">
           <Label htmlFor="endDate">Ends on</Label>

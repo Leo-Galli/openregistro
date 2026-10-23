@@ -12,7 +12,9 @@ export default async function SmtpPage() {
       <Card>
         <CardHeader>
           <CardTitle>Email</CardTitle>
-          <CardDescription>Used for notifications, meeting confirmations, and password resets.</CardDescription>
+          <CardDescription>
+            Used for notifications, meeting confirmations, and password resets.
+          </CardDescription>
         </CardHeader>
         <CardContent>
           <SmtpForm

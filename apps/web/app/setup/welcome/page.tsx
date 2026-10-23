@@ -1,6 +1,13 @@
 import Link from 'next/link';
 import { CheckCircle2, XCircle } from 'lucide-react';
-import { Button, Card, CardContent, CardDescription, CardHeader, CardTitle } from '@openregistro/ui';
+import {
+  Button,
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@openregistro/ui';
 import { WizardShell } from '@/components/setup/wizard-shell';
 import { getEnv } from '@/lib/env';
 import { getStorage } from '@/lib/storage';
@@ -51,7 +58,10 @@ export default async function WelcomePage() {
         </CardHeader>
         <CardContent className="flex flex-col gap-6">
           <ul className="flex flex-col gap-2 rounded-md border border-border bg-muted/40 p-4">
-            <CheckRow ok={nodeOk} label={`Node.js ${process.versions.node} (requires ${MIN_NODE_MAJOR}+)`} />
+            <CheckRow
+              ok={nodeOk}
+              label={`Node.js ${process.versions.node} (requires ${MIN_NODE_MAJOR}+)`}
+            />
             <CheckRow
               ok={storageOk}
               label={`Storage driver "${env.STORAGE_DRIVER}" is reachable`}

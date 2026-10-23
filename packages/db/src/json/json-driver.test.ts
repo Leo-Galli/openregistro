@@ -44,7 +44,13 @@ describe('json storage driver', () => {
 
   it('persists SMTP settings', async () => {
     const settings = await driver.settings.update({
-      smtp: { host: 'smtp.example.com', port: 587, user: 'relay', password: 'secret', from: 'OpenRegistro <no-reply@example.com>' },
+      smtp: {
+        host: 'smtp.example.com',
+        port: 587,
+        user: 'relay',
+        password: 'secret',
+        from: 'OpenRegistro <no-reply@example.com>',
+      },
     });
     expect(settings.smtp).toEqual({
       host: 'smtp.example.com',
@@ -58,7 +64,13 @@ describe('json storage driver', () => {
 
   it('clears SMTP settings', async () => {
     await driver.settings.update({
-      smtp: { host: 'smtp.example.com', port: 587, user: null, password: null, from: 'no-reply@example.com' },
+      smtp: {
+        host: 'smtp.example.com',
+        port: 587,
+        user: null,
+        password: null,
+        from: 'no-reply@example.com',
+      },
     });
     const cleared = await driver.settings.update({ smtp: null });
     expect(cleared.smtp).toBeNull();

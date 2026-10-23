@@ -79,7 +79,9 @@ describe.skipIf(!connectionString)('postgres storage driver', () => {
     await db.delete(schoolYearsTable);
     await db.delete(usersTable);
     await db.delete(schoolsTable);
-    await db.update(installerStateTable).set({ completed: false, completedAt: null, storageDriver: null });
+    await db
+      .update(installerStateTable)
+      .set({ completed: false, completedAt: null, storageDriver: null });
   });
 
   it('reports healthy once connected', async () => {

@@ -1,7 +1,14 @@
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import { CheckCircle2 } from 'lucide-react';
-import { Button, Card, CardContent, CardDescription, CardHeader, CardTitle } from '@openregistro/ui';
+import {
+  Button,
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@openregistro/ui';
 import { WizardShell } from '@/components/setup/wizard-shell';
 import { AdminForm } from '@/components/setup/admin-form';
 import { getStorage } from '@/lib/storage';

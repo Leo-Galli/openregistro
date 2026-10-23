@@ -13,7 +13,13 @@ export {
   CardFooter,
 } from './components/card';
 export { Badge, badgeVariants, type BadgeProps } from './components/badge';
-export { Alert, AlertTitle, AlertDescription, alertVariants, type AlertProps } from './components/alert';
+export {
+  Alert,
+  AlertTitle,
+  AlertDescription,
+  alertVariants,
+  type AlertProps,
+} from './components/alert';
 export { Checkbox } from './components/checkbox';
 export { Switch } from './components/switch';
 export { Separator } from './components/separator';

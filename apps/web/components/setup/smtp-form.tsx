@@ -53,20 +53,29 @@ export function SmtpForm({ defaults }: { defaults: SmtpFormDefaults }) {
   return (
     <form action={formAction} className="flex flex-col gap-5">
       <p className="text-sm text-muted-foreground">
-        Optional. Skip this step if you don&apos;t have an SMTP relay yet - you can configure
-        email later.
+        Optional. Skip this step if you don&apos;t have an SMTP relay yet - you can configure email
+        later.
       </p>
 
       <div className="grid grid-cols-3 gap-4">
         <div className="col-span-2 flex flex-col gap-1.5">
           <Label htmlFor="host">SMTP host</Label>
-          <Input id="host" name="host" placeholder="smtp.example.com" defaultValue={defaults.host} />
-          {state.fieldErrors?.host ? <p className="text-sm text-destructive">{state.fieldErrors.host}</p> : null}
+          <Input
+            id="host"
+            name="host"
+            placeholder="smtp.example.com"
+            defaultValue={defaults.host}
+          />
+          {state.fieldErrors?.host ? (
+            <p className="text-sm text-destructive">{state.fieldErrors.host}</p>
+          ) : null}
         </div>
         <div className="flex flex-col gap-1.5">
           <Label htmlFor="port">Port</Label>
           <Input id="port" name="port" type="number" defaultValue={defaults.port} />
-          {state.fieldErrors?.port ? <p className="text-sm text-destructive">{state.fieldErrors.port}</p> : null}
+          {state.fieldErrors?.port ? (
+            <p className="text-sm text-destructive">{state.fieldErrors.port}</p>
+          ) : null}
         </div>
       </div>
 
@@ -89,7 +98,9 @@ export function SmtpForm({ defaults }: { defaults: SmtpFormDefaults }) {
           placeholder="OpenRegistro <no-reply@example.com>"
           defaultValue={defaults.from}
         />
-        {state.fieldErrors?.from ? <p className="text-sm text-destructive">{state.fieldErrors.from}</p> : null}
+        {state.fieldErrors?.from ? (
+          <p className="text-sm text-destructive">{state.fieldErrors.from}</p>
+        ) : null}
       </div>
 
       <div className="flex flex-col gap-1.5">

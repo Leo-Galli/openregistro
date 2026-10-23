@@ -1,11 +1,4 @@
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@openregistro/ui';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@openregistro/ui';
 import { auth } from '@/auth';
 import { schoolIdOf } from '@/lib/authz';
 import { getStorage } from '@/lib/storage';

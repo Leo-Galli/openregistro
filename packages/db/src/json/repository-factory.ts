@@ -56,7 +56,9 @@ export function createJsonCrudRepository<T extends WithId, CreateInput, UpdateIn
       const existing = await collection.findById(id);
       if (!existing) throw new NotFoundError(collection.name, id);
       const now = nowIso();
-      const merged = mapUpdate ? mapUpdate(existing, patch, now) : { ...existing, ...patch, updatedAt: now };
+      const merged = mapUpdate
+        ? mapUpdate(existing, patch, now)
+        : { ...existing, ...patch, updatedAt: now };
       const entity = schema.parse(merged);
       return collection.replace(id, entity);
     },

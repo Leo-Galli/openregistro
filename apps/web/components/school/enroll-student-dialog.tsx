@@ -17,7 +17,10 @@ import {
   SelectValue,
 } from '@openregistro/ui';
 import { SubmitButton } from '@/components/submit-button';
-import { enrollStudent, type SimpleActionState } from '@/app/dashboard/school/classes/[classId]/actions';
+import {
+  enrollStudent,
+  type SimpleActionState,
+} from '@/app/dashboard/school/classes/[classId]/actions';
 
 const initialState: SimpleActionState = { ok: false };
 
@@ -26,7 +29,13 @@ interface StudentOption {
   fullName: string;
 }
 
-export function EnrollStudentDialog({ classId, students }: { classId: string; students: StudentOption[] }) {
+export function EnrollStudentDialog({
+  classId,
+  students,
+}: {
+  classId: string;
+  students: StudentOption[];
+}) {
   const [open, setOpen] = useState(false);
   const [state, formAction] = useActionState(enrollStudent, initialState);
 

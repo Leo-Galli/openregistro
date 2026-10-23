@@ -67,7 +67,11 @@ export function createPgCrudRepository<T extends WithId, CreateInput, UpdateInpu
 
   return {
     async findById(id: string): Promise<T | null> {
-      const rows = await db.select().from(table).where(eq(idColumn(table), id)).limit(1);
+      const rows = await db
+        .select()
+        .from(table)
+        .where(eq(idColumn(table), id))
+        .limit(1);
       return rows[0] ? schema.parse(rows[0]) : null;
     },
     async findMany(filter?: Partial<T>): Promise<T[]> {
@@ -86,11 +90,17 @@ export function createPgCrudRepository<T extends WithId, CreateInput, UpdateInpu
       return schema.parse(row);
     },
     async update(id: string, patch: UpdateInput): Promise<T> {
-      const existingRows = await db.select().from(table).where(eq(idColumn(table), id)).limit(1);
+      const existingRows = await db
+        .select()
+        .from(table)
+        .where(eq(idColumn(table), id))
+        .limit(1);
       const existing = existingRows[0] ? schema.parse(existingRows[0]) : null;
       if (!existing) throw new NotFoundError(entityName, id);
       const now = nowIso();
-      const merged = mapUpdate ? mapUpdate(existing, patch, now) : { ...existing, ...patch, updatedAt: now };
+      const merged = mapUpdate
+        ? mapUpdate(existing, patch, now)
+        : { ...existing, ...patch, updatedAt: now };
       const entity = schema.parse(merged);
       const [row] = await db
         .update(table)
@@ -115,7 +125,11 @@ export function createPgCreateOnlyRepository<T extends WithId, CreateInput>(opti
 
   return {
     async findById(id: string): Promise<T | null> {
-      const rows = await db.select().from(table).where(eq(idColumn(table), id)).limit(1);
+      const rows = await db
+        .select()
+        .from(table)
+        .where(eq(idColumn(table), id))
+        .limit(1);
       return rows[0] ? schema.parse(rows[0]) : null;
     },
     async findMany(filter?: Partial<T>): Promise<T[]> {

@@ -43,6 +43,9 @@ export async function createSubject(
     revalidatePath('/dashboard/school/subjects');
     return { ok: true };
   } catch (error) {
-    return { ok: false, formError: error instanceof Error ? error.message : 'Could not create the subject.' };
+    return {
+      ok: false,
+      formError: error instanceof Error ? error.message : 'Could not create the subject.',
+    };
   }
 }

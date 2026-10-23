@@ -32,14 +32,17 @@ export function DashboardNav({ role }: { role: Role }) {
   return (
     <nav className="flex gap-1 overflow-x-auto border-b border-border px-6" aria-label="Main">
       {items.map((item) => {
-        const active = item.href === '/dashboard' ? pathname === item.href : pathname.startsWith(item.href);
+        const active =
+          item.href === '/dashboard' ? pathname === item.href : pathname.startsWith(item.href);
         return (
           <Link
             key={item.href}
             href={item.href}
             className={cn(
               'whitespace-nowrap border-b-2 px-3 py-2.5 text-sm font-medium transition-colors',
-              active ? 'border-primary text-primary' : 'border-transparent text-muted-foreground hover:text-foreground',
+              active
+                ? 'border-primary text-primary'
+                : 'border-transparent text-muted-foreground hover:text-foreground',
             )}
           >
             {item.label}

@@ -63,7 +63,11 @@ export function CreatePersonDialog({ students }: { students: StudentOption[] }) 
         <form action={formAction} className="flex flex-col gap-4">
           <div className="flex flex-col gap-1.5">
             <Label htmlFor="role">Role</Label>
-            <Select name="role" value={role} onValueChange={(value) => setRole(value as typeof role)}>
+            <Select
+              name="role"
+              value={role}
+              onValueChange={(value) => setRole(value as typeof role)}
+            >
               <SelectTrigger id="role">
                 <SelectValue />
               </SelectTrigger>
@@ -86,7 +90,9 @@ export function CreatePersonDialog({ students }: { students: StudentOption[] }) 
           <div className="flex flex-col gap-1.5">
             <Label htmlFor="email">Email</Label>
             <Input id="email" name="email" type="email" required />
-            {state.fieldErrors?.email ? <p className="text-sm text-destructive">{state.fieldErrors.email}</p> : null}
+            {state.fieldErrors?.email ? (
+              <p className="text-sm text-destructive">{state.fieldErrors.email}</p>
+            ) : null}
           </div>
 
           <div className="grid grid-cols-2 gap-4">

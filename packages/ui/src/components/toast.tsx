@@ -1,4 +1,9 @@
-import { forwardRef, type ComponentPropsWithoutRef, type ElementRef, type ReactElement } from 'react';
+import {
+  forwardRef,
+  type ComponentPropsWithoutRef,
+  type ElementRef,
+  type ReactElement,
+} from 'react';
 import * as ToastPrimitive from '@radix-ui/react-toast';
 import { cva, type VariantProps } from 'class-variance-authority';
 import { X } from 'lucide-react';
@@ -66,7 +71,10 @@ export const ToastClose = forwardRef<
 >(({ className, ...props }, ref) => (
   <ToastPrimitive.Close
     ref={ref}
-    className={cn('absolute right-2 top-2 rounded-sm opacity-60 transition-opacity hover:opacity-100', className)}
+    className={cn(
+      'absolute right-2 top-2 rounded-sm opacity-60 transition-opacity hover:opacity-100',
+      className,
+    )}
     toast-close=""
     {...props}
   >
@@ -87,7 +95,11 @@ export const ToastDescription = forwardRef<
   ElementRef<typeof ToastPrimitive.Description>,
   ComponentPropsWithoutRef<typeof ToastPrimitive.Description>
 >(({ className, ...props }, ref) => (
-  <ToastPrimitive.Description ref={ref} className={cn('text-sm opacity-90', className)} {...props} />
+  <ToastPrimitive.Description
+    ref={ref}
+    className={cn('text-sm opacity-90', className)}
+    {...props}
+  />
 ));
 ToastDescription.displayName = ToastPrimitive.Description.displayName;
 
