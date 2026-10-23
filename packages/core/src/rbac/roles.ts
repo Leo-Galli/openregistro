@@ -93,6 +93,7 @@ export const ROLE_PERMISSIONS: Record<Role, readonly Permission[]> = {
     'register:read',
     'grades:read',
     'attendance:read',
+    'attendance:justify',
     'homework:read',
     'announcements:read',
     'calendar:read',

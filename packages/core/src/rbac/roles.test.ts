@@ -23,6 +23,11 @@ describe('hasPermission', () => {
     expect(hasPermission('guardian', 'attendance:justify')).toBe(true);
     expect(hasPermission('guardian', 'attendance:write')).toBe(false);
   });
+
+  it('grants students the ability to justify their own absences', () => {
+    expect(hasPermission('student', 'attendance:justify')).toBe(true);
+    expect(hasPermission('student', 'attendance:write')).toBe(false);
+  });
 });
 
 describe('hasAnyPermission', () => {

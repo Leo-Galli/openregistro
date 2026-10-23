@@ -89,7 +89,7 @@ export function AddGradeDialog({
                 name="weight"
                 type="number"
                 step="0.5"
-                min="0.1"
+                min="0"
                 max="5"
                 defaultValue="1"
                 required
