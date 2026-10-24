@@ -40,7 +40,12 @@ const editFormSchema = z.object({
   schoolName: z.string().min(1).max(200),
   contactName: z.string().min(1).max(200),
   contactEmail: z.string().email(),
-  approxStudents: z.coerce.number().int().min(1).max(100000).optional(),
+  // An empty number input submits "" in FormData - z.coerce.number() would
+  // coerce that to 0 and fail .min(1), so blank must become undefined first.
+  approxStudents: z.preprocess(
+    (value) => (value === '' ? undefined : value),
+    z.coerce.number().int().min(1).max(100000).optional(),
+  ),
   message: z.string().max(2000).optional(),
 });
 
