@@ -1,7 +1,6 @@
 import { Scale, Heart, GitPullRequest } from 'lucide-react';
 import { Button } from '@openregistro/ui';
-
-const REPO_URL = 'https://github.com/Leo-Galli/openregistro';
+import { REPO_URL } from '@/lib/constants';
 
 export function OssSection() {
   return (

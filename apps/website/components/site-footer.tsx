@@ -1,6 +1,5 @@
 import Link from 'next/link';
-
-const REPO_URL = 'https://github.com/Leo-Galli/openregistro';
+import { REPO_URL } from '@/lib/constants';
 
 export function SiteFooter() {
   return (
@@ -21,6 +20,9 @@ export function SiteFooter() {
           </a>
           <Link href="/docs" className="hover:text-foreground">
             Docs
+          </Link>
+          <Link href="/host" className="hover:text-foreground">
+            Free hosting
           </Link>
         </div>
       </div>

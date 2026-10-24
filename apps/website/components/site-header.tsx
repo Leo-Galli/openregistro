@@ -1,15 +1,15 @@
 import Link from 'next/link';
 import { Github } from 'lucide-react';
 import { Button } from '@openregistro/ui';
+import { REPO_URL } from '@/lib/constants';
 
 const NAV_LINKS = [
   { href: '/#features', label: 'Features' },
   { href: '/#install', label: 'Install' },
+  { href: '/host', label: 'Free hosting' },
   { href: '/#faq', label: 'FAQ' },
   { href: '/docs', label: 'Docs' },
 ];
-
-const REPO_URL = 'https://github.com/Leo-Galli/openregistro';
 
 export function SiteHeader() {
   return (
@@ -29,12 +29,17 @@ export function SiteHeader() {
             </Link>
           ))}
         </nav>
-        <Button asChild variant="outline" size="sm">
-          <a href={REPO_URL} target="_blank" rel="noreferrer">
-            <Github className="h-4 w-4" />
-            GitHub
-          </a>
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button asChild variant="outline" size="sm">
+            <a href={REPO_URL} target="_blank" rel="noreferrer">
+              <Github className="h-4 w-4" />
+              GitHub
+            </a>
+          </Button>
+          <Button asChild size="sm">
+            <Link href="/host">Get free hosting</Link>
+          </Button>
+        </div>
       </div>
     </header>
   );
