@@ -20,9 +20,9 @@ const FAQ_ITEMS = [
   {
     question: 'Is there a hosted or managed version?',
     answer:
-      'Self-hosting is free and always will be. If your school would rather not run a server, we also offer paid managed hosting - requests are reviewed and set up by hand, not automatically.',
+      'Yes, and it is free. If your school would rather not run a server, we also offer free managed hosting - no fee, no approval step.',
     linkHref: '/host',
-    linkLabel: 'Request managed hosting',
+    linkLabel: 'Get a free hosted instance',
   },
 ];
 

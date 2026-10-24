@@ -11,6 +11,8 @@ import {
 import { listHostingRequests, type HostingRequestStatus } from '@openregistro/db';
 import { requireHostingAdmin } from '@/lib/hosting-admin';
 import { getHostingDb } from '@/lib/hosting-db';
+import { EditHostingRequestDialog } from '@/components/internal/edit-hosting-request-dialog';
+import { DeleteHostingRequestButton } from '@/components/internal/delete-hosting-request-button';
 import { setHostingRequestStatus, logoutInternal } from './actions';
 
 export const dynamic = 'force-dynamic';
@@ -23,6 +25,13 @@ const STATUS_BADGE: Record<
   contacted: 'warning',
   activated: 'success',
   declined: 'destructive',
+};
+
+const STATUS_LABEL: Record<HostingRequestStatus, string> = {
+  pending: 'new',
+  contacted: 'contacted',
+  activated: 'set up',
+  declined: 'declined',
 };
 
 const STATUSES: HostingRequestStatus[] = ['pending', 'contacted', 'activated', 'declined'];
@@ -38,8 +47,9 @@ export default async function HostingRequestsPage() {
         <div>
           <h1 className="font-display text-2xl font-semibold">Hosting requests</h1>
           <p className="text-sm text-muted-foreground">
-            Schools that asked for a managed instance. Activation and billing happen manually,
-            outside this app - set the status here once you&apos;ve followed up.
+            Schools that signed up for free managed hosting. Nothing here blocks or approves
+            anything - this is just your own tracking: edit a request, remove one, or note where you
+            are with setting each school up.
           </p>
         </div>
         <form action={logoutInternal}>
@@ -82,26 +92,30 @@ export default async function HostingRequestsPage() {
                   {req.createdAt.slice(0, 10)}
                 </TableCell>
                 <TableCell>
-                  <Badge variant={STATUS_BADGE[req.status]}>{req.status}</Badge>
+                  <Badge variant={STATUS_BADGE[req.status]}>{STATUS_LABEL[req.status]}</Badge>
                 </TableCell>
                 <TableCell>
-                  <form action={setHostingRequestStatus} className="flex items-center gap-2">
-                    <input type="hidden" name="id" value={req.id} />
-                    <select
-                      name="status"
-                      defaultValue={req.status}
-                      className="h-8 rounded-lg border border-border bg-surface px-2 text-xs"
-                    >
-                      {STATUSES.map((status) => (
-                        <option key={status} value={status}>
-                          {status}
-                        </option>
-                      ))}
-                    </select>
-                    <Button type="submit" size="sm" variant="outline">
-                      Update
-                    </Button>
-                  </form>
+                  <div className="flex flex-wrap items-center gap-2">
+                    <form action={setHostingRequestStatus} className="flex items-center gap-2">
+                      <input type="hidden" name="id" value={req.id} />
+                      <select
+                        name="status"
+                        defaultValue={req.status}
+                        className="h-8 rounded-lg border border-border bg-surface px-2 text-xs"
+                      >
+                        {STATUSES.map((status) => (
+                          <option key={status} value={status}>
+                            {STATUS_LABEL[status]}
+                          </option>
+                        ))}
+                      </select>
+                      <Button type="submit" size="sm" variant="outline">
+                        Update
+                      </Button>
+                    </form>
+                    <EditHostingRequestDialog request={req} />
+                    <DeleteHostingRequestButton id={req.id} schoolName={req.schoolName} />
+                  </div>
                 </TableCell>
               </TableRow>
             ))}

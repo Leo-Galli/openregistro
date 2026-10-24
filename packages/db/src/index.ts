@@ -9,6 +9,8 @@ export {
   createHostingRequest,
   listHostingRequests,
   updateHostingRequestStatus,
+  updateHostingRequestDetails,
+  deleteHostingRequest,
   type CreateHostingRequestInput,
   type HostingRequest,
   type HostingRequestStatus,

@@ -57,3 +57,20 @@ export async function updateHostingRequestStatus(
     .returning();
   return row ? (normalizeTimestamps(row) as HostingRequest) : null;
 }
+
+export async function updateHostingRequestDetails(
+  db: Database,
+  id: string,
+  patch: CreateHostingRequestInput,
+): Promise<HostingRequest | null> {
+  const [row] = await db
+    .update(hostingRequestsTable)
+    .set({ ...patch, updatedAt: nowIso() })
+    .where(eq(hostingRequestsTable.id, id))
+    .returning();
+  return row ? (normalizeTimestamps(row) as HostingRequest) : null;
+}
+
+export async function deleteHostingRequest(db: Database, id: string): Promise<void> {
+  await db.delete(hostingRequestsTable).where(eq(hostingRequestsTable.id, id));
+}

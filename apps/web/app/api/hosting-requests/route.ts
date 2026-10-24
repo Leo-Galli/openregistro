@@ -14,7 +14,7 @@ export const dynamic = 'force-dynamic';
  * standing between it and being spammed from an arbitrary page.
  */
 const ALLOWED_ORIGINS = new Set([
-  'https://openregistro-website.vercel.app',
+  'https://openregistro.vercel.app',
   'http://localhost:3000',
   'http://localhost:3001',
 ]);

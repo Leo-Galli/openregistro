@@ -1,11 +1,11 @@
 import type { Metadata } from 'next';
-import { Server, ShieldCheck, Mail } from 'lucide-react';
+import { Server, ShieldCheck, Zap } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@openregistro/ui';
 import { HostRequestForm } from '@/components/host-request-form';
 
 export const metadata: Metadata = {
-  title: 'Request managed hosting - OpenRegistro',
-  description: 'Ask for a managed, hosted OpenRegistro instance for your school.',
+  title: 'Get a free hosted instance - OpenRegistro',
+  description: 'Get a free, managed, hosted OpenRegistro instance for your school.',
 };
 
 const POINTS = [
@@ -20,10 +20,10 @@ const POINTS = [
     description: 'Every hosted school gets its own instance and its own database, never shared.',
   },
   {
-    icon: Mail,
-    title: 'Reviewed by hand',
+    icon: Zap,
+    title: 'Completely free',
     description:
-      'Requests are not activated automatically - we follow up by email to confirm scope and pricing before anything is set up.',
+      "There's no fee and no approval step - submit your details and your instance gets set up.",
   },
 ];
 
@@ -32,12 +32,11 @@ export default function HostPage() {
     <section className="mx-auto max-w-5xl px-6 py-20">
       <div className="max-w-2xl">
         <h1 className="font-display text-4xl font-semibold tracking-tight">
-          Request a managed, hosted instance
+          Get a free hosted instance
         </h1>
         <p className="mt-4 text-muted-foreground">
           OpenRegistro is free and open source to self-host. If your school would rather not run its
-          own server, we offer managed hosting for a fee - tell us about your school below and
-          we&apos;ll get back to you.
+          own server, we also offer free managed hosting - tell us about your school below.
         </p>
       </div>
 

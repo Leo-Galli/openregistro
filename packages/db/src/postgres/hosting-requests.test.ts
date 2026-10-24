@@ -6,6 +6,8 @@ import {
   createHostingRequest,
   listHostingRequests,
   updateHostingRequestStatus,
+  updateHostingRequestDetails,
+  deleteHostingRequest,
 } from './hosting-requests';
 
 /**
@@ -86,5 +88,43 @@ describe.skipIf(!connectionString)('hosting requests', () => {
       'declined',
     );
     expect(updated).toBeNull();
+  });
+
+  it('edits request details', async () => {
+    const request = await createHostingRequest(db, {
+      schoolName: 'Old Name',
+      contactName: 'Old Contact',
+      contactEmail: 'old@example.com',
+      approxStudents: 10,
+      message: null,
+    });
+    createdIds.push(request.id);
+
+    const updated = await updateHostingRequestDetails(db, request.id, {
+      schoolName: 'New Name',
+      contactName: 'New Contact',
+      contactEmail: 'new@example.com',
+      approxStudents: 20,
+      message: 'Updated message',
+    });
+
+    expect(updated?.schoolName).toBe('New Name');
+    expect(updated?.approxStudents).toBe(20);
+    expect(updated?.message).toBe('Updated message');
+  });
+
+  it('deletes a request', async () => {
+    const request = await createHostingRequest(db, {
+      schoolName: 'To Delete',
+      contactName: 'X',
+      contactEmail: 'x@example.com',
+      approxStudents: null,
+      message: null,
+    });
+
+    await deleteHostingRequest(db, request.id);
+
+    const list = await listHostingRequests(db);
+    expect(list.find((r) => r.id === request.id)).toBeUndefined();
   });
 });
