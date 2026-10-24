@@ -48,9 +48,9 @@ export async function seedDemoData(storage: StorageDriver): Promise<void> {
 
   const demoPasswordHash = await hashPassword(DEMO_PASSWORD);
 
-  const existingAdmin = await storage.users.findMany({ email: 'admin@demo.openregistro.local' });
-  if (existingAdmin.length === 0) {
-    await storage.users.create({
+  const admin =
+    (await storage.users.findMany({ email: 'admin@demo.openregistro.local' }))[0] ??
+    (await storage.users.create({
       schoolId: school.id,
       role: 'school_admin',
       email: 'admin@demo.openregistro.local',
@@ -59,8 +59,7 @@ export async function seedDemoData(storage: StorageDriver): Promise<void> {
       totpSecret: null,
       isActive: true,
       lastLoginAt: null,
-    });
-  }
+    }));
 
   const klass =
     (await storage.classes.findMany({ schoolId: school.id }))[0] ??
@@ -212,5 +211,39 @@ export async function seedDemoData(storage: StorageDriver): Promise<void> {
     title: 'Parent-teacher meetings next week',
     body: 'Booking slots will open on the meetings page starting Monday.',
     attachments: [],
+  });
+
+  await storage.timetableSlots.create({
+    classId: klass.id,
+    subjectId: mathSubject.id,
+    teacherId: teacher.id,
+    weekday: 1,
+    hourSlot: 1,
+  });
+
+  await storage.calendarEvents.create({
+    classId: null,
+    subjectId: null,
+    type: 'test',
+    title: 'Mathematics test - linear equations',
+    description: 'Covers chapter 3: solving and graphing linear equations.',
+    date: '2025-10-27',
+    createdBy: admin.id,
+  });
+
+  await storage.meetingSlots.create({
+    teacherId: teacher.id,
+    startsAt: '2025-10-27T15:00:00.000Z',
+    endsAt: '2025-10-27T15:20:00.000Z',
+    location: 'Room 12',
+    capacity: 2,
+  });
+
+  await storage.disciplinaryNotes.create({
+    studentId: students[0]!.id,
+    classId: klass.id,
+    authorId: teacher.id,
+    date: '2025-10-14',
+    description: 'Arrived 10 minutes late to class without a justification.',
   });
 }
