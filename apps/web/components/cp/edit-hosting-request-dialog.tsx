@@ -14,10 +14,7 @@ import {
   Textarea,
 } from '@openregistro/ui';
 import { SubmitButton } from '@/components/submit-button';
-import {
-  editHostingRequest,
-  type EditHostingRequestState,
-} from '@/app/internal/hosting-requests/actions';
+import { editHostingRequest, type EditHostingRequestState } from '@/app/cp/actions';
 import type { HostingRequest } from '@openregistro/db';
 
 const initialState: EditHostingRequestState = { ok: false };

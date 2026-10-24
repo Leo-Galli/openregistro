@@ -2,7 +2,7 @@
 
 import { Trash2 } from 'lucide-react';
 import { Button } from '@openregistro/ui';
-import { deleteHostingRequestAction } from '@/app/internal/hosting-requests/actions';
+import { deleteHostingRequestAction } from '@/app/cp/actions';
 
 export function DeleteHostingRequestButton({ id, schoolName }: { id: string; schoolName: string }) {
   return (

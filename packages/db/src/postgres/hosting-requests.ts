@@ -1,4 +1,4 @@
-import { randomUUID } from 'node:crypto';
+import { randomUUID, randomBytes } from 'node:crypto';
 import { desc, eq } from 'drizzle-orm';
 import type { Database } from './client';
 import { hostingRequestsTable } from './schema';
@@ -17,8 +17,20 @@ export type HostingRequestStatus = 'pending' | 'contacted' | 'activated' | 'decl
 export interface HostingRequest extends CreateHostingRequestInput {
   id: string;
   status: HostingRequestStatus;
+  licenseKey: string | null;
   createdAt: string;
   updatedAt: string;
+}
+
+/**
+ * A reference code for a hosted instance, not a real activation/DRM scheme -
+ * hosting is free with no license enforcement anywhere in the app. This is
+ * purely so the operator has something short and memorable to hand a school
+ * and look up later.
+ */
+function generateLicenseCode(): string {
+  const groups = Array.from({ length: 3 }, () => randomBytes(2).toString('hex').toUpperCase());
+  return `OR-${groups.join('-')}`;
 }
 
 function nowIso(): string {
@@ -73,4 +85,13 @@ export async function updateHostingRequestDetails(
 
 export async function deleteHostingRequest(db: Database, id: string): Promise<void> {
   await db.delete(hostingRequestsTable).where(eq(hostingRequestsTable.id, id));
+}
+
+export async function generateLicenseKey(db: Database, id: string): Promise<HostingRequest | null> {
+  const [row] = await db
+    .update(hostingRequestsTable)
+    .set({ licenseKey: generateLicenseCode(), updatedAt: nowIso() })
+    .where(eq(hostingRequestsTable.id, id))
+    .returning();
+  return row ? (normalizeTimestamps(row) as HostingRequest) : null;
 }

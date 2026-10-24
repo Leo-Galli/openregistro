@@ -1,0 +1,1 @@
+ALTER TABLE "hosting_requests" ADD COLUMN "license_key" text;

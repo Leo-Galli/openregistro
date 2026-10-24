@@ -11,6 +11,7 @@ export {
   updateHostingRequestStatus,
   updateHostingRequestDetails,
   deleteHostingRequest,
+  generateLicenseKey,
   type CreateHostingRequestInput,
   type HostingRequest,
   type HostingRequestStatus,

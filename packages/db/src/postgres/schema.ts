@@ -430,6 +430,7 @@ export const hostingRequestsTable = pgTable('hosting_requests', {
   approxStudents: integer('approx_students'),
   message: text('message'),
   status: hostingRequestStatusEnum('status').notNull().default('pending'),
+  licenseKey: text('license_key'),
   createdAt: timestamp('created_at', { withTimezone: true, mode: 'string' }).notNull(),
   updatedAt: timestamp('updated_at', { withTimezone: true, mode: 'string' }).notNull(),
 });

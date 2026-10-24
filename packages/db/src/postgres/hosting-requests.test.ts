@@ -8,6 +8,7 @@ import {
   updateHostingRequestStatus,
   updateHostingRequestDetails,
   deleteHostingRequest,
+  generateLicenseKey,
 } from './hosting-requests';
 
 /**
@@ -52,7 +53,25 @@ describe.skipIf(!connectionString)('hosting requests', () => {
 
     expect(request.status).toBe('pending');
     expect(request.schoolName).toBe('Test School');
+    expect(request.licenseKey).toBeNull();
     expect(request.createdAt).toMatch(/^\d{4}-\d{2}-\d{2}T/);
+  });
+
+  it('generates a unique license key in the expected format', async () => {
+    const request = await createHostingRequest(db, {
+      schoolName: 'License School',
+      contactName: 'L',
+      contactEmail: 'l@example.com',
+      approxStudents: null,
+      message: null,
+    });
+    createdIds.push(request.id);
+
+    const first = await generateLicenseKey(db, request.id);
+    expect(first?.licenseKey).toMatch(/^OR-[0-9A-F]{4}-[0-9A-F]{4}-[0-9A-F]{4}$/);
+
+    const second = await generateLicenseKey(db, request.id);
+    expect(second?.licenseKey).not.toBe(first?.licenseKey);
   });
 
   it('lists requests newest first and updates status', async () => {

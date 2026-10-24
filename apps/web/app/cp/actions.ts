@@ -8,15 +8,55 @@ import {
   updateHostingRequestStatus,
   updateHostingRequestDetails,
   deleteHostingRequest,
+  generateLicenseKey,
   type HostingRequestStatus,
 } from '@openregistro/db';
-import { requireHostingAdmin, HOSTING_ADMIN_COOKIE } from '@/lib/hosting-admin';
+import { requireCpAdmin, verifyCpCredentials, sha256, CP_ADMIN_COOKIE } from '@/lib/cp-admin';
 import { getHostingDb } from '@/lib/hosting-db';
+import { checkRateLimit } from '@/lib/rate-limit';
+
+export interface CpLoginState {
+  error?: string;
+}
+
+export async function loginCp(_prevState: CpLoginState, formData: FormData): Promise<CpLoginState> {
+  const rateLimit = checkRateLimit('cp-login', 10, 60 * 1000);
+  if (!rateLimit.allowed) {
+    return { error: 'Too many attempts. Try again shortly.' };
+  }
+
+  const username = formData.get('username');
+  const password = formData.get('password');
+  if (typeof username !== 'string' || typeof password !== 'string') {
+    return { error: 'Enter a username and password.' };
+  }
+
+  if (!verifyCpCredentials(username, password)) {
+    return { error: 'Incorrect username or password.' };
+  }
+
+  const cookieStore = await cookies();
+  cookieStore.set(CP_ADMIN_COOKIE, sha256(password), {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'lax',
+    path: '/cp',
+    maxAge: 60 * 60 * 24 * 30,
+  });
+
+  redirect('/cp');
+}
+
+export async function logoutCp(): Promise<void> {
+  const cookieStore = await cookies();
+  cookieStore.delete(CP_ADMIN_COOKIE);
+  redirect('/cp');
+}
 
 const VALID_STATUSES: HostingRequestStatus[] = ['pending', 'contacted', 'activated', 'declined'];
 
 export async function setHostingRequestStatus(formData: FormData): Promise<void> {
-  await requireHostingAdmin();
+  await requireCpAdmin();
 
   const id = formData.get('id');
   const status = formData.get('status');
@@ -32,7 +72,7 @@ export async function setHostingRequestStatus(formData: FormData): Promise<void>
   if (!db) return;
 
   await updateHostingRequestStatus(db, id, status as HostingRequestStatus);
-  revalidatePath('/internal/hosting-requests');
+  revalidatePath('/cp');
 }
 
 const editFormSchema = z.object({
@@ -40,8 +80,6 @@ const editFormSchema = z.object({
   schoolName: z.string().min(1).max(200),
   contactName: z.string().min(1).max(200),
   contactEmail: z.string().email(),
-  // An empty number input submits "" in FormData - z.coerce.number() would
-  // coerce that to 0 and fail .min(1), so blank must become undefined first.
   approxStudents: z.preprocess(
     (value) => (value === '' ? undefined : value),
     z.coerce.number().int().min(1).max(100000).optional(),
@@ -58,7 +96,7 @@ export async function editHostingRequest(
   _prevState: EditHostingRequestState,
   formData: FormData,
 ): Promise<EditHostingRequestState> {
-  await requireHostingAdmin();
+  await requireCpAdmin();
 
   const parsed = editFormSchema.safeParse(Object.fromEntries(formData));
   if (!parsed.success) {
@@ -77,12 +115,12 @@ export async function editHostingRequest(
     message: patch.message || null,
   });
 
-  revalidatePath('/internal/hosting-requests');
+  revalidatePath('/cp');
   return { ok: true };
 }
 
 export async function deleteHostingRequestAction(formData: FormData): Promise<void> {
-  await requireHostingAdmin();
+  await requireCpAdmin();
 
   const id = formData.get('id');
   if (typeof id !== 'string') return;
@@ -91,11 +129,18 @@ export async function deleteHostingRequestAction(formData: FormData): Promise<vo
   if (!db) return;
 
   await deleteHostingRequest(db, id);
-  revalidatePath('/internal/hosting-requests');
+  revalidatePath('/cp');
 }
 
-export async function logoutInternal(): Promise<void> {
-  const cookieStore = await cookies();
-  cookieStore.delete(HOSTING_ADMIN_COOKIE);
-  redirect('/internal/login');
+export async function generateLicenseAction(formData: FormData): Promise<void> {
+  await requireCpAdmin();
+
+  const id = formData.get('id');
+  if (typeof id !== 'string') return;
+
+  const db = getHostingDb();
+  if (!db) return;
+
+  await generateLicenseKey(db, id);
+  revalidatePath('/cp');
 }

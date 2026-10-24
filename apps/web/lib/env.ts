@@ -21,7 +21,17 @@ const envSchema = z.object({
    * only this project's own managed deployment sets these two.
    */
   HOSTING_DATABASE_URL: z.string().optional(),
-  HOSTING_ADMIN_SECRET: z.string().optional(),
+  /*
+   * The /cp control panel's own operator login - deliberately separate from
+   * auth.ts's per-school credentials system (Argon2id-hashed, stored in the
+   * school's own StorageDriver). This is a single hardcoded operator
+   * account with no per-school meaning, so a SHA-256 hash of one fixed
+   * password compared on every request is enough; there is no signup, no
+   * rotation UI, and no reason to carry the heavier Argon2id machinery for
+   * it. Unset on every self-hosted install by design.
+   */
+  CP_ADMIN_USERNAME: z.string().default('admin'),
+  CP_ADMIN_PASSWORD_SHA256: z.string().optional(),
 });
 
 export type Env = z.infer<typeof envSchema>;
