@@ -1,8 +1,6 @@
 import { ArrowRight, ExternalLink, Github } from 'lucide-react';
 import { Button } from '@openregistro/ui';
-
-const REPO_URL = 'https://github.com/Leo-Galli/openregistro';
-const DEMO_URL = 'https://openregistro-demo.vercel.app';
+import { REPO_URL, DEMO_URL } from '@/lib/constants';
 
 export function Hero() {
   return (

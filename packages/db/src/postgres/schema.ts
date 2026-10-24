@@ -44,6 +44,12 @@ export const auditEntityEnum = pgEnum('audit_entity', [
   'user',
 ]);
 export const storageDriverEnum = pgEnum('installer_storage_driver', ['json', 'postgres']);
+export const hostingRequestStatusEnum = pgEnum('hosting_request_status', [
+  'pending',
+  'contacted',
+  'activated',
+  'declined',
+]);
 
 const timestamps = {
   createdAt: timestamp('created_at', { withTimezone: true, mode: 'string' }).notNull(),
@@ -407,4 +413,23 @@ export const auditLogTable = pgTable('audit_log', {
   before: jsonb('before'),
   after: jsonb('after'),
   createdAt: timestamp('created_at', { withTimezone: true, mode: 'string' }).notNull(),
+});
+
+/**
+ * Pre-sales leads from schools asking for a managed/hosted instance via the
+ * marketing site's "Request hosting" page - deliberately NOT a row on
+ * schoolsTable (that table is for schools that already have an installed
+ * instance). Reviewed and activated manually by the operator; see
+ * apps/web/app/internal/hosting-requests for the hidden admin view.
+ */
+export const hostingRequestsTable = pgTable('hosting_requests', {
+  id: uuid('id').primaryKey(),
+  schoolName: text('school_name').notNull(),
+  contactName: text('contact_name').notNull(),
+  contactEmail: text('contact_email').notNull(),
+  approxStudents: integer('approx_students'),
+  message: text('message'),
+  status: hostingRequestStatusEnum('status').notNull().default('pending'),
+  createdAt: timestamp('created_at', { withTimezone: true, mode: 'string' }).notNull(),
+  updatedAt: timestamp('updated_at', { withTimezone: true, mode: 'string' }).notNull(),
 });

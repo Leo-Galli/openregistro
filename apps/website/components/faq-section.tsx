@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import { ChevronDown } from 'lucide-react';
 
 const FAQ_ITEMS = [
@@ -19,7 +20,9 @@ const FAQ_ITEMS = [
   {
     question: 'Is there a hosted or managed version?',
     answer:
-      'Not at the moment - OpenRegistro is self-hosted only for now. If that changes, it will be announced in the project repository.',
+      'Self-hosting is free and always will be. If your school would rather not run a server, we also offer paid managed hosting - requests are reviewed and set up by hand, not automatically.',
+    linkHref: '/host',
+    linkLabel: 'Request managed hosting',
   },
 ];
 
@@ -38,6 +41,14 @@ export function FaqSection() {
                 <ChevronDown className="h-4 w-4 shrink-0 text-muted-foreground transition-transform group-open:rotate-180" />
               </summary>
               <p className="mt-3 text-muted-foreground">{item.answer}</p>
+              {item.linkHref ? (
+                <Link
+                  href={item.linkHref}
+                  className="mt-2 inline-block text-sm font-medium text-primary hover:underline"
+                >
+                  {item.linkLabel}
+                </Link>
+              ) : null}
             </details>
           ))}
         </div>

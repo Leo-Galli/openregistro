@@ -1,7 +1,7 @@
 import { ExternalLink } from 'lucide-react';
 import { Badge, Button } from '@openregistro/ui';
+import { DEMO_URL } from '@/lib/constants';
 
-const DEMO_URL = 'https://openregistro-demo.vercel.app';
 const DEMO_PASSWORD = 'DemoPassword123!';
 
 const DEMO_ACCOUNTS = [

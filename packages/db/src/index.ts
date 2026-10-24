@@ -5,3 +5,11 @@ export {
 } from './postgres/postgres-driver';
 export { createPostgresClient, type Database, type PostgresClient } from './postgres/client';
 export * as schema from './postgres/schema';
+export {
+  createHostingRequest,
+  listHostingRequests,
+  updateHostingRequestStatus,
+  type CreateHostingRequestInput,
+  type HostingRequest,
+  type HostingRequestStatus,
+} from './postgres/hosting-requests';

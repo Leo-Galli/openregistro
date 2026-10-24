@@ -12,6 +12,16 @@ const envSchema = z.object({
   SMTP_USER: z.string().optional(),
   SMTP_PASSWORD: z.string().optional(),
   SMTP_FROM: z.string().optional(),
+  /*
+   * Deliberately separate from DATABASE_URL (the per-school StorageDriver
+   * connection): hosting-request leads are the operator's own business data,
+   * not a school's data, and must stay available (and the hidden admin page
+   * reachable) independently of what storage driver any given self-hosted
+   * install happens to run. Unset on every self-hosted install by design -
+   * only this project's own managed deployment sets these two.
+   */
+  HOSTING_DATABASE_URL: z.string().optional(),
+  HOSTING_ADMIN_SECRET: z.string().optional(),
 });
 
 export type Env = z.infer<typeof envSchema>;
