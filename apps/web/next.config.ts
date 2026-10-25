@@ -2,6 +2,17 @@ import type { NextConfig } from 'next';
 
 const nextConfig: NextConfig = {
   reactStrictMode: true,
+  /*
+   * /cp is also reachable at openregistro.vercel.app/cp via a vercel.json
+   * rewrite on the marketing site (apps/website), proxying to this app so
+   * the control panel appears on the main domain without duplicating its
+   * auth/DB logic there. Both apps are separate Next.js builds that would
+   * otherwise both serve their own, unrelated bundles from the same
+   * "/_next/static" path - CP_ASSET_PREFIX (set only on this project's own
+   * Vercel deployment, never on a self-hosted install) moves this app's
+   * assets to a path the marketing site's rewrite can forward unambiguously.
+   */
+  assetPrefix: process.env.CP_ASSET_PREFIX,
   // Required for docker/Dockerfile's runtime stage, which copies
   // .next/standalone rather than shipping the full node_modules tree.
   output: 'standalone',
