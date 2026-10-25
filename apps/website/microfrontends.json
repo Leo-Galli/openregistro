@@ -1,0 +1,16 @@
+{
+  "$schema": "https://openapi.vercel.sh/microfrontends.json",
+  "version": "1",
+  "applications": {
+    "openregistro": {
+      "packageName": "@openregistro/website",
+      "development": {
+        "fallback": "openregistro.vercel.app"
+      }
+    },
+    "openregistro-demo": {
+      "packageName": "@openregistro/web",
+      "routing": [{ "paths": ["/cp", "/cp/:path*"] }]
+    }
+  }
+}
