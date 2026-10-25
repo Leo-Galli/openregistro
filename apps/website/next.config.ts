@@ -1,5 +1,4 @@
 import type { NextConfig } from 'next';
-import { withMicrofrontends } from '@vercel/microfrontends/next/config';
 
 const nextConfig: NextConfig = {
   output: 'export',
@@ -7,4 +6,4 @@ const nextConfig: NextConfig = {
   transpilePackages: ['@openregistro/ui'],
 };
 
-export default withMicrofrontends(nextConfig);
+export default nextConfig;
