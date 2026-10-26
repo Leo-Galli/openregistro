@@ -27,13 +27,13 @@ export const ToastViewport = forwardRef<
 ToastViewport.displayName = ToastPrimitive.Viewport.displayName;
 
 export const toastVariants = cva(
-  'pointer-events-auto relative flex w-full items-start gap-3 rounded-xl border p-4 shadow-raised data-[state=open]:animate-in data-[state=closed]:animate-out data-[swipe=end]:animate-out data-[state=closed]:fade-out-80',
+  'pointer-events-auto relative flex w-full items-start gap-3 rounded-xl border-2 p-4 shadow-hard data-[state=open]:animate-in data-[state=closed]:animate-out data-[swipe=end]:animate-out data-[state=closed]:fade-out-80',
   {
     variants: {
       variant: {
         default: 'border-border bg-surface text-surface-foreground',
-        success: 'border-success/30 bg-success/10 text-success',
-        destructive: 'border-destructive/30 bg-destructive/10 text-destructive',
+        success: 'border-border bg-success text-success-foreground',
+        destructive: 'border-border bg-destructive text-destructive-foreground',
       },
     },
     defaultVariants: {

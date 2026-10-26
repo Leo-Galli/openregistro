@@ -1,19 +1,24 @@
 /*
- * OpenRegistro design tokens.
+ * OpenRegistro design tokens - "Pop Ledger" brand system.
  *
- * Palette: "Harbor" ink-blue as the confident primary, paired with warm
- * neutrals (a stone scale with a slight amber undertone, not cold slate) so
- * the dense data screens stay calm instead of clinical. Deliberately not
- * purple/indigo and not glassmorphic.
+ * Palette: sunny yellow primary + cobalt blue secondary + bubblegum pink
+ * (sticker accents only) on a warm cream background, with thick ink-navy
+ * borders and hard offset shadows everywhere instead of soft/blurred ones.
+ * Deliberately loud and playful rather than corporate-muted - a genuine
+ * brand change from the earlier "Harbor" ink-blue system, not a drift.
  *
- * Fonts: Space Grotesk (display, used for marketing headings and the
- * wordmark - a geometric grotesk with enough character to stay distinctive
- * without reading as old-fashioned) paired with Geist Sans (UI/data) for
- * maximum legibility in dense tables.
+ * Fonts: Bricolage Grotesque (display, chunky/rounded, used for headings
+ * and the wordmark) paired with Nunito (UI/body/data) for a warm, friendly
+ * read even in dense tables.
  *
  * Both are consumed by Tailwind v4 via `@theme`, which turns every custom
  * property below into a utility (e.g. `--color-primary-600` becomes
  * `bg-primary-600` / `text-primary-600` / `border-primary-600`).
+ *
+ * Light theme only, deliberately: this brand is built around a bright cream
+ * background and solid ink-navy borders/shadows that only read correctly
+ * against a light surface. There is no `.dark` variant - do not reintroduce
+ * one without redesigning the palette for it first.
  */
 
 @theme {
@@ -23,101 +28,106 @@
    * this file never needs to know the actual @font-face names next/font
    * generates - only the fallback stack if a font fails to load.
    */
-  --font-display: var(--font-space-grotesk), ui-sans-serif, system-ui, sans-serif;
-  --font-ui: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-bricolage), ui-sans-serif, system-ui, sans-serif;
+  --font-ui: var(--font-nunito), ui-sans-serif, system-ui, sans-serif;
   --font-mono: var(--font-geist-mono), ui-monospace, monospace;
 
-  --color-primary-50: #eef4fb;
-  --color-primary-100: #d9e6f5;
-  --color-primary-200: #b3cceb;
-  --color-primary-300: #83aed9;
-  --color-primary-400: #5790c4;
-  --color-primary-500: #3672a8;
-  --color-primary-600: #285a87;
-  --color-primary-700: #20486c;
-  --color-primary-800: #1b3c59;
-  --color-primary-900: #16304a;
-  --color-primary-950: #0e1f30;
+  /* Sunny yellow - the primary brand color. */
+  --color-primary-50: #fffaeb;
+  --color-primary-100: #fff3cc;
+  --color-primary-200: #ffe799;
+  --color-primary-300: #ffdb66;
+  --color-primary-400: #ffd447;
+  --color-primary-500: #ffcd29;
+  --color-primary-600: #ffc300;
+  --color-primary-700: #d6a400;
+  --color-primary-800: #ad8500;
+  --color-primary-900: #856600;
+  --color-primary-950: #523f00;
 
-  --color-neutral-50: #faf9f7;
-  --color-neutral-100: #f3f1ec;
-  --color-neutral-200: #e7e2d9;
-  --color-neutral-300: #d3cbbb;
-  --color-neutral-400: #afa38e;
-  --color-neutral-500: #897c68;
-  --color-neutral-600: #6a5f4f;
-  --color-neutral-700: #52493d;
-  --color-neutral-800: #392f28;
-  --color-neutral-900: #241e19;
-  --color-neutral-950: #15110e;
+  /* Cobalt blue - secondary brand color, used for the ticker, links, and
+     a second button/sticker tone. */
+  --color-blue-50: #e8edfc;
+  --color-blue-100: #c8d3f9;
+  --color-blue-200: #91a8f3;
+  --color-blue-300: #5a7ced;
+  --color-blue-400: #3e66ea;
+  --color-blue-500: #2350e7;
+  --color-blue-600: #1640ca;
+  --color-blue-700: #1235a5;
+  --color-blue-800: #0e2981;
+  --color-blue-900: #0a1d5c;
+  --color-blue-950: #061237;
 
-  --color-success-500: #1f7a4d;
-  --color-success-600: #186039;
-  --color-warning-500: #a1600a;
-  --color-warning-600: #824c08;
-  --color-danger-500: #b3261e;
-  --color-danger-600: #8c1e18;
+  /* Bubblegum pink - sticker-badge accent only, not a UI workhorse color. */
+  --color-pink-400: #f98fa6;
+  --color-pink-500: #f67996;
+  --color-pink-600: #ef5478;
 
-  --radius-sm: 0.375rem;
-  --radius-md: 0.625rem;
-  --radius-lg: 0.875rem;
-  --radius-xl: 1.25rem;
-  --radius-2xl: 1.75rem;
+  /* Ink-navy-tinted neutral scale, for muted text/backgrounds. The pure
+     ink color used for borders/foreground is --color-ink below, not a
+     step of this scale, so it stays pixel-identical to the brand spec. */
+  --color-neutral-50: #f9f9fb;
+  --color-neutral-100: #eff0f5;
+  --color-neutral-200: #dfe2ec;
+  --color-neutral-300: #bfc4d9;
+  --color-neutral-400: #8c95ba;
+  --color-neutral-500: #606c9f;
+  --color-neutral-600: #4d5780;
+  --color-neutral-700: #394160;
+  --color-neutral-800: #2a3046;
+  --color-neutral-900: #212536;
+  --color-neutral-950: #131620;
 
-  --shadow-soft: 0 1px 3px 0 rgb(36 30 25 / 0.08), 0 2px 6px 0 rgb(36 30 25 / 0.07);
-  --shadow-raised: 0 4px 10px -2px rgb(36 30 25 / 0.1), 0 10px 24px -6px rgb(36 30 25 / 0.12);
+  --color-ink: #151b32;
+  --color-cream: #fffbeb;
+
+  --color-success-500: #20b657;
+  --color-success-600: #189247;
+  --color-warning-500: #f9911a;
+  --color-warning-600: #dd7900;
+  --color-danger-500: #ef394b;
+  --color-danger-600: #d41f32;
+
+  --radius-sm: 0.5rem;
+  --radius-md: 0.75rem;
+  --radius-lg: 1rem;
+  --radius-xl: 1.5rem;
+  --radius-2xl: 2rem;
+
+  /* Hard offset shadows - no blur, ever. The pressable-button effect grows
+     this on hover and flattens it to none on press (see button.tsx). */
+  --shadow-hard-sm: 2px 2px 0px var(--color-ink);
+  --shadow-hard: 4px 4px 0px var(--color-ink);
+  --shadow-hard-lg: 6px 6px 0px var(--color-ink);
+  --shadow-hard-none: 0px 0px 0px var(--color-ink);
+  /* Kept as aliases so any not-yet-migrated usage still renders something
+     reasonable instead of breaking outright. */
+  --shadow-soft: var(--shadow-hard-sm);
+  --shadow-raised: var(--shadow-hard);
 }
 
 :root {
-  /*
-   * A visible step below --color-surface (pure white) - cards and other
-   * raised surfaces need actual contrast against the page to read as
-   * elevated, not just as a thin outline. --color-neutral-50 was too close
-   * to white for that.
-   */
-  --color-background: var(--color-neutral-100);
-  --color-foreground: var(--color-neutral-900);
+  --color-background: var(--color-cream);
+  --color-foreground: var(--color-ink);
   --color-surface: #ffffff;
-  --color-surface-foreground: var(--color-neutral-900);
-  --color-muted: var(--color-neutral-100);
-  --color-muted-foreground: var(--color-neutral-600);
-  --color-border: var(--color-neutral-200);
-  --color-ring: var(--color-primary-500);
+  --color-surface-foreground: var(--color-ink);
+  --color-muted: var(--color-primary-50);
+  --color-muted-foreground: #5a5f72;
+  --color-border: var(--color-ink);
+  --color-ring: var(--color-blue-500);
 
-  --color-primary: var(--color-primary-700);
-  --color-primary-foreground: #ffffff;
-  --color-accent: var(--color-neutral-100);
-  --color-accent-foreground: var(--color-neutral-900);
+  --color-primary: var(--color-primary-500);
+  --color-primary-foreground: var(--color-ink);
+  --color-accent: var(--color-blue-50);
+  --color-accent-foreground: var(--color-ink);
 
-  --color-destructive: var(--color-danger-600);
+  --color-destructive: var(--color-danger-500);
   --color-destructive-foreground: #ffffff;
-  --color-success: var(--color-success-600);
+  --color-success: var(--color-success-500);
   --color-success-foreground: #ffffff;
-  --color-warning: var(--color-warning-600);
-  --color-warning-foreground: #ffffff;
-}
-
-.dark {
-  --color-background: var(--color-neutral-950);
-  --color-foreground: var(--color-neutral-100);
-  --color-surface: var(--color-neutral-900);
-  --color-surface-foreground: var(--color-neutral-100);
-  --color-muted: var(--color-neutral-800);
-  --color-muted-foreground: var(--color-neutral-400);
-  --color-border: var(--color-neutral-800);
-  --color-ring: var(--color-primary-400);
-
-  --color-primary: var(--color-primary-400);
-  --color-primary-foreground: var(--color-neutral-950);
-  --color-accent: var(--color-neutral-800);
-  --color-accent-foreground: var(--color-neutral-100);
-
-  --color-destructive: #e35c53;
-  --color-destructive-foreground: var(--color-neutral-950);
-  --color-success: #3fa876;
-  --color-success-foreground: var(--color-neutral-950);
-  --color-warning: #d9972f;
-  --color-warning-foreground: var(--color-neutral-950);
+  --color-warning: var(--color-warning-500);
+  --color-warning-foreground: var(--color-ink);
 }
 
 @theme inline {

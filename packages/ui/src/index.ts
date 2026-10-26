@@ -14,6 +14,11 @@ export {
 } from './components/card';
 export { Badge, badgeVariants, type BadgeProps } from './components/badge';
 export {
+  StickerBadge,
+  stickerBadgeVariants,
+  type StickerBadgeProps,
+} from './components/sticker-badge';
+export {
   Alert,
   AlertTitle,
   AlertDescription,

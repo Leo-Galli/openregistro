@@ -3,16 +3,21 @@ import { Slot } from '@radix-ui/react-slot';
 import { cva, type VariantProps } from 'class-variance-authority';
 import { cn } from '../lib/cn';
 
+const pressable =
+  'border-2 border-border shadow-hard transition-[transform,box-shadow] duration-[120ms] ' +
+  'hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-hard-lg ' +
+  'active:translate-x-1 active:translate-y-1 active:shadow-hard-none';
+
 export const buttonVariants = cva(
-  'inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-lg text-sm font-medium transition-all disabled:pointer-events-none disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 ring-offset-background active:scale-[0.98]',
+  'inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-lg text-sm font-bold disabled:pointer-events-none disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 ring-offset-background',
   {
     variants: {
       variant: {
-        primary: 'bg-primary text-primary-foreground shadow-soft hover:opacity-90',
-        secondary: 'bg-muted text-foreground hover:bg-neutral-200',
-        outline: 'border border-border bg-transparent hover:bg-muted',
-        ghost: 'bg-transparent hover:bg-muted',
-        destructive: 'bg-destructive text-destructive-foreground hover:opacity-90',
+        primary: cn('bg-primary text-primary-foreground', pressable),
+        secondary: cn('bg-blue-500 text-cream', pressable),
+        outline: cn('bg-surface text-foreground', pressable),
+        ghost: 'rounded-lg bg-transparent transition-colors hover:bg-muted',
+        destructive: cn('bg-destructive text-destructive-foreground', pressable),
         link: 'text-primary underline-offset-4 hover:underline',
       },
       size: {
