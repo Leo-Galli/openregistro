@@ -13,14 +13,22 @@ import {
   TableHeader,
   TableRow,
 } from '@openregistro/ui';
-import { BarChart3, Globe } from 'lucide-react';
+import { BarChart3, GitCommit, Globe } from 'lucide-react';
 import { listHostingRequests, type HostingRequestStatus } from '@openregistro/db';
 import { isCpAdmin } from '@/lib/cp-admin';
 import { getHostingDb } from '@/lib/hosting-db';
+import { getEnv } from '@/lib/env';
+import {
+  getCommitsBehindMain,
+  getLatestMainCommit,
+  getRunningVersion,
+  REPO_URL,
+} from '@/lib/deployment-status';
 import { CpLoginForm } from '@/components/cp/cp-login-form';
 import { EditHostingRequestDialog } from '@/components/cp/edit-hosting-request-dialog';
 import { DeleteHostingRequestButton } from '@/components/cp/delete-hosting-request-button';
 import { LicenseCell } from '@/components/cp/license-cell';
+import { RedeployButton } from '@/components/cp/redeploy-button';
 import { setHostingRequestStatus, logoutCp } from './actions';
 
 export const dynamic = 'force-dynamic';
@@ -93,6 +101,16 @@ export default async function CpPage() {
   const db = getHostingDb();
   const requests = db ? await listHostingRequests(db) : [];
 
+  const running = getRunningVersion();
+  const latest = await getLatestMainCommit();
+  const commitsBehind = running.commitSha ? await getCommitsBehindMain(running.commitSha) : null;
+  const versionStatus: 'unknown' | 'up-to-date' | 'behind' = !running.commitSha
+    ? 'unknown'
+    : latest && running.commitSha === latest.sha
+      ? 'up-to-date'
+      : 'behind';
+  const { CP_DEMO_DEPLOY_HOOK_URL } = getEnv();
+
   return (
     <div className="mx-auto flex max-w-6xl flex-col gap-10 px-6 py-8">
       <div className="flex items-center justify-between">
@@ -109,6 +127,88 @@ export default async function CpPage() {
           </Button>
         </form>
       </div>
+
+      <section className="flex flex-col gap-4">
+        <h2 className="font-display text-lg font-semibold">Deployment</h2>
+        <Card>
+          <CardHeader>
+            <span className="flex h-11 w-11 items-center justify-center rounded-xl border-2 border-ink bg-primary-300 text-ink">
+              <GitCommit className="h-5 w-5" />
+            </span>
+            <CardTitle className="mt-3">This demo&apos;s version</CardTitle>
+            <CardDescription>
+              {running.commitShaShort ? (
+                <>
+                  Running{' '}
+                  <a
+                    href={`${REPO_URL}/commit/${running.commitSha}`}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="font-mono text-foreground underline"
+                  >
+                    {running.commitShaShort}
+                  </a>
+                  .
+                </>
+              ) : (
+                'Running commit is unknown on this deployment (only Vercel sets this automatically).'
+              )}
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="flex flex-col gap-4">
+            {latest ? (
+              <div className="flex flex-wrap items-center gap-3">
+                <Badge
+                  variant={
+                    versionStatus === 'up-to-date'
+                      ? 'success'
+                      : versionStatus === 'behind'
+                        ? 'warning'
+                        : 'outline'
+                  }
+                >
+                  {versionStatus === 'up-to-date'
+                    ? 'Up to date'
+                    : versionStatus === 'unknown'
+                      ? 'Version unknown'
+                      : commitsBehind
+                        ? `${commitsBehind} commit${commitsBehind === 1 ? '' : 's'} behind`
+                        : 'Update available'}
+                </Badge>
+                <p className="text-sm text-muted-foreground">
+                  Latest on <code>main</code>:{' '}
+                  <a
+                    href={latest.url}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="font-mono text-foreground underline"
+                  >
+                    {latest.shaShort}
+                  </a>{' '}
+                  - {latest.message}
+                </p>
+              </div>
+            ) : (
+              <p className="text-sm text-muted-foreground">
+                Could not reach GitHub to check the latest commit on <code>main</code> right now.
+              </p>
+            )}
+
+            {CP_DEMO_DEPLOY_HOOK_URL ? (
+              <RedeployButton />
+            ) : (
+              <p className="text-sm text-muted-foreground">
+                Set <code>CP_DEMO_DEPLOY_HOOK_URL</code> (a Vercel Deploy Hook for this project) to
+                enable one-click redeploys here. Until then, update by running{' '}
+                <code>vercel deploy --prod</code> from <code>apps/web</code>, or for a self-hosted
+                install,{' '}
+                <code>git pull &amp;&amp; docker compose pull &amp;&amp; docker compose up -d</code>
+                .
+              </p>
+            )}
+          </CardContent>
+        </Card>
+      </section>
 
       <section className="flex flex-col gap-4">
         <h2 className="font-display text-lg font-semibold">Hosting requests</h2>

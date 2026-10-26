@@ -14,6 +14,7 @@ import {
 import { requireCpAdmin, verifyCpCredentials, sha256, CP_ADMIN_COOKIE } from '@/lib/cp-admin';
 import { getHostingDb } from '@/lib/hosting-db';
 import { checkRateLimit } from '@/lib/rate-limit';
+import { getEnv } from '@/lib/env';
 
 export interface CpLoginState {
   error?: string;
@@ -143,4 +144,38 @@ export async function generateLicenseAction(formData: FormData): Promise<void> {
 
   await generateLicenseKey(db, id);
   revalidatePath('/cp');
+}
+
+export interface RedeployState {
+  ok: boolean;
+  error?: string;
+}
+
+/**
+ * POSTs to the demo project's Vercel Deploy Hook, which redeploys from the
+ * current tip of `main` - the same thing `git push` + a manual `vercel
+ * deploy --prod` would do, just one click instead of a terminal. Returns an
+ * error instead of throwing so the button can show it inline rather than
+ * tripping a full error boundary.
+ */
+export async function redeployDemo(_prevState: RedeployState): Promise<RedeployState> {
+  await requireCpAdmin();
+
+  const { CP_DEMO_DEPLOY_HOOK_URL } = getEnv();
+  if (!CP_DEMO_DEPLOY_HOOK_URL) {
+    return { ok: false, error: 'No deploy hook configured on this instance.' };
+  }
+
+  try {
+    const response = await fetch(CP_DEMO_DEPLOY_HOOK_URL, { method: 'POST' });
+    if (!response.ok) {
+      return { ok: false, error: `Vercel rejected the deploy hook (HTTP ${response.status}).` };
+    }
+    return { ok: true };
+  } catch (error) {
+    return {
+      ok: false,
+      error: error instanceof Error ? error.message : 'Could not reach Vercel.',
+    };
+  }
 }

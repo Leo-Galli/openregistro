@@ -32,6 +32,13 @@ const envSchema = z.object({
    */
   CP_ADMIN_USERNAME: z.string().default('admin'),
   CP_ADMIN_PASSWORD_SHA256: z.string().optional(),
+  /*
+   * A Vercel Deploy Hook URL for the managed demo project (Project Settings
+   * -> Git -> Deploy Hooks). Optional and unset on every self-hosted install
+   * by design - when set, the /cp "Redeploy latest" button becomes a real
+   * POST to this URL instead of only showing manual update instructions.
+   */
+  CP_DEMO_DEPLOY_HOOK_URL: z.string().url().optional(),
 });
 
 export type Env = z.infer<typeof envSchema>;
