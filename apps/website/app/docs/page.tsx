@@ -33,9 +33,9 @@ export default function DocsPage() {
         {STEPS.map((step, index) => (
           <div
             key={step.command}
-            className="flex flex-col gap-3 rounded-xl border border-border bg-surface p-4 shadow-soft sm:flex-row sm:items-center sm:gap-4"
+            className="flex flex-col gap-3 rounded-xl border-2 border-border bg-surface p-4 shadow-hard-sm sm:flex-row sm:items-center sm:gap-4"
           >
-            <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-primary/10 text-sm font-semibold text-primary">
+            <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full border-2 border-ink bg-primary-300 text-sm font-extrabold text-ink">
               {index + 1}
             </span>
             <p className="text-sm font-medium">{step.text}</p>
@@ -44,8 +44,8 @@ export default function DocsPage() {
             </code>
           </div>
         ))}
-        <div className="flex items-center gap-4 rounded-xl border border-border bg-surface p-4 shadow-soft">
-          <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-primary/10 text-sm font-semibold text-primary">
+        <div className="flex items-center gap-4 rounded-xl border-2 border-border bg-surface p-4 shadow-hard-sm">
+          <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full border-2 border-ink bg-primary-300 text-sm font-extrabold text-ink">
             5
           </span>
           <p className="text-sm font-medium">
@@ -56,7 +56,7 @@ export default function DocsPage() {
 
       <Card className="mt-12">
         <CardHeader>
-          <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-primary/10 text-primary">
+          <span className="flex h-11 w-11 items-center justify-center rounded-xl border-2 border-ink bg-primary-300 text-ink">
             <BookOpen className="h-5 w-5" />
           </span>
           <CardTitle className="mt-3">Full documentation</CardTitle>

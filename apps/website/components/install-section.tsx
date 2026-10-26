@@ -3,7 +3,7 @@ const DOCKER_COMMAND = 'docker compose up';
 
 function CodeBlock({ lines }: { lines: string[] }) {
   return (
-    <pre className="overflow-x-auto rounded-xl bg-neutral-900 p-5 font-mono text-sm text-neutral-100 shadow-raised">
+    <pre className="overflow-x-auto rounded-xl bg-neutral-900 p-5 font-mono text-sm text-neutral-100 shadow-hard">
       <code>
         {lines.map((line) => (
           <div key={line}>

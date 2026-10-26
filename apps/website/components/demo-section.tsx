@@ -50,7 +50,7 @@ export function DemoSection() {
           </Button>
         </div>
 
-        <div className="overflow-x-auto rounded-xl border border-border shadow-soft">
+        <div className="overflow-x-auto rounded-xl border-2 border-border shadow-hard-sm">
           <table className="w-full border-collapse text-left text-sm">
             <thead>
               <tr className="border-b border-border bg-muted/40">

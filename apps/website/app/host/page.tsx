@@ -45,7 +45,7 @@ export default function HostPage() {
           {POINTS.map((point) => (
             <Card key={point.title}>
               <CardHeader>
-                <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-primary/10 text-primary">
+                <span className="flex h-11 w-11 items-center justify-center rounded-xl border-2 border-ink bg-primary-300 text-ink">
                   <point.icon className="h-5 w-5" />
                 </span>
                 <CardTitle className="mt-3">{point.title}</CardTitle>

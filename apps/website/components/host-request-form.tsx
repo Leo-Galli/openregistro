@@ -40,7 +40,7 @@ export function HostRequestForm() {
 
   if (status === 'success') {
     return (
-      <p className="rounded-xl border border-border bg-surface p-6 text-sm shadow-soft">
+      <p className="rounded-xl border-2 border-border bg-surface p-6 text-sm shadow-hard-sm">
         Thanks - your request has been received. We&apos;ll set up your free instance and reach out
         by email with the details.
       </p>

@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { Github } from 'lucide-react';
+import { BookOpen, Github } from 'lucide-react';
 import { Button } from '@openregistro/ui';
 import { REPO_URL } from '@/lib/constants';
 
@@ -13,18 +13,20 @@ const NAV_LINKS = [
 
 export function SiteHeader() {
   return (
-    <header className="sticky top-0 z-50 border-b border-border bg-background/80 backdrop-blur-md">
-      <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
-        <Link href="/" className="font-display text-lg font-semibold tracking-tight">
+    <header className="sticky top-0 z-50 flex h-[84px] items-center border-b-2 border-border bg-background">
+      <div className="mx-auto flex w-full max-w-6xl items-center justify-between px-6">
+        <Link
+          href="/"
+          className="flex items-center gap-2 font-display text-lg font-extrabold tracking-tight text-ink"
+        >
+          <span className="flex h-9 w-9 items-center justify-center rounded-lg border-2 border-ink bg-primary-400">
+            <BookOpen className="h-5 w-5" />
+          </span>
           OpenRegistro
         </Link>
-        <nav className="hidden items-center gap-6 text-sm font-medium text-muted-foreground md:flex">
+        <nav className="hidden items-center gap-6 text-sm font-bold text-ink/70 md:flex">
           {NAV_LINKS.map((link) => (
-            <Link
-              key={link.href}
-              href={link.href}
-              className="transition-colors hover:text-foreground"
-            >
+            <Link key={link.href} href={link.href} className="transition-colors hover:text-ink">
               {link.label}
             </Link>
           ))}

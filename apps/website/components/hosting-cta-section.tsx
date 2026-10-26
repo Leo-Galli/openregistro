@@ -5,14 +5,14 @@ export function HostingCtaSection() {
   return (
     <section className="border-t border-border">
       <div className="mx-auto max-w-6xl px-6 py-20">
-        <div className="relative overflow-hidden rounded-2xl border border-border bg-surface px-8 py-14 shadow-raised sm:px-14">
+        <div className="relative overflow-hidden rounded-2xl border-2 border-border bg-surface px-8 py-14 shadow-hard sm:px-14">
           <div
             aria-hidden
             className="pointer-events-none absolute -right-24 -top-24 h-72 w-72 rounded-full bg-primary/15 blur-3xl"
           />
           <div className="relative flex flex-col items-start gap-6 sm:flex-row sm:items-center sm:justify-between">
             <div className="flex items-start gap-4">
-              <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
+              <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl border-2 border-ink bg-primary-300 text-ink">
                 <Server className="h-6 w-6" />
               </span>
               <div>
