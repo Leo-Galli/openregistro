@@ -56,7 +56,7 @@ sequenceDiagram
     participant Storage as StorageDriver
 
     Browser->>ServerComponent: navigate / submit form
-    ServerComponent->>Authz: auth() -> session; requirePermission(session, permission)
+    ServerComponent->>Authz: auth() returns session, then requirePermission(session, permission)
     Authz-->>ServerComponent: redirect('/forbidden') if not authorized
     ServerComponent->>Zod: parse/validate input
     Zod-->>ServerComponent: typed, validated data (or field errors)
