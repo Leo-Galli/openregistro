@@ -111,6 +111,16 @@ export async function saveAttendance(
     const klass = await storage.classes.findById(classId);
     if (!klass) return { ok: false, formError: 'Class not found.' };
 
+    if (session!.user.role !== 'school_admin') {
+      const assignments = await storage.teacherAssignments.findMany({
+        teacherId: recordedBy,
+        classId,
+      });
+      if (assignments.length === 0) {
+        return { ok: false, formError: 'You are not assigned to this class.' };
+      }
+    }
+
     const existing = await storage.attendanceRecords.findMany({ classId, date: parsed.data.date });
     const existingByStudent = new Map(existing.map((record) => [record.studentId, record]));
 
