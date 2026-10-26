@@ -9,11 +9,16 @@ import {
   termIdSchema,
   userIdSchema,
   gradeTypeSchema,
+  type Grade,
+  type SchoolId,
 } from '@openregistro/core';
 import { auth } from '@/auth';
-import { requirePermission, userIdOf } from '@/lib/authz';
+import { requirePermission, schoolIdOf, userIdOf } from '@/lib/authz';
 import { getStorage } from '@/lib/storage';
 import { logAudit } from '@/lib/audit';
+import { sendPlatformEmail, platformEmailEnabledFor } from '@/lib/platform-mailer';
+import { renderBrandedEmail } from '@/lib/email-templates';
+import type { StorageDriver } from '@openregistro/core';
 
 const gradeFormSchema = z.object({
   classId: z.string().uuid(),
@@ -87,6 +92,8 @@ export async function createGrade(
       },
     });
 
+    await notifyGuardiansOfGrade(storage, schoolIdOf(session!), grade);
+
     revalidatePath(`/dashboard/gradebook/${classId}/${subjectId}`);
     return { ok: true };
   } catch (error) {
@@ -94,5 +101,61 @@ export async function createGrade(
       ok: false,
       formError: error instanceof Error ? error.message : 'Could not save the grade.',
     };
+  }
+}
+
+/**
+ * Best-effort notification, never allowed to affect the grade-save result:
+ * a platform-mailbox hiccup must not make an otherwise-successful grade
+ * entry look like it failed. Only sends anything when the school opted in
+ * via usePlatformEmail AND this instance is actually platform-hosted (see
+ * lib/platform-mailer.ts) - inert on every self-hosted install.
+ */
+async function notifyGuardiansOfGrade(
+  storage: StorageDriver,
+  schoolId: SchoolId,
+  grade: Grade,
+): Promise<void> {
+  try {
+    const school = await storage.schools.findById(schoolId);
+    if (!school || !platformEmailEnabledFor(school.usePlatformEmail)) return;
+
+    const [student, subject, guardianships] = await Promise.all([
+      storage.users.findById(grade.studentId),
+      storage.subjects.findById(grade.subjectId),
+      storage.guardianships.findMany({ studentId: grade.studentId }),
+    ]);
+    if (!student) return;
+
+    const guardians = (
+      await Promise.all(guardianships.map((g) => storage.users.findById(g.guardianId)))
+    ).filter((guardian): guardian is NonNullable<typeof guardian> => guardian !== null);
+
+    if (guardians.length === 0) return;
+
+    const { html, text } = renderBrandedEmail({
+      preheader: `New grade for ${student.fullName}`,
+      heading: 'New grade recorded',
+      bodyLines: [
+        `A new grade was recorded for ${student.fullName}${subject ? ` in ${subject.name}` : ''}.`,
+        `Grade: ${grade.value} (weight ${grade.weight})`,
+        ...(grade.note ? [`Note: ${grade.note}`] : []),
+        'Sign in to the register to see the full gradebook.',
+      ],
+      footnote: `${school.name} enabled grade notification emails for this account.`,
+    });
+
+    await Promise.all(
+      guardians.map((guardian) =>
+        sendPlatformEmail({
+          to: guardian.email,
+          subject: `New grade for ${student.fullName}`,
+          text,
+          html,
+        }),
+      ),
+    );
+  } catch (error) {
+    console.error('notifyGuardiansOfGrade failed.', error);
   }
 }

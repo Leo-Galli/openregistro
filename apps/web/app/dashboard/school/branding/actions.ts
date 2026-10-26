@@ -6,6 +6,7 @@ import { THEMES } from '@openregistro/ui';
 import { auth } from '@/auth';
 import { requirePermission, schoolIdOf } from '@/lib/authz';
 import { getStorage } from '@/lib/storage';
+import { getEnv } from '@/lib/env';
 
 const brandingFormSchema = z.object({
   name: z.string().min(1, 'Required').max(200),
@@ -15,6 +16,10 @@ const brandingFormSchema = z.object({
     .regex(/^#[0-9a-fA-F]{6}$/, 'Use a hex color like #16304a')
     .optional()
     .or(z.literal('')),
+  // Native checkboxes omit themselves from FormData entirely when unchecked,
+  // rather than submitting "false" - treat anything other than the checked
+  // value as off.
+  usePlatformEmail: z.preprocess((value) => value === 'on', z.boolean()),
 });
 
 export interface BrandingFormState {
@@ -50,10 +55,16 @@ export async function saveBranding(
       return { ok: false, formError: 'School not found.' };
     }
 
+    // Defense in depth: even if this were somehow POSTed with the toggle on,
+    // a self-hosted instance has no shared mailbox to use it with - force it
+    // off unless the running instance is actually platform-hosted.
+    const { PLATFORM_HOSTED } = getEnv();
+
     await storage.schools.update(schoolId, {
       name: parsed.data.name,
       themeId: parsed.data.themeId,
       primaryColor: parsed.data.primaryColor || null,
+      usePlatformEmail: PLATFORM_HOSTED && parsed.data.usePlatformEmail,
     });
 
     revalidatePath('/dashboard', 'layout');

@@ -55,6 +55,7 @@ export async function saveSchoolDetails(
       contactEmail: contactEmail || null,
       logoUrl: existingSchool?.logoUrl ?? null,
       primaryColor: primaryColor || null,
+      usePlatformEmail: existingSchool?.usePlatformEmail ?? false,
     };
 
     const school = existingSchool

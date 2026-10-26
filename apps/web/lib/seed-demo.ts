@@ -20,6 +20,9 @@ export async function seedDemoData(storage: StorageDriver): Promise<void> {
       // Deliberately distinct from the default ink-blue so the public demo
       // visibly demonstrates per-school brand color customization.
       primaryColor: '#0d7a6b',
+      // Demo guardian accounts use fake @demo.openregistro.local addresses -
+      // never send real platform email to them (it would just bounce).
+      usePlatformEmail: false,
     });
   }
 

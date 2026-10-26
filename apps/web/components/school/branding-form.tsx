@@ -9,6 +9,7 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
+  Switch,
   THEMES,
   getTheme,
 } from '@openregistro/ui';
@@ -20,8 +21,10 @@ const initialState: BrandingFormState = { ok: false };
 
 export function BrandingForm({
   defaults,
+  platformHosted,
 }: {
-  defaults: { name: string; themeId: string; primaryColor: string };
+  defaults: { name: string; themeId: string; primaryColor: string; usePlatformEmail: boolean };
+  platformHosted: boolean;
 }) {
   const [state, formAction] = useActionState(saveBranding, initialState);
 
@@ -61,6 +64,25 @@ export function BrandingForm({
       <ColorField defaultValue={defaults.primaryColor} />
       {state.fieldErrors?.primaryColor ? (
         <p className="-mt-3 text-sm text-destructive">{state.fieldErrors.primaryColor}</p>
+      ) : null}
+
+      {platformHosted ? (
+        <div className="flex items-start justify-between gap-4 rounded-xl border-2 border-border bg-surface p-4">
+          <div>
+            <Label htmlFor="usePlatformEmail">Send notification emails for us</Label>
+            <p className="mt-1 text-xs text-muted-foreground">
+              Grade and other notification emails go out from the platform&apos;s own mailbox
+              instead of requiring your own SMTP setup. Only available on instances hosted by
+              OpenRegistro - not shown on self-hosted installs.
+            </p>
+          </div>
+          <Switch
+            id="usePlatformEmail"
+            name="usePlatformEmail"
+            defaultChecked={defaults.usePlatformEmail}
+            className="mt-1 shrink-0"
+          />
+        </div>
       ) : null}
 
       {state.formError ? <p className="text-sm text-destructive">{state.formError}</p> : null}
