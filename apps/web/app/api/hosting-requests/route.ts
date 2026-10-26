@@ -15,6 +15,7 @@ export const dynamic = 'force-dynamic';
  */
 const ALLOWED_ORIGINS = new Set([
   'https://openregistro.vercel.app',
+  'https://openregistro.another-horizon.eu',
   'http://localhost:3000',
   'http://localhost:3001',
 ]);
