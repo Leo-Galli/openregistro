@@ -82,7 +82,10 @@ const attendanceEntrySchema = z.object({
 const attendancePayloadSchema = z.object({
   classId: z.string().uuid(),
   date: z.string().date(),
-  entries: z.array(attendanceEntrySchema).min(1),
+  // Upper-bounded well above any real class size: an unbounded array schema
+  // lets a caller force Zod to allocate one validation-issue object per
+  // element with no cap (GHSA for zod < 4.6.6, CWE-400).
+  entries: z.array(attendanceEntrySchema).min(1).max(300),
 });
 
 export interface SaveAttendanceState {
