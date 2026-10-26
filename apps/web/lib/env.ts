@@ -7,11 +7,31 @@ const envSchema = z.object({
   AUTH_SECRET: z.string().min(1).optional(),
   AUTH_URL: z.string().optional(),
   NODE_ENV: z.enum(['development', 'production', 'test']).default('development'),
+  /*
+   * The PLATFORM's own mailbox (openregistro@another-horizon.eu via Tophost),
+   * used only to send operator-sent emails (hosting-request confirmations,
+   * and - when a school opts in via usePlatformEmail - grade/notification
+   * emails on platform-hosted instances). Unset on every self-hosted install
+   * by design; self-hosted schools configure their own SMTP through the
+   * setup wizard instead (see lib/mailer.ts's other caller).
+   */
   SMTP_HOST: z.string().optional(),
   SMTP_PORT: z.coerce.number().int().optional(),
   SMTP_USER: z.string().optional(),
   SMTP_PASSWORD: z.string().optional(),
   SMTP_FROM: z.string().optional(),
+  /*
+   * Set to true only on the operator's own platform-hosted deployments
+   * (never on a self-hosted install). Gates two things: whether the
+   * "send emails via the platform mailbox" toggle even appears in a school's
+   * branding settings, and whether notification emails actually go out
+   * through the shared Tophost mailbox even if a school's usePlatformEmail
+   * flag is somehow set (e.g. carried over from a database export).
+   */
+  // z.coerce.boolean() is a trap here: Boolean("false") is true in JS, so it
+  // would treat an explicit PLATFORM_HOSTED=false as truthy. Only the exact
+  // string "true" counts.
+  PLATFORM_HOSTED: z.preprocess((value) => value === 'true', z.boolean()),
   /*
    * Deliberately separate from DATABASE_URL (the per-school StorageDriver
    * connection): hosting-request leads are the operator's own business data,
@@ -46,6 +66,15 @@ const envSchema = z.object({
    * POST to this URL instead of only showing manual update instructions.
    */
   CP_DEMO_DEPLOY_HOOK_URL: z.string().url().optional(),
+  /*
+   * A dedicated Vercel API token (NOT the operator's personal login token)
+   * used only by lib/provisioning to automate creating a new project +
+   * database + domain for each hosted school. Scoped to the same team as
+   * every other managed project. Unset on every self-hosted install by
+   * design, and the hosting-request "activate" automation simply skips
+   * provisioning (leaving it for the manual runbook) when this is absent.
+   */
+  VERCEL_PROVISIONING_TOKEN: z.string().optional(),
 });
 
 export type Env = z.infer<typeof envSchema>;
@@ -64,6 +93,6 @@ export function getEnv(): Env {
   return cached;
 }
 
-export function smtpConfigured(env: Env): boolean {
+export function platformSmtpConfigured(env: Env): boolean {
   return Boolean(env.SMTP_HOST && env.SMTP_PORT && env.SMTP_FROM);
 }
