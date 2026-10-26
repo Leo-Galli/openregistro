@@ -245,7 +245,7 @@ describe('json storage driver', () => {
       actorId: user.id,
       action: 'update',
       entityKind: 'grade',
-      entityId: '22222222-2222-2222-2222-222222222222',
+      entityId: '22222222-2222-4222-8222-222222222222',
       before: { value: 6 },
       after: { value: 7 },
     });

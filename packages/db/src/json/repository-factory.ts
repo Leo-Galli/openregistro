@@ -17,14 +17,14 @@ interface WithId {
 }
 
 /**
- * Zod's third type parameter is the schema's pre-validation input shape.
+ * Zod's second type parameter is the schema's pre-validation input shape.
  * Entity ids are branded only on output (via `.brand()`), so the input shape
  * never matches T exactly; `any` here intentionally opts out of checking just
  * that parameter, while the output type T is still fully enforced by
  * `.parse()`.
  */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-type SchemaFor<T> = z.ZodType<T, z.ZodTypeDef, any>;
+type SchemaFor<T> = z.ZodType<T, any>;
 
 /**
  * mapCreate/mapUpdate intentionally return `unknown`: the candidate they
