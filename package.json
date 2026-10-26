@@ -43,6 +43,9 @@
       "@node-rs/argon2",
       "sharp",
       "unrs-resolver"
-    ]
+    ],
+    "overrides": {
+      "tar": "7.5.22"
+    }
   }
 }
