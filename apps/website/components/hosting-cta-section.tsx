@@ -1,5 +1,5 @@
 import { ArrowRight, Server } from 'lucide-react';
-import { Button } from '@openregistro/ui';
+import { Button, IconBadge } from '@openregistro/ui';
 
 export function HostingCtaSection() {
   return (
@@ -12,9 +12,9 @@ export function HostingCtaSection() {
           />
           <div className="relative flex flex-col items-start gap-6 sm:flex-row sm:items-center sm:justify-between">
             <div className="flex items-start gap-4">
-              <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl border-2 border-ink bg-primary-300 text-ink">
+              <IconBadge size="xl">
                 <Server className="h-6 w-6" />
-              </span>
+              </IconBadge>
               <div>
                 <h2 className="font-display text-2xl font-semibold tracking-tight sm:text-3xl">
                   Don&apos;t want to run a server? We&apos;ll host it for you - free.

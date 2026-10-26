@@ -1,5 +1,5 @@
 import { Users, ClipboardCheck, BarChart3, FileCheck2, Database, Box } from 'lucide-react';
-import { Card, CardHeader, CardTitle, CardDescription } from '@openregistro/ui';
+import { Card, CardHeader, CardTitle, CardDescription, IconBadge } from '@openregistro/ui';
 
 const FEATURES = [
   {
@@ -54,9 +54,9 @@ export function FeaturesSection() {
         {FEATURES.map((feature) => (
           <Card key={feature.title} className="transition-shadow hover:shadow-hard">
             <CardHeader>
-              <span className="flex h-11 w-11 items-center justify-center rounded-xl border-2 border-ink bg-primary-300 text-ink">
+              <IconBadge>
                 <feature.icon className="h-5 w-5" />
-              </span>
+              </IconBadge>
               <CardTitle className="mt-3">{feature.title}</CardTitle>
               <CardDescription>{feature.description}</CardDescription>
             </CardHeader>

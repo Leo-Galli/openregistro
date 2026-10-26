@@ -22,6 +22,7 @@ export {
   CardFooter,
 } from './components/card';
 export { Badge, badgeVariants, type BadgeProps } from './components/badge';
+export { IconBadge, iconBadgeVariants, type IconBadgeProps } from './components/icon-badge';
 export {
   StickerBadge,
   stickerBadgeVariants,

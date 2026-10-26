@@ -1,9 +1,7 @@
 'use client';
 
 import { useActionState } from 'react';
-import { useFormStatus } from 'react-dom';
 import {
-  Button,
   Input,
   Label,
   Select,
@@ -12,20 +10,13 @@ import {
   SelectTrigger,
   SelectValue,
   THEMES,
+  getTheme,
 } from '@openregistro/ui';
 import { saveBranding, type BrandingFormState } from '@/app/dashboard/school/branding/actions';
+import { SubmitButton } from '@/components/submit-button';
 import { ColorField } from './color-field';
 
 const initialState: BrandingFormState = { ok: false };
-
-function SubmitButton() {
-  const { pending } = useFormStatus();
-  return (
-    <Button type="submit" disabled={pending}>
-      {pending ? 'Saving...' : 'Save branding'}
-    </Button>
-  );
-}
 
 export function BrandingForm({
   defaults,
@@ -59,10 +50,8 @@ export function BrandingForm({
           </SelectContent>
         </Select>
         <p className="text-xs text-muted-foreground">
-          {THEMES.find((theme) => theme.id === defaults.themeId)?.description ??
-            'The default OpenRegistro theme.'}{' '}
-          More base themes are added through community pull requests - see{' '}
-          <code>docs/theming.md</code>.
+          {getTheme(defaults.themeId).description} More base themes are added through community pull
+          requests - see <code>docs/theming.md</code>.
         </p>
         {state.fieldErrors?.themeId ? (
           <p className="text-sm text-destructive">{state.fieldErrors.themeId}</p>
@@ -77,7 +66,7 @@ export function BrandingForm({
       {state.formError ? <p className="text-sm text-destructive">{state.formError}</p> : null}
       {state.ok ? <p className="text-sm text-success">Branding saved.</p> : null}
 
-      <SubmitButton />
+      <SubmitButton pendingLabel="Saving...">Save branding</SubmitButton>
     </form>
   );
 }

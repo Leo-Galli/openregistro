@@ -7,10 +7,24 @@
  * relevant scope check below for the specific record being touched.
  */
 
-export interface TeacherClassSubjectAssignment {
+export interface TeacherClassAssignment {
   teacherId: string;
   classId: string;
+}
+
+export interface TeacherClassSubjectAssignment extends TeacherClassAssignment {
   subjectId: string;
+}
+
+/** Is this teacher assigned to this class at all, regardless of subject - for class-wide actions like attendance. */
+export function canTeacherActOnClass(
+  assignments: readonly TeacherClassAssignment[],
+  teacherId: string,
+  classId: string,
+): boolean {
+  return assignments.some(
+    (assignment) => assignment.teacherId === teacherId && assignment.classId === classId,
+  );
 }
 
 export function canTeacherActOnClassSubject(

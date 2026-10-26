@@ -16,7 +16,7 @@ export const buttonVariants = cva(
         primary: cn('bg-primary text-primary-foreground', pressable),
         secondary: cn('bg-blue-500 text-cream', pressable),
         outline: cn('bg-surface text-foreground', pressable),
-        ghost: 'rounded-lg bg-transparent transition-colors hover:bg-muted',
+        ghost: 'bg-transparent transition-colors hover:bg-muted',
         destructive: cn('bg-destructive text-destructive-foreground', pressable),
         link: 'text-primary underline-offset-4 hover:underline',
       },

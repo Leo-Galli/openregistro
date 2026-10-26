@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import type { SchoolId } from '@openregistro/core';
 import { hasPermission } from '@openregistro/core';
-import { Card, CardDescription, CardHeader, CardTitle } from '@openregistro/ui';
+import { Card, CardDescription, CardHeader, CardTitle, IconBadge } from '@openregistro/ui';
 import { auth } from '@/auth';
 import { getStorage } from '@/lib/storage';
 import { NAV_ITEMS } from '@/lib/nav-items';
@@ -72,9 +72,9 @@ export default async function DashboardPage() {
           {quickLinks.map((item) => (
             <Link key={item.href} href={item.href}>
               <Card className="flex h-full flex-col gap-2 p-4 transition-shadow hover:shadow-hard">
-                <span className="flex h-9 w-9 items-center justify-center rounded-lg border-2 border-ink bg-primary-300 text-ink">
+                <IconBadge size="md" shape="rounded">
                   <item.icon className="h-5 w-5" />
-                </span>
+                </IconBadge>
                 <span className="text-sm font-medium">{item.label}</span>
               </Card>
             </Link>

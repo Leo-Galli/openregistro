@@ -3,6 +3,7 @@
 import { z } from 'zod';
 import { revalidatePath } from 'next/cache';
 import {
+  canTeacherActOnClass,
   canTeacherActOnClassSubject,
   classIdSchema,
   subjectIdSchema,
@@ -82,9 +83,9 @@ const attendanceEntrySchema = z.object({
 const attendancePayloadSchema = z.object({
   classId: z.string().uuid(),
   date: z.string().date(),
-  // Upper-bounded well above any real class size: an unbounded array schema
-  // lets a caller force Zod to allocate one validation-issue object per
-  // element with no cap (GHSA for zod < 4.6.6, CWE-400).
+  // Upper-bounded well above any real class size, as defense in depth
+  // against an oversized payload - independent of the zod 4.6.6 fix for
+  // CWE-400 (unbounded array validation), not a substitute for it.
   entries: z.array(attendanceEntrySchema).min(1).max(300),
 });
 
@@ -116,7 +117,7 @@ export async function saveAttendance(
         teacherId: recordedBy,
         classId,
       });
-      if (assignments.length === 0) {
+      if (!canTeacherActOnClass(assignments, recordedBy, classId)) {
         return { ok: false, formError: 'You are not assigned to this class.' };
       }
     }

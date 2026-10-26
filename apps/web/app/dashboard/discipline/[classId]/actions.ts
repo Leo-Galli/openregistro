@@ -2,7 +2,12 @@
 
 import { z } from 'zod';
 import { revalidatePath } from 'next/cache';
-import { classIdSchema, hasAnyPermission, userIdSchema } from '@openregistro/core';
+import {
+  canTeacherActOnClass,
+  classIdSchema,
+  hasAnyPermission,
+  userIdSchema,
+} from '@openregistro/core';
 import { auth } from '@/auth';
 import { userIdOf } from '@/lib/authz';
 import { getStorage } from '@/lib/storage';
@@ -50,7 +55,7 @@ export async function createDisciplinaryNote(
         teacherId: authorId,
         classId,
       });
-      if (assignments.length === 0) {
+      if (!canTeacherActOnClass(assignments, authorId, classId)) {
         return { ok: false, formError: 'You are not assigned to this class.' };
       }
     }

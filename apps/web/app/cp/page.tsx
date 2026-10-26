@@ -6,6 +6,7 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
+  IconBadge,
   Table,
   TableBody,
   TableCell,
@@ -51,6 +52,22 @@ const STATUS_LABEL: Record<HostingRequestStatus, string> = {
 };
 
 const STATUSES: HostingRequestStatus[] = ['pending', 'contacted', 'activated', 'declined'];
+
+function describeVersion(
+  commitSha: string | null,
+  latestSha: string | null,
+  commitsBehind: number | null,
+): { variant: 'success' | 'warning' | 'outline'; label: string } {
+  if (!commitSha) return { variant: 'outline', label: 'Version unknown' };
+  if (commitSha === latestSha) return { variant: 'success', label: 'Up to date' };
+  if (commitsBehind) {
+    return {
+      variant: 'warning',
+      label: `${commitsBehind} commit${commitsBehind === 1 ? '' : 's'} behind`,
+    };
+  }
+  return { variant: 'warning', label: 'Update available' };
+}
 
 const SUBDOMAIN_STEPS = [
   {
@@ -99,16 +116,13 @@ export default async function CpPage() {
   }
 
   const db = getHostingDb();
-  const requests = db ? await listHostingRequests(db) : [];
-
   const running = getRunningVersion();
-  const latest = await getLatestMainCommit();
-  const commitsBehind = running.commitSha ? await getCommitsBehindMain(running.commitSha) : null;
-  const versionStatus: 'unknown' | 'up-to-date' | 'behind' = !running.commitSha
-    ? 'unknown'
-    : latest && running.commitSha === latest.sha
-      ? 'up-to-date'
-      : 'behind';
+  const [requests, latest, commitsBehind] = await Promise.all([
+    db ? listHostingRequests(db) : Promise.resolve([]),
+    getLatestMainCommit(),
+    running.commitSha ? getCommitsBehindMain(running.commitSha) : Promise.resolve(null),
+  ]);
+  const version = describeVersion(running.commitSha, latest?.sha ?? null, commitsBehind);
   const { CP_DEMO_DEPLOY_HOOK_URL } = getEnv();
 
   return (
@@ -132,9 +146,9 @@ export default async function CpPage() {
         <h2 className="font-display text-lg font-semibold">Deployment</h2>
         <Card>
           <CardHeader>
-            <span className="flex h-11 w-11 items-center justify-center rounded-xl border-2 border-ink bg-primary-300 text-ink">
+            <IconBadge>
               <GitCommit className="h-5 w-5" />
-            </span>
+            </IconBadge>
             <CardTitle className="mt-3">This demo&apos;s version</CardTitle>
             <CardDescription>
               {running.commitShaShort ? (
@@ -158,23 +172,7 @@ export default async function CpPage() {
           <CardContent className="flex flex-col gap-4">
             {latest ? (
               <div className="flex flex-wrap items-center gap-3">
-                <Badge
-                  variant={
-                    versionStatus === 'up-to-date'
-                      ? 'success'
-                      : versionStatus === 'behind'
-                        ? 'warning'
-                        : 'outline'
-                  }
-                >
-                  {versionStatus === 'up-to-date'
-                    ? 'Up to date'
-                    : versionStatus === 'unknown'
-                      ? 'Version unknown'
-                      : commitsBehind
-                        ? `${commitsBehind} commit${commitsBehind === 1 ? '' : 's'} behind`
-                        : 'Update available'}
-                </Badge>
+                <Badge variant={version.variant}>{version.label}</Badge>
                 <p className="text-sm text-muted-foreground">
                   Latest on <code>main</code>:{' '}
                   <a
@@ -283,9 +281,9 @@ export default async function CpPage() {
         <h2 className="font-display text-lg font-semibold">Site visits</h2>
         <Card>
           <CardHeader>
-            <span className="flex h-11 w-11 items-center justify-center rounded-xl border-2 border-ink bg-primary-300 text-ink">
+            <IconBadge>
               <BarChart3 className="h-5 w-5" />
-            </span>
+            </IconBadge>
             <CardTitle className="mt-3">Vercel Web Analytics</CardTitle>
             <CardDescription>
               Both the marketing site and this app report real, privacy-friendly page views to
@@ -320,9 +318,9 @@ export default async function CpPage() {
         <h2 className="font-display text-lg font-semibold">Hosting a new school for free</h2>
         <Card>
           <CardHeader>
-            <span className="flex h-11 w-11 items-center justify-center rounded-xl border-2 border-ink bg-primary-300 text-ink">
+            <IconBadge>
               <Globe className="h-5 w-5" />
-            </span>
+            </IconBadge>
             <CardTitle className="mt-3">Setup steps</CardTitle>
             <CardDescription>
               There is no automated provisioning yet - this is the manual runbook. Every new
@@ -334,9 +332,9 @@ export default async function CpPage() {
             <ol className="flex flex-col gap-4">
               {SUBDOMAIN_STEPS.map((step, index) => (
                 <li key={step.title} className="flex gap-3">
-                  <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full border-2 border-ink bg-primary-300 text-xs font-extrabold text-ink">
+                  <IconBadge size="xs" shape="circle" className="text-xs font-extrabold">
                     {index + 1}
-                  </span>
+                  </IconBadge>
                   <div>
                     <p className="text-sm font-medium">{step.title}</p>
                     <p className="text-sm text-muted-foreground">{step.detail}</p>

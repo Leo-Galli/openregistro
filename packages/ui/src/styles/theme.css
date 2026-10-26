@@ -101,10 +101,6 @@
   --shadow-hard: 4px 4px 0px var(--color-ink);
   --shadow-hard-lg: 6px 6px 0px var(--color-ink);
   --shadow-hard-none: 0px 0px 0px var(--color-ink);
-  /* Kept as aliases so any not-yet-migrated usage still renders something
-     reasonable instead of breaking outright. */
-  --shadow-soft: var(--shadow-hard-sm);
-  --shadow-raised: var(--shadow-hard);
 }
 
 :root {

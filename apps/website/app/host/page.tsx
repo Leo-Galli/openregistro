@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import { Server, ShieldCheck, Zap } from 'lucide-react';
-import { Card, CardContent, CardHeader, CardTitle } from '@openregistro/ui';
+import { Card, CardContent, CardHeader, CardTitle, IconBadge } from '@openregistro/ui';
 import { HostRequestForm } from '@/components/host-request-form';
 
 export const metadata: Metadata = {
@@ -45,9 +45,9 @@ export default function HostPage() {
           {POINTS.map((point) => (
             <Card key={point.title}>
               <CardHeader>
-                <span className="flex h-11 w-11 items-center justify-center rounded-xl border-2 border-ink bg-primary-300 text-ink">
+                <IconBadge>
                   <point.icon className="h-5 w-5" />
-                </span>
+                </IconBadge>
                 <CardTitle className="mt-3">{point.title}</CardTitle>
               </CardHeader>
               <CardContent className="-mt-2 text-sm text-muted-foreground">

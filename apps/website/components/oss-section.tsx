@@ -1,5 +1,5 @@
 import { Scale, Heart, GitPullRequest } from 'lucide-react';
-import { Button } from '@openregistro/ui';
+import { Button, IconBadge } from '@openregistro/ui';
 import { REPO_URL } from '@/lib/constants';
 
 export function OssSection() {
@@ -23,21 +23,21 @@ export function OssSection() {
         </div>
         <div className="flex flex-col gap-4 rounded-xl border-2 border-border bg-surface p-6 shadow-hard-sm">
           <div className="flex items-center gap-3">
-            <span className="flex h-9 w-9 items-center justify-center rounded-lg border-2 border-ink bg-primary-300 text-ink">
+            <IconBadge size="md" shape="rounded">
               <Scale className="h-5 w-5" />
-            </span>
+            </IconBadge>
             <span className="font-medium">AGPL-3.0 licensed</span>
           </div>
           <div className="flex items-center gap-3">
-            <span className="flex h-9 w-9 items-center justify-center rounded-lg border-2 border-ink bg-primary-300 text-ink">
+            <IconBadge size="md" shape="rounded">
               <GitPullRequest className="h-5 w-5" />
-            </span>
+            </IconBadge>
             <span className="font-medium">Contributions welcome</span>
           </div>
           <div className="flex items-center gap-3">
-            <span className="flex h-9 w-9 items-center justify-center rounded-lg border-2 border-ink bg-primary-300 text-ink">
+            <IconBadge size="md" shape="rounded">
               <Heart className="h-5 w-5" />
-            </span>
+            </IconBadge>
             <span className="font-medium">No per-student fees, ever</span>
           </div>
           <Button asChild variant="outline" className="mt-2">
