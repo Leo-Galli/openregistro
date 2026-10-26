@@ -22,7 +22,7 @@ export function LicenseCell({ id, licenseKey }: { id: string; licenseKey: string
 
   return (
     <div className="flex items-center gap-2">
-      <code className="rounded-lg border border-border bg-muted px-2 py-1 text-xs">
+      <code className="rounded-lg border-2 border-border bg-muted px-2 py-1 text-xs">
         {licenseKey}
       </code>
       <Button

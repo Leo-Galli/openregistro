@@ -73,7 +73,7 @@ export function TotpSection({ initiallyEnabled }: { initiallyEnabled: boolean })
               alt="Scan this QR code with your authenticator app"
               width={200}
               height={200}
-              className="rounded-md border border-border"
+              className="rounded-md border-2 border-border"
             />
             <p className="text-xs text-muted-foreground">
               Can&apos;t scan it? Enter this code manually: <code>{enrollment.secret}</code>

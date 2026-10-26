@@ -17,7 +17,7 @@ export function ColorField({ defaultValue }: { defaultValue: string }) {
           aria-label="Pick a brand color"
           value={HEX_PATTERN.test(value) ? value : '#285a87'}
           onChange={(event) => setValue(event.target.value)}
-          className="h-10 w-12 shrink-0 cursor-pointer rounded-lg border border-border bg-transparent p-1"
+          className="h-10 w-12 shrink-0 cursor-pointer rounded-lg border-2 border-border bg-transparent p-1"
         />
         <Input
           id="primaryColor"

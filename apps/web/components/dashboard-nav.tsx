@@ -13,7 +13,7 @@ export function DashboardNav({ role }: { role: Role }) {
 
   return (
     <nav
-      className="flex gap-1 overflow-x-auto border-b border-border bg-surface px-6"
+      className="flex gap-1 overflow-x-auto border-b-2 border-border bg-surface px-6"
       aria-label="Main"
     >
       {items.map((item) => {
@@ -24,9 +24,9 @@ export function DashboardNav({ role }: { role: Role }) {
             key={item.href}
             href={item.href}
             className={cn(
-              'flex items-center gap-1.5 whitespace-nowrap border-b-2 px-3 py-2.5 text-sm font-medium transition-colors',
+              'flex items-center gap-1.5 whitespace-nowrap border-b-4 px-3 py-2.5 text-sm font-bold transition-colors',
               active
-                ? 'border-primary text-primary'
+                ? 'border-primary text-ink'
                 : 'border-transparent text-muted-foreground hover:text-foreground',
             )}
           >

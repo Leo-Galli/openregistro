@@ -76,7 +76,7 @@ export default async function CpPage() {
     return (
       <div className="relative flex min-h-screen w-full flex-col items-center justify-center overflow-hidden px-4">
         <div className="w-full max-w-sm">
-          <Card className="shadow-raised">
+          <Card className="shadow-hard">
             <CardHeader>
               <CardTitle className="font-display text-xl">Control panel</CardTitle>
               <CardDescription>Operator access only.</CardDescription>
@@ -149,7 +149,7 @@ export default async function CpPage() {
                         <select
                           name="status"
                           defaultValue={req.status}
-                          className="h-8 rounded-lg border border-border bg-surface px-2 text-xs"
+                          className="h-8 rounded-lg border-2 border-border bg-surface px-2 text-xs"
                         >
                           {STATUSES.map((status) => (
                             <option key={status} value={status}>
@@ -183,7 +183,7 @@ export default async function CpPage() {
         <h2 className="font-display text-lg font-semibold">Site visits</h2>
         <Card>
           <CardHeader>
-            <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-primary/10 text-primary">
+            <span className="flex h-11 w-11 items-center justify-center rounded-xl border-2 border-ink bg-primary-300 text-ink">
               <BarChart3 className="h-5 w-5" />
             </span>
             <CardTitle className="mt-3">Vercel Web Analytics</CardTitle>
@@ -220,7 +220,7 @@ export default async function CpPage() {
         <h2 className="font-display text-lg font-semibold">Hosting a new school for free</h2>
         <Card>
           <CardHeader>
-            <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-primary/10 text-primary">
+            <span className="flex h-11 w-11 items-center justify-center rounded-xl border-2 border-ink bg-primary-300 text-ink">
               <Globe className="h-5 w-5" />
             </span>
             <CardTitle className="mt-3">Setup steps</CardTitle>
@@ -234,7 +234,7 @@ export default async function CpPage() {
             <ol className="flex flex-col gap-4">
               {SUBDOMAIN_STEPS.map((step, index) => (
                 <li key={step.title} className="flex gap-3">
-                  <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-primary/10 text-xs font-semibold text-primary">
+                  <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full border-2 border-ink bg-primary-300 text-xs font-extrabold text-ink">
                     {index + 1}
                   </span>
                   <div>

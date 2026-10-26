@@ -74,7 +74,7 @@ export default async function ClassRegisterPage({
         </CardHeader>
         <CardContent className="flex flex-col gap-4">
           {lessonLogs.length > 0 ? (
-            <ul className="flex flex-col gap-2 rounded-md border border-border bg-muted/40 p-4 text-sm">
+            <ul className="flex flex-col gap-2 rounded-md border-2 border-border bg-muted/40 p-4 text-sm">
               {lessonLogs.map((log) => (
                 <li key={log.id}>
                   <span className="font-medium">

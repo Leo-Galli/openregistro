@@ -57,7 +57,7 @@ export default async function WelcomePage() {
           </CardDescription>
         </CardHeader>
         <CardContent className="flex flex-col gap-6">
-          <ul className="flex flex-col gap-2 rounded-md border border-border bg-muted/40 p-4">
+          <ul className="flex flex-col gap-2 rounded-md border-2 border-border bg-muted/40 p-4">
             <CheckRow
               ok={nodeOk}
               label={`Node.js ${process.versions.node} (requires ${MIN_NODE_MAJOR}+)`}

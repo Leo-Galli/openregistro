@@ -19,7 +19,7 @@ export function DriverTestPanel({ driver }: { driver: 'json' | 'postgres' }) {
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="rounded-md border border-border bg-muted/40 p-4 text-sm">
+      <div className="rounded-md border-2 border-border bg-muted/40 p-4 text-sm">
         <p>
           Detected storage driver: <span className="font-medium">{driver}</span>
         </p>

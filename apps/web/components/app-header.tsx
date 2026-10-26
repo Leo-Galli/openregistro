@@ -20,8 +20,8 @@ export function AppHeader({ name, role }: { name: string; role: string }) {
     .toUpperCase();
 
   return (
-    <header className="flex items-center justify-between border-b border-border bg-surface px-6 py-4">
-      <p className="font-display text-lg font-semibold">OpenRegistro</p>
+    <header className="flex items-center justify-between border-b-2 border-border bg-surface px-6 py-4">
+      <p className="font-display text-lg font-extrabold">OpenRegistro</p>
       <div className="flex items-center gap-4">
         <Link href="/dashboard/account" className="flex items-center gap-4">
           <div className="text-right">

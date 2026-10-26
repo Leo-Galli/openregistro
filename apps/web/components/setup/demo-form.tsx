@@ -29,7 +29,7 @@ export function DemoForm() {
 
   return (
     <form action={formAction} className="flex flex-col gap-5">
-      <div className="flex items-start gap-3 rounded-md border border-border bg-muted/40 p-4">
+      <div className="flex items-start gap-3 rounded-md border-2 border-border bg-muted/40 p-4">
         <Checkbox id="loadDemoData" name="loadDemoData" className="mt-0.5" />
         <div>
           <Label htmlFor="loadDemoData">Load demo data</Label>

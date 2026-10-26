@@ -56,7 +56,7 @@ async function ManageMeetings({ teacherId }: { teacherId: UserId }) {
           slots.map((slot) => {
             const bookings = bookingsBySlot.get(slot.id) ?? [];
             return (
-              <div key={slot.id} className="rounded-md border border-border p-4">
+              <div key={slot.id} className="rounded-md border-2 border-border p-4">
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="font-medium">{formatRange(slot.startsAt, slot.endsAt)}</p>
@@ -135,7 +135,7 @@ async function BookMeetings({ guardianId }: { guardianId: UserId }) {
           availableSlots.map(({ slot, bookings }) => (
             <div
               key={slot.id}
-              className="flex items-center justify-between rounded-md border border-border p-4"
+              className="flex items-center justify-between rounded-md border-2 border-border p-4"
             >
               <div>
                 <p className="font-medium">

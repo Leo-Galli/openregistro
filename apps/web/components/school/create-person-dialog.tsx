@@ -113,7 +113,7 @@ export function CreatePersonDialog({ students }: { students: StudentOption[] }) 
           </div>
 
           {role === 'guardian' ? (
-            <div className="flex flex-col gap-4 rounded-md border border-border bg-muted/40 p-3">
+            <div className="flex flex-col gap-4 rounded-md border-2 border-border bg-muted/40 p-3">
               <div className="flex flex-col gap-1.5">
                 <Label htmlFor="linkedStudentId">Link to student (optional)</Label>
                 <Select name="linkedStudentId">

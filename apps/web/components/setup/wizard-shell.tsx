@@ -8,7 +8,7 @@ export function WizardShell({ activeSlug, children }: { activeSlug: string; chil
   return (
     <div className="mx-auto flex min-h-screen w-full max-w-2xl flex-col justify-center px-4 py-12">
       <div className="mb-8 text-center">
-        <p className="font-display text-2xl font-semibold text-foreground">OpenRegistro setup</p>
+        <p className="font-display text-2xl font-extrabold text-foreground">OpenRegistro setup</p>
         <p className="mt-1 text-sm text-muted-foreground">
           This wizard runs once. It cannot be reopened after the final step.
         </p>
@@ -18,7 +18,7 @@ export function WizardShell({ activeSlug, children }: { activeSlug: string; chil
           <li key={step.slug} className="flex flex-1 flex-col items-center gap-1.5">
             <span
               className={cn(
-                'flex h-7 w-7 items-center justify-center rounded-full text-xs font-medium',
+                'flex h-7 w-7 items-center justify-center rounded-full border-2 border-ink text-xs font-extrabold',
                 index < activeIndex && 'bg-success text-success-foreground',
                 index === activeIndex && 'bg-primary text-primary-foreground',
                 index > activeIndex && 'bg-muted text-muted-foreground',
