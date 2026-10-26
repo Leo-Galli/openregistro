@@ -12,6 +12,8 @@ import { useEffect, useId, useState } from 'react';
  * on the server and passed down as a prop - never user input - and mermaid's
  * own rendered SVG output is what gets injected, not the raw chart text.
  */
+let initialized = false;
+
 export function MermaidDiagram({ chart }: { chart: string }) {
   const id = useId().replace(/:/g, '-');
   const [svg, setSvg] = useState<string | null>(null);
@@ -23,17 +25,20 @@ export function MermaidDiagram({ chart }: { chart: string }) {
     async function render() {
       try {
         const { default: mermaid } = await import('mermaid');
-        mermaid.initialize({
-          startOnLoad: false,
-          theme: 'base',
-          themeVariables: {
-            primaryColor: '#ffcd29',
-            primaryBorderColor: '#151b32',
-            primaryTextColor: '#151b32',
-            lineColor: '#151b32',
-            fontFamily: 'var(--font-ui)',
-          },
-        });
+        if (!initialized) {
+          mermaid.initialize({
+            startOnLoad: false,
+            theme: 'base',
+            themeVariables: {
+              primaryColor: '#ffcd29',
+              primaryBorderColor: '#151b32',
+              primaryTextColor: '#151b32',
+              lineColor: '#151b32',
+              fontFamily: 'var(--font-ui)',
+            },
+          });
+          initialized = true;
+        }
         const result = await mermaid.render(`mermaid-${id}`, chart);
         if (!cancelled) setSvg(result.svg);
       } catch {
