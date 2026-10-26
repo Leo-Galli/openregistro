@@ -2,7 +2,17 @@
 
 import { useActionState } from 'react';
 import { useFormStatus } from 'react-dom';
-import { Button, Input, Label } from '@openregistro/ui';
+import {
+  Button,
+  Input,
+  Label,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+  THEMES,
+} from '@openregistro/ui';
 import { saveBranding, type BrandingFormState } from '@/app/dashboard/school/branding/actions';
 import { ColorField } from './color-field';
 
@@ -17,7 +27,11 @@ function SubmitButton() {
   );
 }
 
-export function BrandingForm({ defaults }: { defaults: { name: string; primaryColor: string } }) {
+export function BrandingForm({
+  defaults,
+}: {
+  defaults: { name: string; themeId: string; primaryColor: string };
+}) {
   const [state, formAction] = useActionState(saveBranding, initialState);
 
   return (
@@ -27,6 +41,31 @@ export function BrandingForm({ defaults }: { defaults: { name: string; primaryCo
         <Input id="name" name="name" defaultValue={defaults.name} required />
         {state.fieldErrors?.name ? (
           <p className="text-sm text-destructive">{state.fieldErrors.name}</p>
+        ) : null}
+      </div>
+
+      <div className="flex flex-col gap-1.5">
+        <Label htmlFor="themeId">Base theme</Label>
+        <Select name="themeId" defaultValue={defaults.themeId}>
+          <SelectTrigger id="themeId">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            {THEMES.map((theme) => (
+              <SelectItem key={theme.id} value={theme.id}>
+                {theme.name}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+        <p className="text-xs text-muted-foreground">
+          {THEMES.find((theme) => theme.id === defaults.themeId)?.description ??
+            'The default OpenRegistro theme.'}{' '}
+          More base themes are added through community pull requests - see{' '}
+          <code>docs/theming.md</code>.
+        </p>
+        {state.fieldErrors?.themeId ? (
+          <p className="text-sm text-destructive">{state.fieldErrors.themeId}</p>
         ) : null}
       </div>
 

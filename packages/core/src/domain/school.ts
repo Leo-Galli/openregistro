@@ -14,6 +14,7 @@ export const schoolSchema = z.object({
     .string()
     .regex(/^#[0-9a-fA-F]{6}$/)
     .nullable(),
+  themeId: z.string().min(1).max(60).nullable().optional(),
   createdAt: timestampSchema,
   updatedAt: timestampSchema,
 });

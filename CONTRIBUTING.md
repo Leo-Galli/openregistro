@@ -50,6 +50,12 @@ shared tooling config (`config`).
 - No TODOs or placeholder implementations in committed code. If something is out of scope,
   leave it out entirely rather than stubbing it.
 
+## Contributing a theme
+
+See `docs/theming.md` for the full guide. The short version: add a `ThemeDefinition` file
+under `packages/ui/src/themes/` and register it in that folder's `THEMES` array - no other
+code needs to change for it to show up in every school's branding settings.
+
 ## Commit messages
 
 This repository uses [Conventional Commits](https://www.conventionalcommits.org/), enforced

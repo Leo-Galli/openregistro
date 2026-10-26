@@ -2,12 +2,14 @@
 
 import { z } from 'zod';
 import { revalidatePath } from 'next/cache';
+import { THEMES } from '@openregistro/ui';
 import { auth } from '@/auth';
 import { requirePermission, schoolIdOf } from '@/lib/authz';
 import { getStorage } from '@/lib/storage';
 
 const brandingFormSchema = z.object({
   name: z.string().min(1, 'Required').max(200),
+  themeId: z.enum(THEMES.map((theme) => theme.id) as [string, ...string[]]),
   primaryColor: z
     .string()
     .regex(/^#[0-9a-fA-F]{6}$/, 'Use a hex color like #16304a')
@@ -17,7 +19,7 @@ const brandingFormSchema = z.object({
 
 export interface BrandingFormState {
   ok: boolean;
-  fieldErrors?: Partial<Record<'name' | 'primaryColor', string>>;
+  fieldErrors?: Partial<Record<'name' | 'themeId' | 'primaryColor', string>>;
   formError?: string;
 }
 
@@ -33,7 +35,7 @@ export async function saveBranding(
     const fieldErrors: BrandingFormState['fieldErrors'] = {};
     for (const issue of parsed.error.issues) {
       const key = issue.path[0];
-      if (key === 'name' || key === 'primaryColor') {
+      if (key === 'name' || key === 'themeId' || key === 'primaryColor') {
         fieldErrors[key] = issue.message;
       }
     }
@@ -50,6 +52,7 @@ export async function saveBranding(
 
     await storage.schools.update(schoolId, {
       name: parsed.data.name,
+      themeId: parsed.data.themeId,
       primaryColor: parsed.data.primaryColor || null,
     });
 

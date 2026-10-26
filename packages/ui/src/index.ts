@@ -1,4 +1,13 @@
 export { cn } from './lib/cn';
+export {
+  THEMES,
+  DEFAULT_THEME_ID,
+  getTheme,
+  themeStyle,
+  popLedgerTheme,
+  type ThemeDefinition,
+  type ThemeTokens,
+} from './themes';
 
 export { Button, buttonVariants, type ButtonProps } from './components/button';
 export { Input, type InputProps } from './components/input';

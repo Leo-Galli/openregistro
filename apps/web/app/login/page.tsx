@@ -1,10 +1,16 @@
 import { redirect } from 'next/navigation';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@openregistro/ui';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+  themeStyle,
+} from '@openregistro/ui';
 import { auth } from '@/auth';
 import { LoginForm } from '@/components/login-form';
 import { requireInstallerComplete } from '@/lib/guards';
 import { getStorage } from '@/lib/storage';
-import { brandColorStyle } from '@/lib/brand-color';
 
 export const dynamic = 'force-dynamic';
 
@@ -22,7 +28,7 @@ export default async function LoginPage() {
   return (
     <div
       className="flex min-h-screen w-full flex-col items-center justify-center bg-background px-4"
-      style={brandColorStyle(school?.primaryColor)}
+      style={themeStyle(school?.themeId, school?.primaryColor)}
     >
       <div className="w-full max-w-sm">
         <Card className="shadow-hard-lg">

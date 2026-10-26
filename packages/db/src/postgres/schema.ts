@@ -80,6 +80,7 @@ export const schoolsTable = pgTable('schools', {
   contactEmail: text('contact_email'),
   logoUrl: text('logo_url'),
   primaryColor: text('primary_color'),
+  themeId: text('theme_id'),
   ...timestamps,
 });
 

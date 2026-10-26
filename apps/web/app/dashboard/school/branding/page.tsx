@@ -1,4 +1,11 @@
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@openregistro/ui';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+  DEFAULT_THEME_ID,
+} from '@openregistro/ui';
 import { auth } from '@/auth';
 import { schoolIdOf } from '@/lib/authz';
 import { getStorage } from '@/lib/storage';
@@ -15,15 +22,16 @@ export default async function BrandingPage() {
       <CardHeader>
         <CardTitle>School branding</CardTitle>
         <CardDescription>
-          Give this instance your own school&apos;s look. The brand color replaces the default
-          OpenRegistro blue across buttons, links, and highlights for everyone signed into this
-          register, including the sign-in page.
+          Give this instance your own school&apos;s look. Pick a base theme, then optionally
+          override its accent color - both apply across buttons, links, and highlights for everyone
+          signed into this register, including the sign-in page.
         </CardDescription>
       </CardHeader>
       <CardContent>
         <BrandingForm
           defaults={{
             name: school?.name ?? '',
+            themeId: school?.themeId ?? DEFAULT_THEME_ID,
             primaryColor: school?.primaryColor ?? '',
           }}
         />
