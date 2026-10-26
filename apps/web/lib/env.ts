@@ -31,7 +31,14 @@ const envSchema = z.object({
    * it. Unset on every self-hosted install by design.
    */
   CP_ADMIN_USERNAME: z.string().default('admin'),
-  CP_ADMIN_PASSWORD_SHA256: z.string().optional(),
+  /*
+   * An Argon2id hash (same algorithm as real user accounts, via
+   * lib/password.ts) of the /cp operator password - generate one with
+   * `pnpm --filter @openregistro/web hash-cp-password <password>`. Never a
+   * fast hash (SHA-256 etc.): CodeQL flags that pattern as CWE-916, and it
+   * would make the configured credential crackable if this value ever leaked.
+   */
+  CP_ADMIN_PASSWORD_HASH: z.string().optional(),
   /*
    * A Vercel Deploy Hook URL for the managed demo project (Project Settings
    * -> Git -> Deploy Hooks). Optional and unset on every self-hosted install

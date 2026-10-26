@@ -11,7 +11,7 @@ import {
   generateLicenseKey,
   type HostingRequestStatus,
 } from '@openregistro/db';
-import { requireCpAdmin, verifyCpCredentials, sha256, CP_ADMIN_COOKIE } from '@/lib/cp-admin';
+import { requireCpAdmin, verifyCpCredentials, CP_ADMIN_COOKIE } from '@/lib/cp-admin';
 import { getHostingDb } from '@/lib/hosting-db';
 import { checkRateLimit } from '@/lib/rate-limit';
 import { getEnv } from '@/lib/env';
@@ -32,12 +32,14 @@ export async function loginCp(_prevState: CpLoginState, formData: FormData): Pro
     return { error: 'Enter a username and password.' };
   }
 
-  if (!verifyCpCredentials(username, password)) {
+  if (!(await verifyCpCredentials(username, password))) {
     return { error: 'Incorrect username or password.' };
   }
 
+  // Safe to assert: verifyCpCredentials only returns true when this is set.
+  const { CP_ADMIN_PASSWORD_HASH } = getEnv();
   const cookieStore = await cookies();
-  cookieStore.set(CP_ADMIN_COOKIE, sha256(password), {
+  cookieStore.set(CP_ADMIN_COOKIE, CP_ADMIN_PASSWORD_HASH as string, {
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
     sameSite: 'lax',

@@ -62,6 +62,11 @@ All notable changes to this project are documented in this file. The format is b
   `javascript:` URIs; now restricted to `http(s)`).
 - The Docker image build, which failed in CI against real Docker infrastructure
   (`apps/web/public` was referenced by the Dockerfile but never existed).
+- The hidden `/cp` operator control panel's password was hashed with SHA-256
+  (CodeQL `js/insufficient-password-hash`, CWE-916) - switched to Argon2id, the same
+  algorithm already used for real user accounts, via `lib/password.ts`. Operators running
+  their own managed instance must regenerate `CP_ADMIN_PASSWORD_HASH` with
+  `pnpm --filter @openregistro/web hash-cp-password <password>`.
 
 ### Known gaps
 
