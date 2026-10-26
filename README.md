@@ -30,6 +30,28 @@ students' data never leaves your infrastructure.
 > for installation and architecture, and [CHANGELOG.md](./CHANGELOG.md) for what's shipped
 > so far and what's deliberately still a gap.
 
+## How it works
+
+<table>
+<tr>
+<td align="center" width="33%">
+  <img src="./docs/assets/readme/icon-download.svg" width="56" height="56" alt="" /><br />
+  <strong>Install, or get hosted free</strong><br />
+  <sub>One Docker command on your own server, or a dedicated instance we host for you at no cost.</sub>
+</td>
+<td align="center" width="33%">
+  <img src="./docs/assets/readme/icon-school.svg" width="56" height="56" alt="" /><br />
+  <strong>Set up your school</strong><br />
+  <sub>A first-run wizard walks you through classes, subjects, staff, and student accounts.</sub>
+</td>
+<td align="center" width="33%">
+  <img src="./docs/assets/readme/icon-calendar-check.svg" width="56" height="56" alt="" /><br />
+  <strong>Run your register</strong><br />
+  <sub>Teachers take attendance and grade; families see progress in real time, on your infrastructure.</sub>
+</td>
+</tr>
+</table>
+
 ## Screenshots
 
 <div align="center">
@@ -47,18 +69,32 @@ themes are welcome as pull requests - see [`docs/theming.md`](./docs/theming.md)
 
 ## Features
 
-- Role-based access for school admins, secretary staff, principals, teachers, students, and
-  guardians, enforced server-side on every action.
-- Class register: lesson logs with sign-off, attendance tracking, absence justifications.
-- Gradebook with weighted averages, separate end-of-term evaluations, and PDF report cards.
-- Homework, school-wide or class-scoped announcements with read receipts, a weekly
-  timetable, disciplinary notes, a shared calendar, and parent-teacher meeting booking.
-- An audit log for sensitive changes, TOTP two-factor authentication, and a self-service
-  personal data export.
-- A base theme system (`packages/ui/src/themes`) plus a per-school accent color - one brand
-  shipped today, more welcome via pull request.
-- Two storage backends behind one interface: JSON files (no database required) or
-  PostgreSQL, selected at install time.
+<table>
+<tr>
+<td width="56"><img src="./docs/assets/readme/icon-roles.svg" width="44" height="44" alt="" /></td>
+<td><strong>Role-based access</strong><br />School admins, secretary staff, principals, teachers, students, and guardians - enforced server-side on every action, not just hidden in the UI.</td>
+</tr>
+<tr>
+<td width="56"><img src="./docs/assets/readme/icon-register.svg" width="44" height="44" alt="" /></td>
+<td><strong>Class register</strong><br />Lesson logs with sign-off, attendance tracking (present / absent / late / early leave), and online absence justifications.</td>
+</tr>
+<tr>
+<td width="56"><img src="./docs/assets/readme/icon-gradebook.svg" width="44" height="44" alt="" /></td>
+<td><strong>Gradebook &amp; report cards</strong><br />Weighted grade averages, separate end-of-term evaluations, and PDF report card generation.</td>
+</tr>
+<tr>
+<td width="56"><img src="./docs/assets/readme/icon-calendar.svg" width="44" height="44" alt="" /></td>
+<td><strong>Homework, announcements &amp; calendar</strong><br />Read receipts on announcements, a weekly timetable, disciplinary notes, a shared calendar, and parent-teacher meeting booking.</td>
+</tr>
+<tr>
+<td width="56"><img src="./docs/assets/readme/icon-shield.svg" width="44" height="44" alt="" /></td>
+<td><strong>Audit log, 2FA &amp; data export</strong><br />An audit log for sensitive changes, TOTP two-factor authentication, and a self-service personal data export.</td>
+</tr>
+<tr>
+<td width="56"><img src="./docs/assets/readme/icon-database.svg" width="44" height="44" alt="" /></td>
+<td><strong>Your choice of storage</strong><br />JSON files with zero infrastructure, or PostgreSQL when you need to scale - same application, same data model, selected at install time.</td>
+</tr>
+</table>
 
 ## Monorepo layout
 
