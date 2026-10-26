@@ -130,14 +130,17 @@ docker compose -f docker-compose.json.yml up
 
 ## Documentation
 
+Rendered at [openregistro.vercel.app/docs](https://openregistro.vercel.app/docs), straight from
+the markdown files below - pick whichever is more convenient to read.
+
 <table>
-<tr><td><a href="./docs/installation.md">Installation</a></td><td>self-hosting from scratch, Docker or Node</td></tr>
-<tr><td><a href="./docs/configuration.md">Configuration</a></td><td>environment variables and the setup wizard</td></tr>
-<tr><td><a href="./docs/architecture.md">Architecture</a></td><td>monorepo layout, the StorageDriver abstraction</td></tr>
-<tr><td><a href="./docs/theming.md">Theming</a></td><td>the base theme system and how to contribute one</td></tr>
-<tr><td><a href="./docs/backups.md">Backups</a></td><td>backing up and restoring both storage drivers</td></tr>
-<tr><td><a href="./docs/gdpr.md">GDPR / data protection</a></td><td>what personal data is stored and how to export or erase it</td></tr>
-<tr><td><a href="./docs/api-reference.md">Server actions reference</a></td><td>every mutating server action, by feature area</td></tr>
+<tr><td><a href="https://openregistro.vercel.app/docs/installation">Installation</a></td><td><a href="./docs/installation.md"><code>docs/installation.md</code></a></td><td>self-hosting from scratch, Docker or Node</td></tr>
+<tr><td><a href="https://openregistro.vercel.app/docs/configuration">Configuration</a></td><td><a href="./docs/configuration.md"><code>docs/configuration.md</code></a></td><td>environment variables and the setup wizard</td></tr>
+<tr><td><a href="https://openregistro.vercel.app/docs/architecture">Architecture</a></td><td><a href="./docs/architecture.md"><code>docs/architecture.md</code></a></td><td>monorepo layout, the StorageDriver abstraction</td></tr>
+<tr><td><a href="https://openregistro.vercel.app/docs/theming">Theming</a></td><td><a href="./docs/theming.md"><code>docs/theming.md</code></a></td><td>the base theme system and how to contribute one</td></tr>
+<tr><td><a href="https://openregistro.vercel.app/docs/backups">Backups</a></td><td><a href="./docs/backups.md"><code>docs/backups.md</code></a></td><td>backing up and restoring both storage drivers</td></tr>
+<tr><td><a href="https://openregistro.vercel.app/docs/gdpr">GDPR / data protection</a></td><td><a href="./docs/gdpr.md"><code>docs/gdpr.md</code></a></td><td>what personal data is stored and how to export or erase it</td></tr>
+<tr><td><a href="https://openregistro.vercel.app/docs/api-reference">Server actions reference</a></td><td><a href="./docs/api-reference.md"><code>docs/api-reference.md</code></a></td><td>every mutating server action, by feature area</td></tr>
 </table>
 
 ## License
