@@ -15,7 +15,11 @@ import {
   TableRow,
 } from '@openregistro/ui';
 import { BarChart3, GitCommit, Globe } from 'lucide-react';
-import { listHostingRequests, type HostingRequestStatus } from '@openregistro/db';
+import {
+  listHostingRequests,
+  type HostingRequestStatus,
+  type ProvisioningStatus,
+} from '@openregistro/db';
 import { isCpAdmin } from '@/lib/cp-admin';
 import { getHostingDb } from '@/lib/hosting-db';
 import { getEnv } from '@/lib/env';
@@ -53,6 +57,23 @@ const STATUS_LABEL: Record<HostingRequestStatus, string> = {
 
 const STATUSES: HostingRequestStatus[] = ['pending', 'contacted', 'activated', 'declined'];
 
+const PROVISIONING_BADGE: Record<
+  ProvisioningStatus,
+  'secondary' | 'warning' | 'success' | 'destructive'
+> = {
+  not_started: 'secondary',
+  provisioning: 'warning',
+  ready: 'success',
+  failed: 'destructive',
+};
+
+const PROVISIONING_LABEL: Record<ProvisioningStatus, string> = {
+  not_started: 'manual',
+  provisioning: 'provisioning...',
+  ready: 'live',
+  failed: 'failed',
+};
+
 function describeVersion(
   commitSha: string | null,
   latestSha: string | null,
@@ -73,7 +94,7 @@ const SUBDOMAIN_STEPS = [
   {
     title: 'Create a new Vercel project for the school',
     detail:
-      "vercel link --project <school-slug>-registro, Root Directory = apps/web. Every Vercel project gets a free *.vercel.app domain automatically - there's nothing to buy or configure for that part.",
+      'vercel link --project <school-slug>-registro, Root Directory = apps/web, same Git repo/branch as the other deployments.',
   },
   {
     title: 'Provision a database',
@@ -85,14 +106,9 @@ const SUBDOMAIN_STEPS = [
     detail: 'STORAGE_DRIVER=postgres, DATABASE_URL, AUTH_SECRET (openssl rand -base64 32).',
   },
   {
-    title: 'Deploy and run the setup wizard',
+    title: 'Deploy and attach the assigned subdomain',
     detail:
-      'vercel deploy --prod --yes, then open the free *.vercel.app URL and complete the first-run wizard as the school.',
-  },
-  {
-    title: '(Optional) point a real subdomain at it',
-    detail:
-      'Only if the school wants something nicer than the free *.vercel.app URL: add a CNAME for school.openregistro.app (or their own domain) to the Vercel project in Domains settings. Not required - the free domain works on its own.',
+      "vercel deploy --prod --yes, then vercel domains add <subdomain>.openregistro.another-horizon.eu <project> using the subdomain already shown in the table above - it was generated automatically the moment this request was marked 'set up', and the confirmation email already told the school that address.",
   },
 ];
 
@@ -123,7 +139,7 @@ export default async function CpPage() {
     running.commitSha ? getCommitsBehindMain(running.commitSha) : Promise.resolve(null),
   ]);
   const version = describeVersion(running.commitSha, latest?.sha ?? null, commitsBehind);
-  const { CP_DEMO_DEPLOY_HOOK_URL } = getEnv();
+  const { CP_DEMO_DEPLOY_HOOK_URL, VERCEL_PROVISIONING_TOKEN } = getEnv();
 
   return (
     <div className="mx-auto flex max-w-6xl flex-col gap-10 px-6 py-8">
@@ -223,6 +239,8 @@ export default async function CpPage() {
                 <TableHead>Students</TableHead>
                 <TableHead>Received</TableHead>
                 <TableHead>Status</TableHead>
+                <TableHead>Subdomain</TableHead>
+                <TableHead>Provisioning</TableHead>
                 <TableHead>License</TableHead>
                 <TableHead />
               </TableRow>
@@ -260,6 +278,30 @@ export default async function CpPage() {
                         </Button>
                       </form>
                     </div>
+                  </TableCell>
+                  <TableCell>
+                    {req.subdomain ? (
+                      <a
+                        href={`https://${req.subdomain}.openregistro.another-horizon.eu`}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="font-mono text-xs text-foreground underline"
+                      >
+                        {req.subdomain}
+                      </a>
+                    ) : (
+                      <span className="text-xs text-muted-foreground">-</span>
+                    )}
+                  </TableCell>
+                  <TableCell>
+                    <Badge variant={PROVISIONING_BADGE[req.provisioningStatus]}>
+                      {PROVISIONING_LABEL[req.provisioningStatus]}
+                    </Badge>
+                    {req.provisioningStatus === 'failed' && req.provisioningError ? (
+                      <p className="mt-1 max-w-48 text-xs text-destructive">
+                        {req.provisioningError}
+                      </p>
+                    ) : null}
                   </TableCell>
                   <TableCell>
                     <LicenseCell id={req.id} licenseKey={req.licenseKey} />
@@ -323,9 +365,24 @@ export default async function CpPage() {
             </IconBadge>
             <CardTitle className="mt-3">Setup steps</CardTitle>
             <CardDescription>
-              There is no automated provisioning yet - this is the manual runbook. Every new
-              instance gets a free *.vercel.app subdomain the moment it&apos;s deployed; a custom
-              domain is optional, never required.
+              {VERCEL_PROVISIONING_TOKEN ? (
+                <>
+                  Marking a request &quot;set up&quot; fully automates provisioning: a dedicated
+                  Vercel project, a free Neon database via Vercel&apos;s own marketplace
+                  integration, the assigned &lt;subdomain&gt;.openregistro.another-horizon.eu
+                  domain, an initial deploy from <code>main</code>, and a confirmation email - see
+                  the Provisioning column above. Only falls back to the manual runbook below if that
+                  fails.
+                </>
+              ) : (
+                <>
+                  Marking a request &quot;set up&quot; automatically assigns it a
+                  &lt;subdomain&gt;.openregistro.another-horizon.eu address and emails the school a
+                  confirmation with that address. Set <code>VERCEL_PROVISIONING_TOKEN</code> to
+                  automate the rest; until then, creating the actual Vercel project and database is
+                  the manual runbook below.
+                </>
+              )}
             </CardDescription>
           </CardHeader>
           <CardContent>

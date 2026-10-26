@@ -22,6 +22,21 @@ const nextConfig: NextConfig = {
   // on exactly this. It has no effect in production builds either way.
   devIndicators: false,
   transpilePackages: ['@openregistro/core', '@openregistro/db', '@openregistro/ui'],
+  // The `vercel` CLI (used by lib/provisioning to shell out for automated
+  // school provisioning) has its own complex internals not meant to be
+  // webpack-bundled - this keeps it as a real node_modules dependency at
+  // runtime instead.
+  serverExternalPackages: ['vercel'],
+  // serverExternalPackages alone does not make the deploy-time file tracer
+  // include `vercel`'s files in /cp's function bundle - lib/provisioning
+  // deliberately resolves its CLI path via a non-statically-analyzable
+  // expression (to dodge a separate webpack ESM-resolution build failure),
+  // which also makes it invisible to the tracer's static analysis. This
+  // forces inclusion explicitly instead - confirmed necessary and sufficient
+  // by deploying and curling a real Vercel Function, not just a local build.
+  outputFileTracingIncludes: {
+    '/cp': ['node_modules/vercel/**/*'],
+  },
   async headers() {
     // Content-Security-Policy is set per-request in middleware.ts instead,
     // since it needs a fresh nonce on every request for script-src.

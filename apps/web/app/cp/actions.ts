@@ -9,12 +9,19 @@ import {
   updateHostingRequestDetails,
   deleteHostingRequest,
   generateLicenseKey,
+  assignSubdomain,
+  isSubdomainTaken,
+  setProvisioningState,
   type HostingRequestStatus,
 } from '@openregistro/db';
 import { requireCpAdmin, verifyCpCredentials, CP_ADMIN_COOKIE } from '@/lib/cp-admin';
 import { getHostingDb } from '@/lib/hosting-db';
 import { checkRateLimit } from '@/lib/rate-limit';
 import { getEnv } from '@/lib/env';
+import { generateUniqueSubdomain } from '@/lib/subdomain-slug';
+import { sendPlatformEmail } from '@/lib/platform-mailer';
+import { renderBrandedEmail } from '@/lib/email-templates';
+import { provisionSchoolInstance } from '@/lib/provisioning/provision-school';
 
 export interface CpLoginState {
   error?: string;
@@ -74,8 +81,95 @@ export async function setHostingRequestStatus(formData: FormData): Promise<void>
   const db = getHostingDb();
   if (!db) return;
 
-  await updateHostingRequestStatus(db, id, status as HostingRequestStatus);
+  let request = await updateHostingRequestStatus(db, id, status as HostingRequestStatus);
+  if (!request || request.status !== 'activated') {
+    revalidatePath('/cp');
+    return;
+  }
+
+  // Assign a subdomain exactly once - re-saving "activated" on a request
+  // that already has one must not generate a second subdomain.
+  const subdomainJustAssigned = !request.subdomain;
+  if (subdomainJustAssigned) {
+    const subdomain = await generateUniqueSubdomain(request.schoolName, (candidate) =>
+      isSubdomainTaken(db, candidate),
+    );
+    request = (await assignSubdomain(db, id, subdomain)) ?? request;
+  }
+
+  const { VERCEL_PROVISIONING_TOKEN } = getEnv();
+  const canAutoProvision =
+    Boolean(VERCEL_PROVISIONING_TOKEN) &&
+    request.subdomain &&
+    request.provisioningStatus !== 'ready' &&
+    request.provisioningStatus !== 'provisioning';
+
+  if (canAutoProvision && request.subdomain) {
+    await setProvisioningState(db, id, { provisioningStatus: 'provisioning' });
+    try {
+      const { vercelProjectId } = await provisionSchoolInstance(
+        request.schoolName,
+        request.subdomain,
+      );
+      await setProvisioningState(db, id, {
+        provisioningStatus: 'ready',
+        vercelProjectId,
+        provisioningError: null,
+      });
+      await sendHostingActivatedEmail(request.contactEmail, {
+        schoolName: request.schoolName,
+        subdomain: request.subdomain,
+        licenseKey: request.licenseKey,
+      });
+    } catch (error) {
+      await setProvisioningState(db, id, {
+        provisioningStatus: 'failed',
+        provisioningError: error instanceof Error ? error.message : 'Unknown provisioning error.',
+      });
+    }
+  } else if (!VERCEL_PROVISIONING_TOKEN && request.subdomain && subdomainJustAssigned) {
+    // No provisioning automation configured on this instance - fall back to
+    // the manual runbook, same as before automation existed. Only send once,
+    // the first time a subdomain is assigned (re-activating later must not
+    // re-send this).
+    await sendHostingActivatedEmail(request.contactEmail, {
+      schoolName: request.schoolName,
+      subdomain: request.subdomain,
+      licenseKey: request.licenseKey,
+    });
+  }
+
   revalidatePath('/cp');
+}
+
+async function sendHostingActivatedEmail(
+  contactEmail: string,
+  details: { schoolName: string; subdomain: string; licenseKey: string | null },
+): Promise<void> {
+  const instanceUrl = `https://${details.subdomain}.openregistro.another-horizon.eu`;
+  const { html, text } = renderBrandedEmail({
+    preheader: `${details.schoolName} is ready on OpenRegistro.`,
+    heading: 'Your hosted instance is ready',
+    bodyLines: [
+      `Hi, great news - ${details.schoolName}'s free hosted OpenRegistro instance is now live.`,
+      `Your address: ${instanceUrl}`,
+      "Open that link and follow the first-run setup wizard to create your school's admin account, classes, and staff.",
+      ...(details.licenseKey
+        ? [`Your reference code (keep this for support requests): ${details.licenseKey}`]
+        : []),
+      'This instance has its own dedicated database - nothing is shared with any other school.',
+    ],
+    cta: { label: 'Open your instance', url: instanceUrl },
+    footnote:
+      "You're receiving this because a hosting request was submitted for this school at openregistro.another-horizon.eu/host.",
+  });
+
+  await sendPlatformEmail({
+    to: contactEmail,
+    subject: `${details.schoolName} is ready on OpenRegistro`,
+    text,
+    html,
+  });
 }
 
 const editFormSchema = z.object({
