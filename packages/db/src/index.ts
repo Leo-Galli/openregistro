@@ -12,7 +12,11 @@ export {
   updateHostingRequestDetails,
   deleteHostingRequest,
   generateLicenseKey,
+  isSubdomainTaken,
+  assignSubdomain,
+  setProvisioningState,
   type CreateHostingRequestInput,
   type HostingRequest,
   type HostingRequestStatus,
+  type ProvisioningStatus,
 } from './postgres/hosting-requests';

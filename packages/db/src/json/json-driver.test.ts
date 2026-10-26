@@ -83,6 +83,7 @@ describe('json storage driver', () => {
       contactEmail: 'info@liceogalilei.example',
       logoUrl: null,
       primaryColor: '#1a2b3c',
+      usePlatformEmail: false,
     });
 
     expect(school.id).toBeTruthy();
@@ -96,6 +97,7 @@ describe('json storage driver', () => {
       contactEmail: null,
       logoUrl: null,
       primaryColor: null,
+      usePlatformEmail: false,
     });
 
     const updated = await driver.schools.update(school.id, { name: 'Liceo Fermi' });
@@ -110,6 +112,7 @@ describe('json storage driver', () => {
       contactEmail: null,
       logoUrl: null,
       primaryColor: null,
+      usePlatformEmail: false,
     });
 
     await driver.schools.delete(school.id);
@@ -123,6 +126,7 @@ describe('json storage driver', () => {
       contactEmail: null,
       logoUrl: null,
       primaryColor: null,
+      usePlatformEmail: false,
     });
     await driver.schools.create({
       name: 'School B',
@@ -130,6 +134,7 @@ describe('json storage driver', () => {
       contactEmail: null,
       logoUrl: null,
       primaryColor: null,
+      usePlatformEmail: false,
     });
 
     const results = await driver.schools.findMany({ name: 'School A' });
@@ -144,6 +149,7 @@ describe('json storage driver', () => {
         contactEmail: null,
         logoUrl: null,
         primaryColor: null,
+        usePlatformEmail: false,
       }),
     ).rejects.toThrow();
   });
@@ -163,6 +169,7 @@ describe('json storage driver', () => {
       contactEmail: null,
       logoUrl: null,
       primaryColor: null,
+      usePlatformEmail: false,
     });
     const schoolYear = await driver.schoolYears.create({
       schoolId: school.id,
@@ -229,6 +236,7 @@ describe('json storage driver', () => {
       contactEmail: null,
       logoUrl: null,
       primaryColor: null,
+      usePlatformEmail: false,
     });
     const user = await driver.users.create({
       schoolId: school.id,

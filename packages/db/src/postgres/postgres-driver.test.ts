@@ -101,6 +101,7 @@ describe.skipIf(!connectionString)('postgres storage driver', () => {
       contactEmail: null,
       logoUrl: null,
       primaryColor: null,
+      usePlatformEmail: false,
     });
     expect(await driver.schools.findById(school.id)).toEqual(school);
 
@@ -126,6 +127,7 @@ describe.skipIf(!connectionString)('postgres storage driver', () => {
       contactEmail: null,
       logoUrl: null,
       primaryColor: null,
+      usePlatformEmail: false,
     });
     const schoolYear = await driver.schoolYears.create({
       schoolId: school.id,

@@ -44,6 +44,13 @@ export const auditEntityEnum = pgEnum('audit_entity', [
   'user',
 ]);
 export const storageDriverEnum = pgEnum('installer_storage_driver', ['json', 'postgres']);
+export const provisioningStatusEnum = pgEnum('provisioning_status', [
+  'not_started',
+  'provisioning',
+  'ready',
+  'failed',
+]);
+
 export const hostingRequestStatusEnum = pgEnum('hosting_request_status', [
   'pending',
   'contacted',
@@ -81,6 +88,7 @@ export const schoolsTable = pgTable('schools', {
   logoUrl: text('logo_url'),
   primaryColor: text('primary_color'),
   themeId: text('theme_id'),
+  usePlatformEmail: boolean('use_platform_email').notNull().default(false),
   ...timestamps,
 });
 
@@ -432,6 +440,24 @@ export const hostingRequestsTable = pgTable('hosting_requests', {
   message: text('message'),
   status: hostingRequestStatusEnum('status').notNull().default('pending'),
   licenseKey: text('license_key'),
+  /**
+   * Assigned when the operator activates the request (see
+   * apps/web/lib/subdomain-slug.ts) - the school's eventual
+   * <subdomain>.openregistro.another-horizon.eu address. Nullable because it
+   * does not exist yet for pending/contacted/declined requests.
+   */
+  subdomain: text('subdomain').unique(),
+  /**
+   * The Vercel project name for this school's dedicated instance - a
+   * deterministic `openregistro-<subdomain>` string, not a raw Vercel
+   * project ID, since Vercel's own APIs/CLI accept a project name
+   * interchangeably with its ID everywhere this codebase calls them.
+   */
+  vercelProjectId: text('vercel_project_id'),
+  provisioningStatus: provisioningStatusEnum('provisioning_status')
+    .notNull()
+    .default('not_started'),
+  provisioningError: text('provisioning_error'),
   createdAt: timestamp('created_at', { withTimezone: true, mode: 'string' }).notNull(),
   updatedAt: timestamp('updated_at', { withTimezone: true, mode: 'string' }).notNull(),
 });

@@ -9,6 +9,8 @@ import {
   updateHostingRequestDetails,
   deleteHostingRequest,
   generateLicenseKey,
+  assignSubdomain,
+  isSubdomainTaken,
 } from './hosting-requests';
 
 /**
@@ -130,6 +132,23 @@ describe.skipIf(!connectionString)('hosting requests', () => {
     expect(updated?.schoolName).toBe('New Name');
     expect(updated?.approxStudents).toBe(20);
     expect(updated?.message).toBe('Updated message');
+  });
+
+  it('assigns a subdomain and reports it as taken afterward', async () => {
+    const request = await createHostingRequest(db, {
+      schoolName: 'Subdomain School',
+      contactName: 'S',
+      contactEmail: 's@example.com',
+      approxStudents: null,
+      message: null,
+    });
+    createdIds.push(request.id);
+
+    expect(await isSubdomainTaken(db, 'subdomain-school')).toBe(false);
+
+    const updated = await assignSubdomain(db, request.id, 'subdomain-school');
+    expect(updated?.subdomain).toBe('subdomain-school');
+    expect(await isSubdomainTaken(db, 'subdomain-school')).toBe(true);
   });
 
   it('deletes a request', async () => {

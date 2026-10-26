@@ -13,11 +13,16 @@ export interface CreateHostingRequestInput {
 }
 
 export type HostingRequestStatus = 'pending' | 'contacted' | 'activated' | 'declined';
+export type ProvisioningStatus = 'not_started' | 'provisioning' | 'ready' | 'failed';
 
 export interface HostingRequest extends CreateHostingRequestInput {
   id: string;
   status: HostingRequestStatus;
   licenseKey: string | null;
+  subdomain: string | null;
+  vercelProjectId: string | null;
+  provisioningStatus: ProvisioningStatus;
+  provisioningError: string | null;
   createdAt: string;
   updatedAt: string;
 }
@@ -91,6 +96,45 @@ export async function generateLicenseKey(db: Database, id: string): Promise<Host
   const [row] = await db
     .update(hostingRequestsTable)
     .set({ licenseKey: generateLicenseCode(), updatedAt: nowIso() })
+    .where(eq(hostingRequestsTable.id, id))
+    .returning();
+  return row ? (normalizeTimestamps(row) as HostingRequest) : null;
+}
+
+export async function isSubdomainTaken(db: Database, subdomain: string): Promise<boolean> {
+  const [row] = await db
+    .select({ id: hostingRequestsTable.id })
+    .from(hostingRequestsTable)
+    .where(eq(hostingRequestsTable.subdomain, subdomain))
+    .limit(1);
+  return row !== undefined;
+}
+
+export async function assignSubdomain(
+  db: Database,
+  id: string,
+  subdomain: string,
+): Promise<HostingRequest | null> {
+  const [row] = await db
+    .update(hostingRequestsTable)
+    .set({ subdomain, updatedAt: nowIso() })
+    .where(eq(hostingRequestsTable.id, id))
+    .returning();
+  return row ? (normalizeTimestamps(row) as HostingRequest) : null;
+}
+
+export async function setProvisioningState(
+  db: Database,
+  id: string,
+  state: {
+    provisioningStatus: ProvisioningStatus;
+    vercelProjectId?: string | null;
+    provisioningError?: string | null;
+  },
+): Promise<HostingRequest | null> {
+  const [row] = await db
+    .update(hostingRequestsTable)
+    .set({ ...state, updatedAt: nowIso() })
     .where(eq(hostingRequestsTable.id, id))
     .returning();
   return row ? (normalizeTimestamps(row) as HostingRequest) : null;

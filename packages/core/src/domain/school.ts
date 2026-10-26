@@ -15,6 +15,15 @@ export const schoolSchema = z.object({
     .regex(/^#[0-9a-fA-F]{6}$/)
     .nullable(),
   themeId: z.string().min(1).max(60).nullable().optional(),
+  /**
+   * Opt-in to having platform-hosted instances send notification emails
+   * (grades, etc.) through the operator's own shared mailbox instead of the
+   * school's own SMTP settings. Only ever effective when the running
+   * instance is platform-hosted (see apps/web/lib/env.ts's PLATFORM_HOSTED) -
+   * self-hosted installs have no shared mailbox to use, so this flag is
+   * inert there regardless of its stored value.
+   */
+  usePlatformEmail: z.boolean().default(false),
   createdAt: timestampSchema,
   updatedAt: timestampSchema,
 });

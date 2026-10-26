@@ -36,6 +36,20 @@
       "when": 1793008238531,
       "tag": "0004_awesome_meggan",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1793032858328,
+      "tag": "0005_parched_stick",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1793038213275,
+      "tag": "0006_outstanding_wraith",
+      "breakpoints": true
     }
   ]
 }
