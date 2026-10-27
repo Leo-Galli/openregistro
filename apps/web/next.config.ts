@@ -93,10 +93,29 @@ const nextConfig: NextConfig = {
   // apps/web, and `node_modules/vercel/**/*` (unprefixed) is also still
   // required, since the vercel package's own entrypoint file still only
   // lives via its normal pnpm symlink in apps/web's own node_modules.
+  //
+  // A THIRD production failure after the above (confirmed missing:
+  // @vercel/detect-agent's dist/index.js, while @vercel/cli-auth's own files
+  // - which happen to sit flat at its package root with no subdirectory -
+  // were present) traced back to the underlying `glob` package (a dependency
+  // of @vercel/nft, Next's tracer) not following a symlink it discovers
+  // *during* a recursive `**` match. `node_modules/@vercel` is a real
+  // directory (the hoisted packages each live under it as individual
+  // symlinks), so `@vercel/**/*` makes `**` itself discover each package
+  // symlink mid-traversal - and by default `glob` does not follow a
+  // symlink it finds that way, so it lists the symlinked package directory's
+  // own immediate contents but refuses to descend into any further
+  // subdirectory inside it (like detect-agent's `dist/`). Replacing the
+  // leading `**` with a single `*` (matching exactly the package-name
+  // segment, not discovered via recursion) avoids that code path entirely -
+  // confirmed by walking every real file under every hoisted `@vercel/*`
+  // package and diffing against what each pattern actually matches: `@vercel/
+  // **/*` silently dropped nested files in multiple packages (not just
+  // detect-agent), `@vercel/*/**/*` matched all of them.
   outputFileTracingIncludes: {
     '/cp': [
       'node_modules/vercel/**/*',
-      '../../node_modules/@vercel/**/*',
+      '../../node_modules/@vercel/*/**/*',
       '../../node_modules/chokidar/**/*',
       '../../node_modules/esbuild/**/*',
       '../../node_modules/jose/**/*',
