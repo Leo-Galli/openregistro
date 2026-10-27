@@ -88,12 +88,19 @@ export async function setHostingRequestStatus(formData: FormData): Promise<void>
   }
 
   // Assign a subdomain exactly once - re-saving "activated" on a request
-  // that already has one must not generate a second subdomain.
+  // that already has one must not generate a second subdomain. Honor what
+  // the requester chose at submission time if it's still free (someone else
+  // could have claimed it since); otherwise fall back to auto-generating
+  // one from the school name.
   const subdomainJustAssigned = !request.subdomain;
   if (subdomainJustAssigned) {
-    const subdomain = await generateUniqueSubdomain(request.schoolName, (candidate) =>
-      isSubdomainTaken(db, candidate),
-    );
+    const requested = request.requestedSubdomain;
+    const subdomain =
+      requested && !(await isSubdomainTaken(db, requested))
+        ? requested
+        : await generateUniqueSubdomain(request.schoolName, (candidate) =>
+            isSubdomainTaken(db, candidate),
+          );
     request = (await assignSubdomain(db, id, subdomain)) ?? request;
   }
 

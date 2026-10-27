@@ -19,6 +19,60 @@ function slugify(schoolName: string): string {
   return base || 'school';
 }
 
+/**
+ * Names that would collide with real infrastructure subdomains, or be
+ * confusing/misleading as a school's own address, if a visitor were allowed
+ * to claim them for themselves.
+ */
+const RESERVED_SUBDOMAINS = new Set([
+  'www',
+  'api',
+  'demo',
+  'admin',
+  'cp',
+  'app',
+  'mail',
+  'smtp',
+  'ftp',
+  'docs',
+  'status',
+  'blog',
+  'openregistro',
+]);
+
+const SUBDOMAIN_FORMAT = /^[a-z0-9]([a-z0-9-]{0,28}[a-z0-9])?$/;
+
+export interface SubdomainFormatError {
+  code: 'too_short' | 'too_long' | 'invalid_format' | 'reserved';
+  message: string;
+}
+
+/**
+ * Validates a visitor-chosen subdomain - lowercase letters, digits, and
+ * hyphens only, no leading/trailing hyphen, 3-30 characters, and not one of
+ * the names this platform's own infrastructure already uses. Pure format
+ * check only; availability (is it already taken by another school) is a
+ * separate, async check against the database.
+ */
+export function validateSubdomainFormat(subdomain: string): SubdomainFormatError | null {
+  if (subdomain.length < 3) {
+    return { code: 'too_short', message: 'Must be at least 3 characters.' };
+  }
+  if (subdomain.length > 30) {
+    return { code: 'too_long', message: 'Must be 30 characters or fewer.' };
+  }
+  if (!SUBDOMAIN_FORMAT.test(subdomain)) {
+    return {
+      code: 'invalid_format',
+      message: 'Use only lowercase letters, numbers, and hyphens - no leading or trailing hyphen.',
+    };
+  }
+  if (RESERVED_SUBDOMAINS.has(subdomain)) {
+    return { code: 'reserved', message: 'This subdomain is reserved.' };
+  }
+  return null;
+}
+
 const MAX_ATTEMPTS = 20;
 
 /**

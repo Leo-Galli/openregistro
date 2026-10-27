@@ -289,6 +289,13 @@ export default async function CpPage() {
                       >
                         {req.subdomain}
                       </a>
+                    ) : req.requestedSubdomain ? (
+                      <span
+                        className="font-mono text-xs text-muted-foreground"
+                        title="Requested - not yet assigned"
+                      >
+                        {req.requestedSubdomain}?
+                      </span>
                     ) : (
                       <span className="text-xs text-muted-foreground">-</span>
                     )}

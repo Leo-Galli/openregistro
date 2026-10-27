@@ -1,24 +1,12 @@
 import { NextResponse, type NextRequest } from 'next/server';
 import { z } from 'zod';
-import { createHostingRequest } from '@openregistro/db';
+import { createHostingRequest, isSubdomainTaken } from '@openregistro/db';
 import { getHostingDb } from '@/lib/hosting-db';
 import { checkRateLimit } from '@/lib/rate-limit';
+import { publicApiCorsHeaders } from '@/lib/public-api-cors';
+import { validateSubdomainFormat } from '@/lib/subdomain-slug';
 
 export const dynamic = 'force-dynamic';
-
-/*
- * The marketing site (apps/website) is a static export with no server of
- * its own, so its "request hosting" form submits here, cross-origin. Only
- * that site's known origins are allowed - this is a public, unauthenticated,
- * write-only endpoint (a lead-capture form), so CORS is the only thing
- * standing between it and being spammed from an arbitrary page.
- */
-const ALLOWED_ORIGINS = new Set([
-  'https://openregistro.vercel.app',
-  'https://openregistro.another-horizon.eu',
-  'http://localhost:3000',
-  'http://localhost:3001',
-]);
 
 const hostingRequestSchema = z.object({
   schoolName: z.string().min(1).max(200),
@@ -26,26 +14,18 @@ const hostingRequestSchema = z.object({
   contactEmail: z.string().email(),
   approxStudents: z.number().int().min(1).max(100000).nullable(),
   message: z.string().max(2000).nullable(),
+  requestedSubdomain: z.string().min(1).max(30).nullable().optional(),
 });
-
-function corsHeaders(origin: string | null): HeadersInit {
-  if (!origin || !ALLOWED_ORIGINS.has(origin)) return {};
-  return {
-    'Access-Control-Allow-Origin': origin,
-    'Access-Control-Allow-Methods': 'POST, OPTIONS',
-    'Access-Control-Allow-Headers': 'Content-Type',
-  };
-}
 
 export async function OPTIONS(request: NextRequest) {
   return new NextResponse(null, {
     status: 204,
-    headers: corsHeaders(request.headers.get('origin')),
+    headers: publicApiCorsHeaders(request.headers.get('origin')),
   });
 }
 
 export async function POST(request: NextRequest) {
-  const headers = corsHeaders(request.headers.get('origin'));
+  const headers = publicApiCorsHeaders(request.headers.get('origin'));
 
   const db = getHostingDb();
   if (!db) {
@@ -66,6 +46,27 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Invalid request.' }, { status: 400, headers });
   }
 
-  await createHostingRequest(db, parsed.data);
+  const { requestedSubdomain: rawRequestedSubdomain, ...rest } = parsed.data;
+
+  // Re-validate and re-check availability server-side even though the form
+  // already did both client-side - the client's check is a UX convenience,
+  // never the source of truth for what actually gets stored.
+  let requestedSubdomain: string | null = null;
+  if (rawRequestedSubdomain) {
+    const normalized = rawRequestedSubdomain.toLowerCase().trim();
+    const formatError = validateSubdomainFormat(normalized);
+    if (formatError) {
+      return NextResponse.json({ error: formatError.message }, { status: 400, headers });
+    }
+    if (await isSubdomainTaken(db, normalized)) {
+      return NextResponse.json(
+        { error: 'That subdomain was just taken - please choose another.' },
+        { status: 409, headers },
+      );
+    }
+    requestedSubdomain = normalized;
+  }
+
+  await createHostingRequest(db, { ...rest, requestedSubdomain });
   return NextResponse.json({ ok: true }, { status: 201, headers });
 }

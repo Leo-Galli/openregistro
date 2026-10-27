@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { generateUniqueSubdomain } from './subdomain-slug';
+import { generateUniqueSubdomain, validateSubdomainFormat } from './subdomain-slug';
 
 const neverTaken = async () => false;
 
@@ -37,5 +37,33 @@ describe('generateUniqueSubdomain', () => {
     await expect(generateUniqueSubdomain('Liceo Galilei', async () => true)).rejects.toThrow(
       /Could not generate a unique subdomain/,
     );
+  });
+});
+
+describe('validateSubdomainFormat', () => {
+  it('accepts a well-formed subdomain', () => {
+    expect(validateSubdomainFormat('liceo-galilei')).toBeNull();
+    expect(validateSubdomainFormat('abc')).toBeNull();
+  });
+
+  it('rejects subdomains that are too short', () => {
+    expect(validateSubdomainFormat('ab')?.code).toBe('too_short');
+  });
+
+  it('rejects subdomains that are too long', () => {
+    expect(validateSubdomainFormat('a'.repeat(31))?.code).toBe('too_long');
+  });
+
+  it('rejects uppercase, leading/trailing hyphens, and invalid characters', () => {
+    expect(validateSubdomainFormat('Liceo')?.code).toBe('invalid_format');
+    expect(validateSubdomainFormat('-liceo')?.code).toBe('invalid_format');
+    expect(validateSubdomainFormat('liceo-')?.code).toBe('invalid_format');
+    expect(validateSubdomainFormat('liceo_galilei')?.code).toBe('invalid_format');
+  });
+
+  it('rejects names reserved for platform infrastructure', () => {
+    expect(validateSubdomainFormat('api')?.code).toBe('reserved');
+    expect(validateSubdomainFormat('demo')?.code).toBe('reserved');
+    expect(validateSubdomainFormat('www')?.code).toBe('reserved');
   });
 });
