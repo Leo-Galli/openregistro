@@ -22,7 +22,6 @@
     "@openregistro/ui": "workspace:*",
     "@react-pdf/renderer": "4.9.0",
     "@vercel/analytics": "^2.0.1",
-    "drizzle-orm": "0.45.4",
     "geist": "1.8.2",
     "lucide-react": "0.61.0",
     "next": "16.4.2",
