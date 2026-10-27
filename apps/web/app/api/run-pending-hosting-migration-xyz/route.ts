@@ -32,22 +32,26 @@ export async function POST(request: NextRequest) {
     await db.execute(sql`ALTER TABLE "hosting_requests" ADD COLUMN IF NOT EXISTS "subdomain" text`);
     applied.push('subdomain column');
 
-    await db.execute(sql`
-      DO $$ BEGIN
-        ALTER TABLE "hosting_requests" ADD CONSTRAINT "hosting_requests_subdomain_unique" UNIQUE("subdomain");
-      EXCEPTION
-        WHEN duplicate_object THEN NULL;
-      END $$;
+    const constraintRows = await db.execute<{ exists: boolean }>(sql`
+      SELECT EXISTS (
+        SELECT 1 FROM pg_constraint WHERE conname = 'hosting_requests_subdomain_unique'
+      ) AS exists
     `);
+    if (!constraintRows[0]?.exists) {
+      await db.execute(
+        sql`ALTER TABLE "hosting_requests" ADD CONSTRAINT "hosting_requests_subdomain_unique" UNIQUE("subdomain")`,
+      );
+    }
     applied.push('subdomain unique constraint');
 
-    await db.execute(sql`
-      DO $$ BEGIN
-        CREATE TYPE "public"."provisioning_status" AS ENUM('not_started', 'provisioning', 'ready', 'failed');
-      EXCEPTION
-        WHEN duplicate_object THEN NULL;
-      END $$;
+    const enumRows = await db.execute<{ exists: boolean }>(sql`
+      SELECT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'provisioning_status') AS exists
     `);
+    if (!enumRows[0]?.exists) {
+      await db.execute(
+        sql`CREATE TYPE "public"."provisioning_status" AS ENUM('not_started', 'provisioning', 'ready', 'failed')`,
+      );
+    }
     applied.push('provisioning_status enum');
 
     await db.execute(
