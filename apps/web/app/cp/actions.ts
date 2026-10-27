@@ -5,6 +5,7 @@ import { revalidatePath } from 'next/cache';
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 import {
+  listHostingRequests,
   updateHostingRequestStatus,
   updateHostingRequestDetails,
   deleteHostingRequest,
@@ -81,77 +82,133 @@ export async function setHostingRequestStatus(formData: FormData): Promise<void>
   const db = getHostingDb();
   if (!db) return;
 
-  let request = await updateHostingRequestStatus(db, id, status as HostingRequestStatus);
-  if (!request || request.status !== 'activated') {
+  const request = await updateHostingRequestStatus(db, id, status as HostingRequestStatus);
+  if (!request || request.status !== 'activated' || request.subdomain) {
     revalidatePath('/cp');
     return;
   }
 
-  // Assign a subdomain exactly once - re-saving "activated" on a request
-  // that already has one must not generate a second subdomain. Honor what
-  // the requester chose at submission time if it's still free (someone else
-  // could have claimed it since); otherwise fall back to auto-generating
-  // one from the school name.
-  const subdomainJustAssigned = !request.subdomain;
-  if (subdomainJustAssigned) {
-    const requested = request.requestedSubdomain;
-    const subdomain =
-      requested && !(await isSubdomainTaken(db, requested))
-        ? requested
-        : await generateUniqueSubdomain(request.schoolName, (candidate) =>
-            isSubdomainTaken(db, candidate),
-          );
-    request = (await assignSubdomain(db, id, subdomain)) ?? request;
+  // Assign a subdomain exactly once, the first time a request is marked "set
+  // up" - honor what the requester chose at submission time if it's still
+  // free (someone else could have claimed it since), otherwise auto-generate
+  // one from the school name. Creating the actual Vercel project/database and
+  // notifying the school are deliberate, separate operator actions
+  // (provisionRequestAction / notifyReadyAction below), not automatic side
+  // effects of this status change - the operator decides when each happens.
+  const requested = request.requestedSubdomain;
+  const subdomain =
+    requested && !(await isSubdomainTaken(db, requested))
+      ? requested
+      : await generateUniqueSubdomain(request.schoolName, (candidate) =>
+          isSubdomainTaken(db, candidate),
+        );
+  await assignSubdomain(db, id, subdomain);
+
+  revalidatePath('/cp');
+}
+
+/**
+ * Creates the dedicated Vercel project + database for a request that already
+ * has a subdomain assigned - triggered explicitly by the operator (not as a
+ * side effect of changing status), so they can review the request before
+ * committing a real resource to it.
+ */
+export async function provisionRequestAction(formData: FormData): Promise<void> {
+  await requireCpAdmin();
+
+  const id = formData.get('id');
+  if (typeof id !== 'string') return;
+
+  const db = getHostingDb();
+  if (!db) return;
+
+  const requests = await listHostingRequests(db);
+  const request = requests.find((candidate) => candidate.id === id);
+  if (!request || !request.subdomain) return;
+  if (request.provisioningStatus === 'ready' || request.provisioningStatus === 'provisioning') {
+    return;
   }
 
   const { VERCEL_PROVISIONING_TOKEN } = getEnv();
-  const canAutoProvision =
-    Boolean(VERCEL_PROVISIONING_TOKEN) &&
-    request.subdomain &&
-    request.provisioningStatus !== 'ready' &&
-    request.provisioningStatus !== 'provisioning';
+  if (!VERCEL_PROVISIONING_TOKEN) return;
 
-  if (canAutoProvision && request.subdomain) {
-    await setProvisioningState(db, id, { provisioningStatus: 'provisioning' });
-    try {
-      const { vercelProjectId } = await provisionSchoolInstance(
-        request.schoolName,
-        request.subdomain,
-      );
-      await setProvisioningState(db, id, {
-        provisioningStatus: 'ready',
-        vercelProjectId,
-        provisioningError: null,
-      });
-      await sendHostingActivatedEmail(request.contactEmail, {
-        schoolName: request.schoolName,
-        subdomain: request.subdomain,
-        licenseKey: request.licenseKey,
-      });
-    } catch (error) {
-      await setProvisioningState(db, id, {
-        provisioningStatus: 'failed',
-        provisioningError: error instanceof Error ? error.message : 'Unknown provisioning error.',
-      });
-    }
-  } else if (!VERCEL_PROVISIONING_TOKEN && request.subdomain && subdomainJustAssigned) {
-    // No provisioning automation configured on this instance - fall back to
-    // the manual runbook, same as before automation existed. Only send once,
-    // the first time a subdomain is assigned (re-activating later must not
-    // re-send this).
-    await sendHostingActivatedEmail(request.contactEmail, {
-      schoolName: request.schoolName,
-      subdomain: request.subdomain,
-      licenseKey: request.licenseKey,
+  await setProvisioningState(db, id, { provisioningStatus: 'provisioning' });
+  try {
+    const { vercelProjectId } = await provisionSchoolInstance(
+      request.schoolName,
+      request.subdomain,
+    );
+    await setProvisioningState(db, id, {
+      provisioningStatus: 'ready',
+      vercelProjectId,
+      provisioningError: null,
+    });
+  } catch (error) {
+    await setProvisioningState(db, id, {
+      provisioningStatus: 'failed',
+      provisioningError: error instanceof Error ? error.message : 'Unknown provisioning error.',
     });
   }
 
   revalidatePath('/cp');
 }
 
+export interface NotifyReadyState {
+  ok: boolean;
+  error?: string;
+}
+
+/**
+ * Sends the "your instance is ready" email on demand, with an operator-
+ * editable note - deliberately separate from provisioning so the operator
+ * can proofread/customize the message (or re-send it) rather than it firing
+ * automatically the moment the project is created.
+ */
+export async function notifyReadyAction(
+  _prevState: NotifyReadyState,
+  formData: FormData,
+): Promise<NotifyReadyState> {
+  await requireCpAdmin();
+
+  const id = formData.get('id');
+  const note = formData.get('note');
+  if (typeof id !== 'string') return { ok: false, error: 'Missing request id.' };
+
+  const db = getHostingDb();
+  if (!db) return { ok: false, error: 'Hosting requests are not available on this instance.' };
+
+  const requests = await listHostingRequests(db);
+  const request = requests.find((candidate) => candidate.id === id);
+  if (!request || !request.subdomain) {
+    return { ok: false, error: 'This request has no subdomain assigned yet.' };
+  }
+
+  try {
+    await sendHostingActivatedEmail(request.contactEmail, {
+      schoolName: request.schoolName,
+      subdomain: request.subdomain,
+      licenseKey: request.licenseKey,
+      note: typeof note === 'string' && note.trim() ? note.trim() : null,
+    });
+  } catch (error) {
+    return {
+      ok: false,
+      error: error instanceof Error ? error.message : 'Could not send the email.',
+    };
+  }
+
+  revalidatePath('/cp');
+  return { ok: true };
+}
+
 async function sendHostingActivatedEmail(
   contactEmail: string,
-  details: { schoolName: string; subdomain: string; licenseKey: string | null },
+  details: {
+    schoolName: string;
+    subdomain: string;
+    licenseKey: string | null;
+    note?: string | null;
+  },
 ): Promise<void> {
   const instanceUrl = `https://${details.subdomain}.openregistro.another-horizon.eu`;
   const { html, text } = renderBrandedEmail({
@@ -165,6 +222,7 @@ async function sendHostingActivatedEmail(
         ? [`Your reference code (keep this for support requests): ${details.licenseKey}`]
         : []),
       'This instance has its own dedicated database - nothing is shared with any other school.',
+      ...(details.note ? [details.note] : []),
     ],
     cta: { label: 'Open your instance', url: instanceUrl },
     footnote:

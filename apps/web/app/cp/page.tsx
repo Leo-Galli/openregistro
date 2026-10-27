@@ -34,6 +34,8 @@ import { EditHostingRequestDialog } from '@/components/cp/edit-hosting-request-d
 import { DeleteHostingRequestButton } from '@/components/cp/delete-hosting-request-button';
 import { LicenseCell } from '@/components/cp/license-cell';
 import { RedeployButton } from '@/components/cp/redeploy-button';
+import { ProvisionRequestButton } from '@/components/cp/provision-request-button';
+import { NotifyReadyDialog } from '@/components/cp/notify-ready-dialog';
 import { setHostingRequestStatus, logoutCp } from './actions';
 
 export const dynamic = 'force-dynamic';
@@ -108,7 +110,7 @@ const SUBDOMAIN_STEPS = [
   {
     title: 'Deploy and attach the assigned subdomain',
     detail:
-      "vercel deploy --prod --yes, then vercel domains add <subdomain>.openregistro.another-horizon.eu <project> using the subdomain already shown in the table above - it was generated automatically the moment this request was marked 'set up', and the confirmation email already told the school that address.",
+      "vercel deploy --prod --yes, then vercel domains add <subdomain>.openregistro.another-horizon.eu <project> using the subdomain already shown in the table above - it was generated automatically the moment this request was marked 'set up'. Once it's live, use the 'Notify' button in the Actions column to tell the school.",
   },
 ];
 
@@ -301,20 +303,33 @@ export default async function CpPage() {
                     )}
                   </TableCell>
                   <TableCell>
-                    <Badge variant={PROVISIONING_BADGE[req.provisioningStatus]}>
-                      {PROVISIONING_LABEL[req.provisioningStatus]}
-                    </Badge>
-                    {req.provisioningStatus === 'failed' && req.provisioningError ? (
-                      <p className="mt-1 max-w-48 text-xs text-destructive">
-                        {req.provisioningError}
-                      </p>
-                    ) : null}
+                    <div className="flex flex-col items-start gap-1.5">
+                      <Badge variant={PROVISIONING_BADGE[req.provisioningStatus]}>
+                        {PROVISIONING_LABEL[req.provisioningStatus]}
+                      </Badge>
+                      {req.provisioningStatus === 'failed' && req.provisioningError ? (
+                        <p className="max-w-48 text-xs text-destructive">{req.provisioningError}</p>
+                      ) : null}
+                      {VERCEL_PROVISIONING_TOKEN &&
+                      req.subdomain &&
+                      req.provisioningStatus !== 'ready' &&
+                      req.provisioningStatus !== 'provisioning' ? (
+                        <ProvisionRequestButton id={req.id} />
+                      ) : null}
+                    </div>
                   </TableCell>
                   <TableCell>
                     <LicenseCell id={req.id} licenseKey={req.licenseKey} />
                   </TableCell>
                   <TableCell>
                     <div className="flex flex-wrap items-center gap-2">
+                      {req.subdomain ? (
+                        <NotifyReadyDialog
+                          id={req.id}
+                          schoolName={req.schoolName}
+                          subdomain={req.subdomain}
+                        />
+                      ) : null}
                       <EditHostingRequestDialog request={req} />
                       <DeleteHostingRequestButton id={req.id} schoolName={req.schoolName} />
                     </div>
@@ -374,20 +389,24 @@ export default async function CpPage() {
             <CardDescription>
               {VERCEL_PROVISIONING_TOKEN ? (
                 <>
-                  Marking a request &quot;set up&quot; fully automates provisioning: a dedicated
-                  Vercel project, a free Neon database via Vercel&apos;s own marketplace
-                  integration, the assigned &lt;subdomain&gt;.openregistro.another-horizon.eu
-                  domain, an initial deploy from <code>main</code>, and a confirmation email - see
-                  the Provisioning column above. Only falls back to the manual runbook below if that
-                  fails.
+                  Marking a request &quot;set up&quot; assigns it a
+                  &lt;subdomain&gt;.openregistro.another-horizon.eu address. From there it&apos;s
+                  two deliberate clicks in the Provisioning and Actions columns above: &quot;Create
+                  project&quot; provisions a dedicated Vercel project, a free Neon database via
+                  Vercel&apos;s own marketplace integration, and an initial deploy from{' '}
+                  <code>main</code> - then &quot;Notify&quot; sends the school a confirmation email
+                  (with an editable note) once you&apos;ve confirmed it&apos;s actually live. Only
+                  falls back to the manual runbook below if provisioning fails.
                 </>
               ) : (
                 <>
                   Marking a request &quot;set up&quot; automatically assigns it a
-                  &lt;subdomain&gt;.openregistro.another-horizon.eu address and emails the school a
-                  confirmation with that address. Set <code>VERCEL_PROVISIONING_TOKEN</code> to
-                  automate the rest; until then, creating the actual Vercel project and database is
-                  the manual runbook below.
+                  &lt;subdomain&gt;.openregistro.another-horizon.eu address. Set{' '}
+                  <code>VERCEL_PROVISIONING_TOKEN</code> to enable the one-click &quot;Create
+                  project&quot; button; until then, creating the actual Vercel project and database
+                  is the manual runbook below. Once it&apos;s live (automated or manual), use
+                  &quot;Notify&quot; in the Actions column to email the school a confirmation, with
+                  an editable note.
                 </>
               )}
             </CardDescription>
