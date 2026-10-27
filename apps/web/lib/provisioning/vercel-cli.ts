@@ -43,6 +43,54 @@ export class VercelCliError extends Error {
 }
 
 /**
+ * Every managed project this codebase ever creates or operates on lives
+ * under this one team - hardcoded (matches the slug already hardcoded in
+ * app/cp/page.tsx's dashboard links) rather than left to whatever scope the
+ * provisioning token defaults to, since a personal-account-scoped token
+ * silently resolves commands against the wrong account otherwise (see the
+ * error-message fix below - this was the actual root cause of a real
+ * "Not authorized" / "Check that the selected team is correct" failure).
+ */
+const TEAM_SCOPE = 'leo-gallis-projects';
+
+/**
+ * Pulls the real failure reason out of a failed vercel CLI invocation. The
+ * CLI always writes its own version banner (and any deprecation notices) to
+ * stderr - on every invocation, not just failures - while the actual
+ * machine-readable error (`{ status: "error", reason, message, hint, ... }`)
+ * goes to stdout. A naive `stderr || stdout` pick (what this used to do)
+ * means every real failure showed only "Vercel CLI 65.3.1 (Node.js ...)" -
+ * confirmed by deliberately forcing a failure (an invalid token) and
+ * inspecting both streams directly, not guessed.
+ */
+function extractErrorMessage(stdout: string, stderr: string): string {
+  const trimmedStdout = stdout.trim();
+  if (trimmedStdout) {
+    try {
+      const parsed = JSON.parse(trimmedStdout) as {
+        message?: string;
+        reason?: string;
+        hint?: string;
+      };
+      if (parsed.message) {
+        return [parsed.message, parsed.hint].filter(Boolean).join(' - ');
+      }
+    } catch {
+      return trimmedStdout;
+    }
+  }
+  const trimmedStderr = stderr.trim();
+  // Strip the version banner / deprecation notices so a genuine stderr-only
+  // failure doesn't get buried under them.
+  const meaningfulStderr = trimmedStderr
+    .split('\n')
+    .filter((line) => !/^Vercel CLI \d|^! `.*` is deprecated/.test(line.trim()))
+    .join('\n')
+    .trim();
+  return meaningfulStderr || trimmedStderr || 'unknown error';
+}
+
+/**
  * Shells out to the bundled Vercel CLI, authenticated with this instance's
  * own provisioning token (never the operator's personal login) - every call
  * is non-interactive by construction, since this only ever runs unattended
@@ -66,7 +114,15 @@ export async function runVercelCli(
   try {
     const { stdout, stderr } = await execFileAsync(
       process.execPath,
-      [resolveCliPath(), ...args, '--token', VERCEL_PROVISIONING_TOKEN, '--non-interactive'],
+      [
+        resolveCliPath(),
+        ...args,
+        '--token',
+        VERCEL_PROVISIONING_TOKEN,
+        '--scope',
+        TEAM_SCOPE,
+        '--non-interactive',
+      ],
       { cwd: options.cwd, timeout: 120_000, maxBuffer: 10 * 1024 * 1024 },
     );
     return { stdout, stderr };
@@ -76,7 +132,7 @@ export async function runVercelCli(
     const stdout = isExecFileError(error) ? error.stdout : '';
     const stderr = isExecFileError(error) ? error.stderr : '';
     throw new VercelCliError(
-      `vercel ${args[0] ?? ''} failed: ${stderr.trim() || stdout.trim() || 'unknown error'}`,
+      `vercel ${args[0] ?? ''} failed: ${extractErrorMessage(stdout, stderr)}`,
       stdout,
       stderr,
     );
