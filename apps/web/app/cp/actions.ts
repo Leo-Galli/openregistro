@@ -343,55 +343,88 @@ export async function redeployDemo(_prevState: RedeployState): Promise<RedeployS
   }
 }
 
-export interface NotificationEmailsState {
+export interface AddNotificationEmailState {
   ok: boolean;
   error?: string;
+  warning?: string;
 }
 
-/**
- * Splits on commas and newlines so either "a@x.com, b@y.com" or one address
- * per line works - whichever the operator happens to type.
- */
-function parseEmailsInput(raw: string): string[] {
-  return raw
-    .split(/[,\n]/)
-    .map((email) => email.trim())
-    .filter(Boolean);
-}
-
-const emailListSchema = z.array(z.string().email());
-
-export async function updateNotificationEmailsAction(
-  _prevState: NotificationEmailsState,
+export async function addNotificationEmailAction(
+  _prevState: AddNotificationEmailState,
   formData: FormData,
-): Promise<NotificationEmailsState> {
+): Promise<AddNotificationEmailState> {
   await requireCpAdmin();
 
-  const raw = formData.get('emails');
-  if (typeof raw !== 'string') return { ok: false, error: 'Missing emails field.' };
+  const raw = formData.get('email');
+  if (typeof raw !== 'string') return { ok: false, error: 'Missing email.' };
 
-  const parsed = emailListSchema.safeParse(parseEmailsInput(raw));
-  if (!parsed.success) {
-    return { ok: false, error: 'One or more addresses are not valid emails.' };
-  }
+  const parsed = z.string().email().safeParse(raw.trim());
+  if (!parsed.success) return { ok: false, error: 'Enter a valid email address.' };
 
   const db = getHostingDb();
   if (!db) return { ok: false, error: 'Hosting requests are not available on this instance.' };
 
-  const before = await getPlatformSettings(db);
-  await setNotificationEmails(db, parsed.data);
+  const { notificationEmails } = await getPlatformSettings(db);
+  if (notificationEmails.includes(parsed.data)) {
+    return { ok: false, error: 'That address is already on the list.' };
+  }
 
-  // Only the addresses that are genuinely new get the welcome email - saving
-  // the same list again (or removing one) must not re-send it to everyone
-  // still on it.
-  const newlyAdded = parsed.data.filter((email) => !before.notificationEmails.includes(email));
-  await Promise.all(newlyAdded.map((email) => sendNotificationAddedEmail(email)));
+  await setNotificationEmails(db, [...notificationEmails, parsed.data]);
+  const sent = await sendNotificationAddedEmail(parsed.data);
 
   revalidatePath('/cp');
-  return { ok: true };
+  return sent
+    ? { ok: true }
+    : {
+        ok: true,
+        warning:
+          'Added, but the welcome email could not be sent - check the platform SMTP settings.',
+      };
 }
 
-async function sendNotificationAddedEmail(to: string): Promise<void> {
+/**
+ * The "x" next to each address - a plain fire-and-forget action (like
+ * DeleteHostingRequestButton) rather than useActionState, since there is
+ * nothing meaningful to confirm beyond the row disappearing.
+ */
+export async function removeNotificationEmailAction(formData: FormData): Promise<void> {
+  await requireCpAdmin();
+
+  const email = formData.get('email');
+  if (typeof email !== 'string') return;
+
+  const db = getHostingDb();
+  if (!db) return;
+
+  const { notificationEmails } = await getPlatformSettings(db);
+  await setNotificationEmails(
+    db,
+    notificationEmails.filter((candidate) => candidate !== email),
+  );
+  revalidatePath('/cp');
+}
+
+export interface ResendWelcomeEmailState {
+  ok: boolean;
+  error?: string;
+}
+
+export async function resendWelcomeEmailAction(
+  _prevState: ResendWelcomeEmailState,
+  formData: FormData,
+): Promise<ResendWelcomeEmailState> {
+  await requireCpAdmin();
+
+  const email = formData.get('email');
+  if (typeof email !== 'string') return { ok: false, error: 'Missing email.' };
+
+  const sent = await sendNotificationAddedEmail(email);
+  return sent
+    ? { ok: true }
+    : { ok: false, error: 'Could not send - check the platform SMTP settings.' };
+}
+
+async function sendNotificationAddedEmail(to: string): Promise<boolean> {
   const { html, text } = renderBrandedEmail({
     preheader: "You'll now get an email for every new OpenRegistro hosting request.",
     heading: "You're on the hosting-request notification list",
@@ -404,7 +437,7 @@ async function sendNotificationAddedEmail(to: string): Promise<void> {
     footnote: 'This is an automated message from the OpenRegistro control panel.',
   });
 
-  await sendPlatformEmail({
+  return sendPlatformEmail({
     to,
     subject: "You're now on the OpenRegistro hosting-request notification list",
     text,

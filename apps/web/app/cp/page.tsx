@@ -37,7 +37,8 @@ import { LicenseCell } from '@/components/cp/license-cell';
 import { RedeployButton } from '@/components/cp/redeploy-button';
 import { ProvisionRequestButton } from '@/components/cp/provision-request-button';
 import { NotifyReadyDialog } from '@/components/cp/notify-ready-dialog';
-import { NotificationEmailsForm } from '@/components/cp/notification-emails-form';
+import { NotificationEmailRow } from '@/components/cp/notification-email-row';
+import { AddNotificationEmailForm } from '@/components/cp/add-notification-email-form';
 import { setHostingRequestStatus, logoutCp } from './actions';
 
 export const dynamic = 'force-dynamic';
@@ -465,11 +466,21 @@ export default async function CpPage() {
             <CardTitle className="mt-3">Who gets pinged</CardTitle>
             <CardDescription>
               Every address below gets a branded email the moment a school submits the free hosting
-              form - one per line or comma-separated.
+              form. Adding one sends it a welcome email automatically; &quot;Resend&quot; sends that
+              same email again on demand.
             </CardDescription>
           </CardHeader>
-          <CardContent>
-            <NotificationEmailsForm initialEmails={platformSettings.notificationEmails} />
+          <CardContent className="flex flex-col gap-4">
+            {platformSettings.notificationEmails.length === 0 ? (
+              <p className="text-sm text-muted-foreground">No addresses yet.</p>
+            ) : (
+              <div className="flex flex-col gap-2">
+                {platformSettings.notificationEmails.map((email) => (
+                  <NotificationEmailRow key={email} email={email} />
+                ))}
+              </div>
+            )}
+            <AddNotificationEmailForm />
           </CardContent>
         </Card>
       </section>
