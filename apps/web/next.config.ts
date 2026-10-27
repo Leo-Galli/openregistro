@@ -49,10 +49,25 @@ const nextConfig: NextConfig = {
   // deliberately resolves its CLI path via a non-statically-analyzable
   // expression (to dodge a separate webpack ESM-resolution build failure),
   // which also makes it invisible to the tracer's static analysis. This
-  // forces inclusion explicitly instead - confirmed necessary and sufficient
-  // by deploying and curling a real Vercel Function, not just a local build.
+  // forces inclusion explicitly instead.
+  //
+  // `node_modules/vercel/**/*` alone is NOT enough: lib/provisioning/
+  // vercel-cli.ts runs vercel's CLI entrypoint as a genuine child process
+  // (`node node_modules/vercel/dist/vc.js ...`), and that process does its
+  // own plain Node `require()` resolution from the deployed function's own
+  // filesystem - nothing about webpack bundling applies to it at all. The
+  // `vercel` package's own package.json lists dozens of `@vercel/*` packages
+  // as real (non-optional) dependencies (`@vercel/cli-auth`, `@vercel/build-
+  // utils`, one per framework builder, etc.), plus a platform-specific native
+  // binary (`@vercel/vc-native-linux-x64` on Vercel's own runtime) as an
+  // optional dependency - every one of those lives as a SIBLING package under
+  // `node_modules/@vercel/*`, not nested inside `node_modules/vercel/`, so
+  // the original glob silently missed all of them. Confirmed as the actual
+  // cause of a real production failure ("Cannot find package '@vercel/cli-
+  // auth'", "native Vercel CLI package ... is not installed") when clicking
+  // "Create project" in /cp, not guessed.
   outputFileTracingIncludes: {
-    '/cp': ['node_modules/vercel/**/*'],
+    '/cp': ['node_modules/vercel/**/*', 'node_modules/@vercel/**/*'],
   },
   // This same codebase is deployed to multiple Vercel projects under
   // multiple domains (the demo/control-panel project, the public-API

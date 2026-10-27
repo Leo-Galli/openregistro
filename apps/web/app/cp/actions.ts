@@ -215,16 +215,16 @@ async function sendHostingActivatedEmail(
   const instanceUrl = `https://${details.subdomain}.openregistro.another-horizon.eu`;
   const { html, text } = renderBrandedEmail({
     preheader: `${details.schoolName} is ready on OpenRegistro.`,
-    heading: 'Your hosted instance is ready',
+    eyebrow: 'Your instance is ready',
+    heading: `Welcome aboard, ${details.schoolName}`,
     bodyLines: [
-      `Hi, great news - ${details.schoolName}'s free hosted OpenRegistro instance is now live.`,
-      `Your address: ${instanceUrl}`,
-      "Open that link and follow the first-run setup wizard to create your school's admin account, classes, and staff.",
-      ...(details.licenseKey
-        ? [`Your reference code (keep this for support requests): ${details.licenseKey}`]
-        : []),
-      'This instance has its own dedicated database - nothing is shared with any other school.',
+      'Great news - your free, dedicated OpenRegistro instance is live, with its own database. Nothing is shared with any other school.',
+      "Open the link below and follow the first-run setup wizard to create your school's admin account, classes, and staff.",
       ...(details.note ? [details.note] : []),
+    ],
+    facts: [
+      { label: 'Address', value: instanceUrl },
+      ...(details.licenseKey ? [{ label: 'Reference code', value: details.licenseKey }] : []),
     ],
     cta: { label: 'Open your instance', url: instanceUrl },
     footnote:
@@ -427,6 +427,7 @@ export async function resendWelcomeEmailAction(
 async function sendNotificationAddedEmail(to: string): Promise<boolean> {
   const { html, text } = renderBrandedEmail({
     preheader: "You'll now get an email for every new OpenRegistro hosting request.",
+    eyebrow: 'Control panel',
     heading: "You're on the hosting-request notification list",
     bodyLines: [
       'This address was just added in the OpenRegistro control panel.',

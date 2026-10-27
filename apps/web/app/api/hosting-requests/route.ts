@@ -74,7 +74,10 @@ export async function POST(request: NextRequest) {
   }
 
   await createHostingRequest(db, { ...rest, requestedSubdomain });
-  await notifyOperatorsOfNewRequest(db, { ...rest, requestedSubdomain });
+  await Promise.all([
+    notifyOperatorsOfNewRequest(db, { ...rest, requestedSubdomain }),
+    sendRequestReceivedEmail(rest),
+  ]);
   return NextResponse.json({ ok: true }, { status: 201, headers });
 }
 
@@ -99,13 +102,20 @@ async function notifyOperatorsOfNewRequest(
 
   const { html, text } = renderBrandedEmail({
     preheader: `New hosting request from ${request.schoolName}.`,
-    heading: 'New hosting request',
+    eyebrow: 'New hosting request',
+    heading: request.schoolName,
     bodyLines: [
       `${request.schoolName} just requested free hosting.`,
-      `Contact: ${request.contactName} <${request.contactEmail}>`,
-      ...(request.approxStudents ? [`Approximate students: ${request.approxStudents}`] : []),
-      ...(request.requestedSubdomain ? [`Requested subdomain: ${request.requestedSubdomain}`] : []),
-      ...(request.message ? [`Message: ${request.message}`] : []),
+      ...(request.message ? [`Message: "${request.message}"`] : []),
+    ],
+    facts: [
+      { label: 'Contact', value: `${request.contactName} <${request.contactEmail}>` },
+      ...(request.approxStudents
+        ? [{ label: 'Students', value: String(request.approxStudents) }]
+        : []),
+      ...(request.requestedSubdomain
+        ? [{ label: 'Requested subdomain', value: request.requestedSubdomain }]
+        : []),
     ],
     cta: {
       label: 'Review in the control panel',
@@ -124,4 +134,37 @@ async function notifyOperatorsOfNewRequest(
       }),
     ),
   );
+}
+
+/**
+ * The requester's own confirmation - separate from the operator alert above,
+ * sent to the school's contactEmail rather than the notification list, so
+ * they know their submission actually went through even before anyone on the
+ * operator side has looked at it.
+ */
+async function sendRequestReceivedEmail(request: {
+  schoolName: string;
+  contactName: string;
+  contactEmail: string;
+}): Promise<void> {
+  const { html, text } = renderBrandedEmail({
+    preheader: 'Thanks - your free hosting request is in.',
+    eyebrow: 'Request received',
+    heading: `Thanks for requesting hosting, ${request.contactName.split(' ')[0]}`,
+    bodyLines: [
+      `We've received ${request.schoolName}'s request for a free, self-hosted OpenRegistro instance.`,
+      "A real person reviews every request - we'll email this address as soon as it's set up, usually within a few days.",
+      'No action is needed from you in the meantime.',
+    ],
+    cta: { label: 'See what OpenRegistro can do', url: 'https://openregistro.another-horizon.eu' },
+    footnote:
+      "You're receiving this because this address submitted a hosting request at openregistro.another-horizon.eu/host.",
+  });
+
+  await sendPlatformEmail({
+    to: request.contactEmail,
+    subject: `We've got your OpenRegistro hosting request, ${request.schoolName}`,
+    text,
+    html,
+  });
 }
