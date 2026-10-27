@@ -1,6 +1,8 @@
 import { NextResponse, type NextRequest } from 'next/server';
 import { getEnv, platformSmtpConfigured } from '@/lib/env';
 import { sendEmail } from '@/lib/mailer';
+import { getHostingDb } from '@/lib/hosting-db';
+import { listHostingRequests, deleteHostingRequest } from '@openregistro/db';
 
 export const dynamic = 'force-dynamic';
 
@@ -59,4 +61,20 @@ export async function POST(request: NextRequest) {
           : String(error),
     });
   }
+}
+
+/** Removes the throwaway rows created while verifying the email flow above. */
+export async function DELETE(request: NextRequest) {
+  const token = process.env.DIAG_TOKEN;
+  if (!token || request.headers.get('x-diag-token') !== token) {
+    return NextResponse.json({ ok: false, error: 'unauthorized' }, { status: 401 });
+  }
+
+  const db = getHostingDb();
+  if (!db) return NextResponse.json({ ok: false, error: 'no hosting db' }, { status: 503 });
+
+  const requests = await listHostingRequests(db);
+  const toDelete = requests.filter((r) => r.schoolName.startsWith('Diagnostic Test School'));
+  await Promise.all(toDelete.map((r) => deleteHostingRequest(db, r.id)));
+  return NextResponse.json({ ok: true, deleted: toDelete.length });
 }
