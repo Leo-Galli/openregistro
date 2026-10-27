@@ -111,6 +111,23 @@ export async function runVercelCli(
     throw new Error('VERCEL_PROVISIONING_TOKEN is not configured on this instance.');
   }
 
+  // This code runs inside a Vercel Function deployed on the *demo* project,
+  // which - if "Automatically expose System Environment Variables" is on for
+  // that project (it is) - has its OWN VERCEL_PROJECT_ID/VERCEL_ORG_ID set in
+  // process.env. execFile inherits the parent's env by default, so every
+  // spawned `vercel` subprocess was seeing the demo project's identity leak
+  // in instead of resolving the *target* project from the `.vercel/
+  // project.json` that `vercel link` deliberately writes to the scratch cwd
+  // for exactly this purpose. The CLI apparently only trusts a full env-var
+  // pair as an override and errors instead of silently ignoring a partial
+  // one ("you specified VERCEL_PROJECT_ID but forgot VERCEL_ORG_ID") - a real
+  // production failure confirmed by inspecting this project's own runtime
+  // env directly, not guessed. Stripping both here lets the CLI fall back to
+  // the file-based link as intended.
+  const env = { ...process.env };
+  delete env.VERCEL_PROJECT_ID;
+  delete env.VERCEL_ORG_ID;
+
   try {
     const { stdout, stderr } = await execFileAsync(
       process.execPath,
@@ -123,7 +140,7 @@ export async function runVercelCli(
         TEAM_SCOPE,
         '--non-interactive',
       ],
-      { cwd: options.cwd, timeout: 120_000, maxBuffer: 10 * 1024 * 1024 },
+      { cwd: options.cwd, timeout: 120_000, maxBuffer: 10 * 1024 * 1024, env },
     );
     return { stdout, stderr };
   } catch (error) {
