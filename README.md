@@ -13,8 +13,8 @@
 
 <p>
   <a href="https://demo.openregistro.another-horizon.eu"><img src="https://img.shields.io/badge/-Try%20the%20live%20demo-2350E7?style=for-the-badge" alt="Try the live demo" /></a>
-  <a href="https://openregistro.vercel.app/host"><img src="https://img.shields.io/badge/-Get%20free%20hosting-151B32?style=for-the-badge" alt="Get free hosting" /></a>
-  <a href="https://openregistro.vercel.app/docs"><img src="https://img.shields.io/badge/-Docs-EF5478?style=for-the-badge" alt="Docs" /></a>
+  <a href="https://openregistro.another-horizon.eu/host"><img src="https://img.shields.io/badge/-Get%20free%20hosting-151B32?style=for-the-badge" alt="Get free hosting" /></a>
+  <a href="https://openregistro.another-horizon.eu/docs"><img src="https://img.shields.io/badge/-Docs-EF5478?style=for-the-badge" alt="Docs" /></a>
 </p>
 
 </div>
@@ -56,7 +56,7 @@ students' data never leaves your infrastructure.
 
 <div align="center">
   <img src="./docs/assets/readme/website-hero.png" alt="OpenRegistro marketing site hero section" width="100%" />
-  <p><sub>Marketing site - <a href="https://openregistro.vercel.app">openregistro.vercel.app</a></sub></p>
+  <p><sub>Marketing site - <a href="https://openregistro.another-horizon.eu">openregistro.another-horizon.eu</a></sub></p>
   <br />
   <img src="./docs/assets/readme/dashboard.png" alt="OpenRegistro dashboard overview" width="100%" />
   <p><sub>Dashboard overview on the live demo - <a href="https://demo.openregistro.another-horizon.eu">demo.openregistro.another-horizon.eu</a></sub></p>
@@ -130,17 +130,17 @@ docker compose -f docker-compose.json.yml up
 
 ## Documentation
 
-Rendered at [openregistro.vercel.app/docs](https://openregistro.vercel.app/docs), straight from
+Rendered at [openregistro.another-horizon.eu/docs](https://openregistro.another-horizon.eu/docs), straight from
 the markdown files below - pick whichever is more convenient to read.
 
 <table>
-<tr><td><a href="https://openregistro.vercel.app/docs/installation">Installation</a></td><td><a href="./docs/installation.md"><code>docs/installation.md</code></a></td><td>self-hosting from scratch, Docker or Node</td></tr>
-<tr><td><a href="https://openregistro.vercel.app/docs/configuration">Configuration</a></td><td><a href="./docs/configuration.md"><code>docs/configuration.md</code></a></td><td>environment variables and the setup wizard</td></tr>
-<tr><td><a href="https://openregistro.vercel.app/docs/architecture">Architecture</a></td><td><a href="./docs/architecture.md"><code>docs/architecture.md</code></a></td><td>monorepo layout, the StorageDriver abstraction</td></tr>
-<tr><td><a href="https://openregistro.vercel.app/docs/theming">Theming</a></td><td><a href="./docs/theming.md"><code>docs/theming.md</code></a></td><td>the base theme system and how to contribute one</td></tr>
-<tr><td><a href="https://openregistro.vercel.app/docs/backups">Backups</a></td><td><a href="./docs/backups.md"><code>docs/backups.md</code></a></td><td>backing up and restoring both storage drivers</td></tr>
-<tr><td><a href="https://openregistro.vercel.app/docs/gdpr">GDPR / data protection</a></td><td><a href="./docs/gdpr.md"><code>docs/gdpr.md</code></a></td><td>what personal data is stored and how to export or erase it</td></tr>
-<tr><td><a href="https://openregistro.vercel.app/docs/api-reference">Server actions reference</a></td><td><a href="./docs/api-reference.md"><code>docs/api-reference.md</code></a></td><td>every mutating server action, by feature area</td></tr>
+<tr><td><a href="https://openregistro.another-horizon.eu/docs/installation">Installation</a></td><td><a href="./docs/installation.md"><code>docs/installation.md</code></a></td><td>self-hosting from scratch, Docker or Node</td></tr>
+<tr><td><a href="https://openregistro.another-horizon.eu/docs/configuration">Configuration</a></td><td><a href="./docs/configuration.md"><code>docs/configuration.md</code></a></td><td>environment variables and the setup wizard</td></tr>
+<tr><td><a href="https://openregistro.another-horizon.eu/docs/architecture">Architecture</a></td><td><a href="./docs/architecture.md"><code>docs/architecture.md</code></a></td><td>monorepo layout, the StorageDriver abstraction</td></tr>
+<tr><td><a href="https://openregistro.another-horizon.eu/docs/theming">Theming</a></td><td><a href="./docs/theming.md"><code>docs/theming.md</code></a></td><td>the base theme system and how to contribute one</td></tr>
+<tr><td><a href="https://openregistro.another-horizon.eu/docs/backups">Backups</a></td><td><a href="./docs/backups.md"><code>docs/backups.md</code></a></td><td>backing up and restoring both storage drivers</td></tr>
+<tr><td><a href="https://openregistro.another-horizon.eu/docs/gdpr">GDPR / data protection</a></td><td><a href="./docs/gdpr.md"><code>docs/gdpr.md</code></a></td><td>what personal data is stored and how to export or erase it</td></tr>
+<tr><td><a href="https://openregistro.another-horizon.eu/docs/api-reference">Server actions reference</a></td><td><a href="./docs/api-reference.md"><code>docs/api-reference.md</code></a></td><td>every mutating server action, by feature area</td></tr>
 </table>
 
 ## License

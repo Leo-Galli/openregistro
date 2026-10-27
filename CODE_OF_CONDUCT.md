@@ -1,3 +1,7 @@
+<div align="center">
+  <a href="./README.md"><img src="./docs/assets/readme/banner.svg" alt="OpenRegistro" width="420" /></a>
+</div>
+
 # Contributor Covenant Code of Conduct
 
 ## Our Pledge

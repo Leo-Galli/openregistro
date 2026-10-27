@@ -1,3 +1,7 @@
+<div align="center">
+  <a href="./README.md"><img src="./docs/assets/readme/banner.svg" alt="OpenRegistro" width="420" /></a>
+</div>
+
 # Contributing to OpenRegistro
 
 Thanks for considering a contribution. This document covers how to get a development

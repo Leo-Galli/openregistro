@@ -1,3 +1,7 @@
+<div align="center">
+  <a href="./README.md"><img src="./docs/assets/readme/banner.svg" alt="OpenRegistro" width="420" /></a>
+</div>
+
 # Changelog
 
 All notable changes to this project are documented in this file. The format is based on
