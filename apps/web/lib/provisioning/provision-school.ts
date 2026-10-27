@@ -54,6 +54,14 @@ export async function provisionSchoolInstance(
 
   await runVercelCli(['project', 'add', projectName]);
 
+  // --yes is required here specifically: `project update` refuses to change
+  // settings non-interactively without it ("Updating project settings
+  // requires confirmation"), a real production failure this surfaced before
+  // the error-message fix made it visible. Not added globally in
+  // runVercelCli - `project add` above doesn't accept --yes at all and
+  // errors on an unrecognized flag if it's passed; confirmed per-command,
+  // not assumed, by running this exact sequence against a real throwaway
+  // project before touching production again.
   await runVercelCli([
     'project',
     'update',
@@ -66,6 +74,7 @@ export async function provisionSchoolInstance(
     BUILD_COMMAND,
     '--framework',
     'nextjs',
+    '--yes',
   ]);
 
   // `vercel integration add` and `vercel git connect` resolve "the current
@@ -73,7 +82,7 @@ export async function provisionSchoolInstance(
   // this scratch directory exists only to hold that link for this run.
   const scratchDir = await mkdtemp(path.join(tmpdir(), 'openregistro-provision-'));
   try {
-    await runVercelCli(['link', '--project', projectName, '--yes'], { cwd: scratchDir });
+    await runVercelCli(['link', '--project', projectName], { cwd: scratchDir });
     await runVercelCli(['git', 'connect', `${REPO_URL}.git`], { cwd: scratchDir });
     await runVercelCli(['integration', 'add', 'neon', '--plan', 'free_v3', '--no-claim'], {
       cwd: scratchDir,
@@ -119,7 +128,6 @@ async function setEnvVar(projectName: string, key: string, value: string): Promi
     value,
     '--project',
     projectName,
-    '--yes',
     '--force',
   ]);
 }
