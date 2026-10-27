@@ -4,6 +4,14 @@ const YELLOW = '#ffcd29';
 const MUTED = '#6b7280';
 const BORDER = '#e7e2d3';
 const FACT_BG = '#fbf6e8';
+/**
+ * The exact same banner used at the top of the repo's README
+ * (docs/assets/readme/banner.svg), rasterized to PNG (via Playwright) since
+ * email clients - Outlook desktop especially - don't reliably render inline
+ * SVG. Served from apps/web's own public/ folder so the same deployment that
+ * sends these emails also hosts the image, with no separate asset pipeline.
+ */
+const BANNER_URL = 'https://demo.openregistro.another-horizon.eu/email-banner.png';
 
 function escapeHtml(value: string): string {
   return value
@@ -38,9 +46,9 @@ const SERIF = "Georgia,'Times New Roman',serif";
  * this intentionally skips the app's hard-shadow/radius language (an offset
  * drop-shadow built from nested tables renders inconsistently across Outlook/
  * Gmail) in favor of a simpler bordered-card look that degrades safely
- * everywhere, while still getting a real visual hierarchy: an eyebrow label,
- * a monogram mark next to the wordmark, and an optional bordered "facts" card
- * for key details instead of burying them in prose.
+ * everywhere, while still getting a real visual hierarchy: the same banner
+ * image used at the top of the README, an eyebrow label, and an optional
+ * bordered "facts" card for key details instead of burying them in prose.
  *
  * Every dynamic string (heading, body lines, facts, footnote, CTA label) is
  * HTML-escaped before interpolation - some of this content originates from
@@ -122,17 +130,15 @@ export function renderBrandedEmail(options: BrandedEmailOptions): { html: string
         <td align="center" style="padding:40px 16px;">
           <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:560px;">
             <tr>
-              <td style="background:${INK};border-radius:14px 14px 0 0;padding:22px 24px;">
-                <table role="presentation" cellpadding="0" cellspacing="0">
-                  <tr>
-                    <td style="background:${YELLOW};border-radius:8px;width:32px;height:32px;text-align:center;vertical-align:middle;font-size:15px;font-weight:800;color:${INK};font-family:${SANS};">OR</td>
-                    <td style="padding-left:10px;font-size:17px;font-weight:700;color:${CREAM};letter-spacing:0.01em;font-family:${SANS};vertical-align:middle;">OpenRegistro</td>
-                  </tr>
-                </table>
+              <td style="line-height:0;font-size:0;">
+                <img
+                  src="${BANNER_URL}"
+                  width="560"
+                  height="140"
+                  alt="OpenRegistro - a register you run yourself, not one you rent."
+                  style="display:block;width:100%;max-width:560px;height:auto;border:2px solid ${INK};border-bottom:none;border-radius:14px 14px 0 0;"
+                />
               </td>
-            </tr>
-            <tr>
-              <td style="height:3px;line-height:3px;font-size:0;background:${YELLOW};">&nbsp;</td>
             </tr>
             <tr>
               <td style="background:#ffffff;border:2px solid ${INK};border-top:none;border-radius:0 0 14px 14px;padding:30px 26px;">

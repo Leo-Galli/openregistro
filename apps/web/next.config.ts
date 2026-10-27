@@ -60,14 +60,54 @@ const nextConfig: NextConfig = {
   // as real (non-optional) dependencies (`@vercel/cli-auth`, `@vercel/build-
   // utils`, one per framework builder, etc.), plus a platform-specific native
   // binary (`@vercel/vc-native-linux-x64` on Vercel's own runtime) as an
-  // optional dependency - every one of those lives as a SIBLING package under
-  // `node_modules/@vercel/*`, not nested inside `node_modules/vercel/`, so
-  // the original glob silently missed all of them. Confirmed as the actual
-  // cause of a real production failure ("Cannot find package '@vercel/cli-
-  // auth'", "native Vercel CLI package ... is not installed") when clicking
-  // "Create project" in /cp, not guessed.
+  // optional dependency.
+  //
+  // Two prior attempts both failed in production, confirmed by actually
+  // inspecting .next/server/app/cp/page.js.nft.json (the real file-trace
+  // manifest Next writes for this route) rather than guessing:
+  //   1. `node_modules/@vercel/**/*` (relative to apps/web) - wrong, because
+  //      pnpm's strict isolation keeps vercel's own dependencies private
+  //      inside its own .pnpm store entry; `apps/web/node_modules/@vercel/`
+  //      only ever held this app's own direct dependency (`@vercel/
+  //      analytics`), never vercel's.
+  //   2. `node_modules/.pnpm/vercel@*/node_modules/**/*` (targeting that
+  //      .pnpm store entry directly) - also wrong: confirmed via the nft.json
+  //      that Next's include-glob matcher silently skips dot-prefixed path
+  //      segments like `.pnpm`, so nothing under it can ever be force-included
+  //      this way no matter how the pattern is phrased.
+  // The actual fix has two parts: the root `.npmrc`'s `public-hoist-pattern`
+  // entries make pnpm additionally place every `@vercel/*` package, plus
+  // vercel's plain (non-scoped) dependencies (chokidar, esbuild, jose,
+  // jsonc-parser, luxon, sandbox, smol-toml, undici, uuid, zod), at the
+  // WORKSPACE ROOT's `node_modules/<pkg>` (an ordinary, non-dot, glob-
+  // reachable path) - confirmed by re-running `pnpm install` and finding
+  // `node_modules/@vercel/cli-auth` really there, as a symlink, at the repo
+  // root (not inside `apps/web/node_modules/`, which pnpm hoisting never
+  // duplicates into per-package trees). Node's own module resolution walks
+  // every ancestor directory looking for a `node_modules` folder with a
+  // match, all the way up to the filesystem root, not just the nearest one -
+  // so a copy at the workspace root still gets found by vercel's deeply
+  // nested files once the (missing, dot-path, uncopyable) nearer one inside
+  // `.pnpm/vercel@.../node_modules/` simply doesn't exist in the deployed
+  // bundle to shadow it. The `../../` below reaches that workspace root from
+  // apps/web, and `node_modules/vercel/**/*` (unprefixed) is also still
+  // required, since the vercel package's own entrypoint file still only
+  // lives via its normal pnpm symlink in apps/web's own node_modules.
   outputFileTracingIncludes: {
-    '/cp': ['node_modules/vercel/**/*', 'node_modules/@vercel/**/*'],
+    '/cp': [
+      'node_modules/vercel/**/*',
+      '../../node_modules/@vercel/**/*',
+      '../../node_modules/chokidar/**/*',
+      '../../node_modules/esbuild/**/*',
+      '../../node_modules/jose/**/*',
+      '../../node_modules/jsonc-parser/**/*',
+      '../../node_modules/luxon/**/*',
+      '../../node_modules/sandbox/**/*',
+      '../../node_modules/smol-toml/**/*',
+      '../../node_modules/undici/**/*',
+      '../../node_modules/uuid/**/*',
+      '../../node_modules/zod/**/*',
+    ],
   },
   // This same codebase is deployed to multiple Vercel projects under
   // multiple domains (the demo/control-panel project, the public-API
