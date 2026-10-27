@@ -441,6 +441,13 @@ export const hostingRequestsTable = pgTable('hosting_requests', {
   status: hostingRequestStatusEnum('status').notNull().default('pending'),
   licenseKey: text('license_key'),
   /**
+   * What the requester typed into the "choose a subdomain" field and
+   * confirmed was available at submission time - a preference, not a
+   * reservation (another request could still claim it first). Not unique:
+   * only the `subdomain` column below is the authoritative, assigned one.
+   */
+  requestedSubdomain: text('requested_subdomain'),
+  /**
    * Assigned when the operator activates the request (see
    * apps/web/lib/subdomain-slug.ts) - the school's eventual
    * <subdomain>.openregistro.another-horizon.eu address. Nullable because it

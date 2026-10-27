@@ -10,15 +10,18 @@ export interface CreateHostingRequestInput {
   contactEmail: string;
   approxStudents: number | null;
   message: string | null;
+  /** Optional: omitted entirely (not set to null) on an update leaves the existing value untouched. */
+  requestedSubdomain?: string | null;
 }
 
 export type HostingRequestStatus = 'pending' | 'contacted' | 'activated' | 'declined';
 export type ProvisioningStatus = 'not_started' | 'provisioning' | 'ready' | 'failed';
 
-export interface HostingRequest extends CreateHostingRequestInput {
+export interface HostingRequest extends Omit<CreateHostingRequestInput, 'requestedSubdomain'> {
   id: string;
   status: HostingRequestStatus;
   licenseKey: string | null;
+  requestedSubdomain: string | null;
   subdomain: string | null;
   vercelProjectId: string | null;
   provisioningStatus: ProvisioningStatus;

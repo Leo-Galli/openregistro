@@ -1,0 +1,1 @@
+ALTER TABLE "hosting_requests" ADD COLUMN "requested_subdomain" text;
