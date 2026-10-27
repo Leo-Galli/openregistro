@@ -13,6 +13,7 @@ import {
   assignSubdomain,
   isSubdomainTaken,
   setProvisioningState,
+  getPlatformSettings,
   setNotificationEmails,
   type HostingRequestStatus,
 } from '@openregistro/db';
@@ -377,7 +378,36 @@ export async function updateNotificationEmailsAction(
   const db = getHostingDb();
   if (!db) return { ok: false, error: 'Hosting requests are not available on this instance.' };
 
+  const before = await getPlatformSettings(db);
   await setNotificationEmails(db, parsed.data);
+
+  // Only the addresses that are genuinely new get the welcome email - saving
+  // the same list again (or removing one) must not re-send it to everyone
+  // still on it.
+  const newlyAdded = parsed.data.filter((email) => !before.notificationEmails.includes(email));
+  await Promise.all(newlyAdded.map((email) => sendNotificationAddedEmail(email)));
+
   revalidatePath('/cp');
   return { ok: true };
+}
+
+async function sendNotificationAddedEmail(to: string): Promise<void> {
+  const { html, text } = renderBrandedEmail({
+    preheader: "You'll now get an email for every new OpenRegistro hosting request.",
+    heading: "You're on the hosting-request notification list",
+    bodyLines: [
+      'This address was just added in the OpenRegistro control panel.',
+      "From now on, you'll get an email here every time a school submits the free hosting form.",
+      "If this wasn't you, remove this address from the notification list in /cp.",
+    ],
+    cta: { label: 'Open the control panel', url: 'https://openregistro.another-horizon.eu/cp' },
+    footnote: 'This is an automated message from the OpenRegistro control panel.',
+  });
+
+  await sendPlatformEmail({
+    to,
+    subject: "You're now on the OpenRegistro hosting-request notification list",
+    text,
+    html,
+  });
 }

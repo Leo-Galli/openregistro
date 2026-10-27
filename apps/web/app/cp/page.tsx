@@ -14,7 +14,7 @@ import {
   TableHeader,
   TableRow,
 } from '@openregistro/ui';
-import { BarChart3, GitCommit, Globe, Mail } from 'lucide-react';
+import { BarChart3, ExternalLink, GitCommit, Globe, Mail } from 'lucide-react';
 import {
   listHostingRequests,
   getPlatformSettings,
@@ -112,7 +112,7 @@ const SUBDOMAIN_STEPS = [
   {
     title: 'Deploy and attach the assigned subdomain',
     detail:
-      "vercel deploy --prod --yes, then vercel domains add <subdomain>.openregistro.another-horizon.eu <project> using the subdomain already shown in the table above - it was generated automatically the moment this request was marked 'set up'. Once it's live, use the 'Notify' button in the Actions column to tell the school.",
+      "vercel deploy --prod --yes, then vercel domains add <subdomain>.openregistro.another-horizon.eu <project> using the subdomain already shown in the table above - it was generated automatically the moment this request was marked 'set up'. This zone's nameservers point at the registrar, not Vercel, so also add the CNAME Vercel shows you (project -> Settings -> Domains) at the registrar's own DNS panel. Once it resolves, use the 'Notify' button in the Actions column to tell the school.",
   },
 ];
 
@@ -319,6 +319,24 @@ export default async function CpPage() {
                       req.provisioningStatus !== 'provisioning' ? (
                         <ProvisionRequestButton id={req.id} />
                       ) : null}
+                      {req.provisioningStatus === 'ready' && req.vercelProjectId ? (
+                        <div className="flex flex-col items-start gap-1">
+                          <Button asChild size="sm" variant="outline">
+                            <a
+                              href={`https://vercel.com/leo-gallis-projects/${req.vercelProjectId}/settings/domains`}
+                              target="_blank"
+                              rel="noreferrer"
+                            >
+                              <ExternalLink className="h-3.5 w-3.5" />
+                              Finish DNS setup
+                            </a>
+                          </Button>
+                          <p className="max-w-48 text-xs text-muted-foreground">
+                            Domain is attached to the project - this zone&apos;s DNS isn&apos;t
+                            delegated to Vercel, so add the CNAME shown there at the registrar.
+                          </p>
+                        </div>
+                      ) : null}
                     </div>
                   </TableCell>
                   <TableCell>
@@ -393,13 +411,16 @@ export default async function CpPage() {
               {VERCEL_PROVISIONING_TOKEN ? (
                 <>
                   Marking a request &quot;set up&quot; assigns it a
-                  &lt;subdomain&gt;.openregistro.another-horizon.eu address. From there it&apos;s
-                  two deliberate clicks in the Provisioning and Actions columns above: &quot;Create
-                  project&quot; provisions a dedicated Vercel project, a free Neon database via
-                  Vercel&apos;s own marketplace integration, and an initial deploy from{' '}
-                  <code>main</code> - then &quot;Notify&quot; sends the school a confirmation email
-                  (with an editable note) once you&apos;ve confirmed it&apos;s actually live. Only
-                  falls back to the manual runbook below if provisioning fails.
+                  &lt;subdomain&gt;.openregistro.another-horizon.eu address, then &quot;Create
+                  project&quot; fully automates the rest: a dedicated Vercel project, a free Neon
+                  database via Vercel&apos;s own marketplace integration, and an initial deploy from{' '}
+                  <code>main</code>. Two things are deliberately left to you: this domain zone
+                  isn&apos;t delegated to Vercel&apos;s nameservers, so &quot;Finish DNS setup&quot;
+                  (shown once the project is live) takes you straight to that project&apos;s domain
+                  settings to add the CNAME at the registrar - and &quot;Notify&quot; sends the
+                  school its confirmation email (with an editable note) once you&apos;ve confirmed
+                  the address actually resolves. Only falls back to the manual runbook below if
+                  provisioning itself fails.
                 </>
               ) : (
                 <>
