@@ -468,3 +468,17 @@ export const hostingRequestsTable = pgTable('hosting_requests', {
   createdAt: timestamp('created_at', { withTimezone: true, mode: 'string' }).notNull(),
   updatedAt: timestamp('updated_at', { withTimezone: true, mode: 'string' }).notNull(),
 });
+
+/**
+ * Singleton row (same id=1 pattern as installerStateTable/appSettingsTable)
+ * living in the HOSTING_DATABASE_URL database, operator-editable from /cp -
+ * not an env var, since the whole point is changing it without a redeploy.
+ * Comma-separated rather than a Postgres array column: there are at most a
+ * handful of addresses, and a plain string keeps the read/write code in
+ * lib/platform-settings.ts trivial.
+ */
+export const platformSettingsTable = pgTable('platform_settings', {
+  id: integer('id').primaryKey().default(1),
+  notificationEmails: text('notification_emails'),
+  updatedAt: timestamp('updated_at', { withTimezone: true, mode: 'string' }).notNull(),
+});

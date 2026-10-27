@@ -13,6 +13,23 @@ const nextConfig: NextConfig = {
    * assets to a path the marketing site's rewrite can forward unambiguously.
    */
   assetPrefix: process.env.CP_ASSET_PREFIX,
+  /*
+   * Next.js Server Actions reject any POST whose Origin header doesn't match
+   * the server's own host, as CSRF protection - correct by default, but it
+   * also rejects every /cp button when the page is reached through the
+   * apps/website vercel.json rewrite (openregistro.another-horizon.eu/cp),
+   * since the browser's Origin is the marketing site's domain, not this
+   * deployment's own. Confirmed as the actual cause of "every button 404s"
+   * via a real click-through, not guessed - every /cp form POST failed only
+   * when reached via the proxy domain, never via demo.openregistro... direct.
+   * This is exactly the documented use case for allowedOrigins ("helpful when
+   * you have a reverse proxy in front of your app").
+   */
+  experimental: {
+    serverActions: {
+      allowedOrigins: ['openregistro.another-horizon.eu', 'openregistro.vercel.app'],
+    },
+  },
   // Required for docker/Dockerfile's runtime stage, which copies
   // .next/standalone rather than shipping the full node_modules tree.
   output: 'standalone',

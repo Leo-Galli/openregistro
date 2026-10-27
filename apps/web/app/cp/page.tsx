@@ -14,9 +14,10 @@ import {
   TableHeader,
   TableRow,
 } from '@openregistro/ui';
-import { BarChart3, GitCommit, Globe } from 'lucide-react';
+import { BarChart3, GitCommit, Globe, Mail } from 'lucide-react';
 import {
   listHostingRequests,
+  getPlatformSettings,
   type HostingRequestStatus,
   type ProvisioningStatus,
 } from '@openregistro/db';
@@ -36,6 +37,7 @@ import { LicenseCell } from '@/components/cp/license-cell';
 import { RedeployButton } from '@/components/cp/redeploy-button';
 import { ProvisionRequestButton } from '@/components/cp/provision-request-button';
 import { NotifyReadyDialog } from '@/components/cp/notify-ready-dialog';
+import { NotificationEmailsForm } from '@/components/cp/notification-emails-form';
 import { setHostingRequestStatus, logoutCp } from './actions';
 
 export const dynamic = 'force-dynamic';
@@ -135,8 +137,9 @@ export default async function CpPage() {
 
   const db = getHostingDb();
   const running = getRunningVersion();
-  const [requests, latest, commitsBehind] = await Promise.all([
+  const [requests, platformSettings, latest, commitsBehind] = await Promise.all([
     db ? listHostingRequests(db) : Promise.resolve([]),
+    db ? getPlatformSettings(db) : Promise.resolve({ notificationEmails: [] }),
     getLatestMainCommit(),
     running.commitSha ? getCommitsBehindMain(running.commitSha) : Promise.resolve(null),
   ]);
@@ -411,20 +414,41 @@ export default async function CpPage() {
               )}
             </CardDescription>
           </CardHeader>
+          {VERCEL_PROVISIONING_TOKEN ? null : (
+            <CardContent>
+              <ol className="flex flex-col gap-4">
+                {SUBDOMAIN_STEPS.map((step, index) => (
+                  <li key={step.title} className="flex gap-3">
+                    <IconBadge size="xs" shape="circle" className="text-xs font-extrabold">
+                      {index + 1}
+                    </IconBadge>
+                    <div>
+                      <p className="text-sm font-medium">{step.title}</p>
+                      <p className="text-sm text-muted-foreground">{step.detail}</p>
+                    </div>
+                  </li>
+                ))}
+              </ol>
+            </CardContent>
+          )}
+        </Card>
+      </section>
+
+      <section className="flex flex-col gap-4">
+        <h2 className="font-display text-lg font-semibold">New request notifications</h2>
+        <Card>
+          <CardHeader>
+            <IconBadge>
+              <Mail className="h-5 w-5" />
+            </IconBadge>
+            <CardTitle className="mt-3">Who gets pinged</CardTitle>
+            <CardDescription>
+              Every address below gets a branded email the moment a school submits the free hosting
+              form - one per line or comma-separated.
+            </CardDescription>
+          </CardHeader>
           <CardContent>
-            <ol className="flex flex-col gap-4">
-              {SUBDOMAIN_STEPS.map((step, index) => (
-                <li key={step.title} className="flex gap-3">
-                  <IconBadge size="xs" shape="circle" className="text-xs font-extrabold">
-                    {index + 1}
-                  </IconBadge>
-                  <div>
-                    <p className="text-sm font-medium">{step.title}</p>
-                    <p className="text-sm text-muted-foreground">{step.detail}</p>
-                  </div>
-                </li>
-              ))}
-            </ol>
+            <NotificationEmailsForm initialEmails={platformSettings.notificationEmails} />
           </CardContent>
         </Card>
       </section>

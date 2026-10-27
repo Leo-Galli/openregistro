@@ -57,6 +57,13 @@
       "when": 1793095400447,
       "tag": "0007_boring_thing",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1793100586181,
+      "tag": "0008_fresh_luckman",
+      "breakpoints": true
     }
   ]
 }

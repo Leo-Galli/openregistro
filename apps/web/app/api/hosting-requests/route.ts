@@ -1,11 +1,13 @@
 import { NextResponse, type NextRequest } from 'next/server';
 import { z } from 'zod';
-import { createHostingRequest, isSubdomainTaken } from '@openregistro/db';
+import { createHostingRequest, isSubdomainTaken, getPlatformSettings } from '@openregistro/db';
 import { getHostingDb } from '@/lib/hosting-db';
 import { checkRateLimit } from '@/lib/rate-limit';
 import { publicApiCorsHeaders } from '@/lib/public-api-cors';
 import { validateSubdomainFormat } from '@/lib/subdomain-slug';
 import { proxyToTargetIfConfigured } from '@/lib/public-api-proxy';
+import { sendPlatformEmail } from '@/lib/platform-mailer';
+import { renderBrandedEmail } from '@/lib/email-templates';
 
 export const dynamic = 'force-dynamic';
 
@@ -72,5 +74,54 @@ export async function POST(request: NextRequest) {
   }
 
   await createHostingRequest(db, { ...rest, requestedSubdomain });
+  await notifyOperatorsOfNewRequest(db, { ...rest, requestedSubdomain });
   return NextResponse.json({ ok: true }, { status: 201, headers });
+}
+
+/**
+ * Best-effort: a misconfigured/absent platform SMTP (true on every
+ * self-hosted install) must never fail the public submission itself -
+ * sendPlatformEmail already swallows its own errors and returns a boolean.
+ */
+async function notifyOperatorsOfNewRequest(
+  db: NonNullable<ReturnType<typeof getHostingDb>>,
+  request: {
+    schoolName: string;
+    contactName: string;
+    contactEmail: string;
+    approxStudents: number | null;
+    message: string | null;
+    requestedSubdomain: string | null;
+  },
+): Promise<void> {
+  const { notificationEmails } = await getPlatformSettings(db);
+  if (notificationEmails.length === 0) return;
+
+  const { html, text } = renderBrandedEmail({
+    preheader: `New hosting request from ${request.schoolName}.`,
+    heading: 'New hosting request',
+    bodyLines: [
+      `${request.schoolName} just requested free hosting.`,
+      `Contact: ${request.contactName} <${request.contactEmail}>`,
+      ...(request.approxStudents ? [`Approximate students: ${request.approxStudents}`] : []),
+      ...(request.requestedSubdomain ? [`Requested subdomain: ${request.requestedSubdomain}`] : []),
+      ...(request.message ? [`Message: ${request.message}`] : []),
+    ],
+    cta: {
+      label: 'Review in the control panel',
+      url: 'https://openregistro.another-horizon.eu/cp',
+    },
+    footnote: 'You are receiving this because your address is on the notification list in /cp.',
+  });
+
+  await Promise.all(
+    notificationEmails.map((to) =>
+      sendPlatformEmail({
+        to,
+        subject: `New hosting request: ${request.schoolName}`,
+        text,
+        html,
+      }),
+    ),
+  );
 }

@@ -13,6 +13,7 @@ import {
   assignSubdomain,
   isSubdomainTaken,
   setProvisioningState,
+  setNotificationEmails,
   type HostingRequestStatus,
 } from '@openregistro/db';
 import { requireCpAdmin, verifyCpCredentials, CP_ADMIN_COOKIE } from '@/lib/cp-admin';
@@ -339,4 +340,44 @@ export async function redeployDemo(_prevState: RedeployState): Promise<RedeployS
       error: error instanceof Error ? error.message : 'Could not reach Vercel.',
     };
   }
+}
+
+export interface NotificationEmailsState {
+  ok: boolean;
+  error?: string;
+}
+
+/**
+ * Splits on commas and newlines so either "a@x.com, b@y.com" or one address
+ * per line works - whichever the operator happens to type.
+ */
+function parseEmailsInput(raw: string): string[] {
+  return raw
+    .split(/[,\n]/)
+    .map((email) => email.trim())
+    .filter(Boolean);
+}
+
+const emailListSchema = z.array(z.string().email());
+
+export async function updateNotificationEmailsAction(
+  _prevState: NotificationEmailsState,
+  formData: FormData,
+): Promise<NotificationEmailsState> {
+  await requireCpAdmin();
+
+  const raw = formData.get('emails');
+  if (typeof raw !== 'string') return { ok: false, error: 'Missing emails field.' };
+
+  const parsed = emailListSchema.safeParse(parseEmailsInput(raw));
+  if (!parsed.success) {
+    return { ok: false, error: 'One or more addresses are not valid emails.' };
+  }
+
+  const db = getHostingDb();
+  if (!db) return { ok: false, error: 'Hosting requests are not available on this instance.' };
+
+  await setNotificationEmails(db, parsed.data);
+  revalidatePath('/cp');
+  return { ok: true };
 }

@@ -20,3 +20,8 @@ export {
   type HostingRequestStatus,
   type ProvisioningStatus,
 } from './postgres/hosting-requests';
+export {
+  getPlatformSettings,
+  setNotificationEmails,
+  type PlatformSettings,
+} from './postgres/platform-settings';
