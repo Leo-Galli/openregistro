@@ -5,6 +5,7 @@ import { getHostingDb } from '@/lib/hosting-db';
 import { checkRateLimit } from '@/lib/rate-limit';
 import { publicApiCorsHeaders } from '@/lib/public-api-cors';
 import { validateSubdomainFormat } from '@/lib/subdomain-slug';
+import { proxyToTargetIfConfigured } from '@/lib/public-api-proxy';
 
 export const dynamic = 'force-dynamic';
 
@@ -25,6 +26,9 @@ export async function OPTIONS(request: NextRequest) {
 }
 
 export async function POST(request: NextRequest) {
+  const proxied = await proxyToTargetIfConfigured(request);
+  if (proxied) return proxied;
+
   const headers = publicApiCorsHeaders(request.headers.get('origin'));
 
   const db = getHostingDb();

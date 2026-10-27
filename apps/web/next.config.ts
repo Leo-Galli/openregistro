@@ -60,28 +60,6 @@ const nextConfig: NextConfig = {
       },
     ];
   },
-  // The public-API project (api.openregistro.another-horizon.eu) runs this
-  // exact same codebase but deliberately has no HOSTING_DATABASE_URL of its
-  // own - duplicating that connection string into a second project is a
-  // second place it could leak, for no real benefit. Instead, when
-  // API_PROXY_TARGET is set (only on that project), its two public
-  // hosting-request routes transparently proxy through to the demo
-  // project's already-working, already-connected copy of the same routes.
-  // Unset everywhere else, including every self-hosted install.
-  async rewrites() {
-    const target = process.env.API_PROXY_TARGET;
-    if (!target) return [];
-    return [
-      {
-        source: '/api/hosting-requests',
-        destination: `${target}/api/hosting-requests`,
-      },
-      {
-        source: '/api/hosting-requests/:path*',
-        destination: `${target}/api/hosting-requests/:path*`,
-      },
-    ];
-  },
   async headers() {
     // Content-Security-Policy is set per-request in middleware.ts instead,
     // since it needs a fresh nonce on every request for script-src.
