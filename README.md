@@ -12,7 +12,7 @@
 </p>
 
 <p>
-  <a href="https://openregistro-demo.vercel.app"><img src="https://img.shields.io/badge/-Try%20the%20live%20demo-2350E7?style=for-the-badge" alt="Try the live demo" /></a>
+  <a href="https://demo.openregistro.another-horizon.eu"><img src="https://img.shields.io/badge/-Try%20the%20live%20demo-2350E7?style=for-the-badge" alt="Try the live demo" /></a>
   <a href="https://openregistro.vercel.app/host"><img src="https://img.shields.io/badge/-Get%20free%20hosting-151B32?style=for-the-badge" alt="Get free hosting" /></a>
   <a href="https://openregistro.vercel.app/docs"><img src="https://img.shields.io/badge/-Docs-EF5478?style=for-the-badge" alt="Docs" /></a>
 </p>
@@ -59,7 +59,7 @@ students' data never leaves your infrastructure.
   <p><sub>Marketing site - <a href="https://openregistro.vercel.app">openregistro.vercel.app</a></sub></p>
   <br />
   <img src="./docs/assets/readme/dashboard.png" alt="OpenRegistro dashboard overview" width="100%" />
-  <p><sub>Dashboard overview on the live demo - <a href="https://openregistro-demo.vercel.app">openregistro-demo.vercel.app</a></sub></p>
+  <p><sub>Dashboard overview on the live demo - <a href="https://demo.openregistro.another-horizon.eu">demo.openregistro.another-horizon.eu</a></sub></p>
 </div>
 
 The entire app - not just the marketing site - uses the same light-only "Pop Ledger" design

@@ -37,6 +37,29 @@ const nextConfig: NextConfig = {
   outputFileTracingIncludes: {
     '/cp': ['node_modules/vercel/**/*'],
   },
+  // This same codebase is deployed to multiple Vercel projects under
+  // multiple domains (the demo/control-panel project, the public-API
+  // project, and one more per auto-provisioned school) - redirect each
+  // project's own default *.vercel.app URL to its real branded domain, but
+  // only for these two specific hosts. A blanket "any *.vercel.app" rule
+  // would also catch every per-school instance's own fallback URL, which
+  // must keep working as-is, not bounce to the demo's domain.
+  async redirects() {
+    return [
+      {
+        source: '/:path*',
+        has: [{ type: 'host' as const, value: 'openregistro-demo.vercel.app' }],
+        destination: 'https://demo.openregistro.another-horizon.eu/:path*',
+        permanent: true,
+      },
+      {
+        source: '/:path*',
+        has: [{ type: 'host' as const, value: 'openregistro-api.vercel.app' }],
+        destination: 'https://api.openregistro.another-horizon.eu/:path*',
+        permanent: true,
+      },
+    ];
+  },
   async headers() {
     // Content-Security-Policy is set per-request in middleware.ts instead,
     // since it needs a fresh nonce on every request for script-src.

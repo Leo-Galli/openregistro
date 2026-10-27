@@ -7,11 +7,14 @@
   "cleanUrls": true,
   "trailingSlash": false,
   "rewrites": [
-    { "source": "/cp", "destination": "https://openregistro-demo.vercel.app/cp" },
-    { "source": "/cp/:path*", "destination": "https://openregistro-demo.vercel.app/cp/:path*" },
+    { "source": "/cp", "destination": "https://demo.openregistro.another-horizon.eu/cp" },
+    {
+      "source": "/cp/:path*",
+      "destination": "https://demo.openregistro.another-horizon.eu/cp/:path*"
+    },
     {
       "source": "/cp-assets/:path*",
-      "destination": "https://openregistro-demo.vercel.app/cp-assets/:path*"
+      "destination": "https://demo.openregistro.another-horizon.eu/cp-assets/:path*"
     }
   ]
 }
