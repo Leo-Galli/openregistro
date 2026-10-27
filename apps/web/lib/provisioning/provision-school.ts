@@ -4,6 +4,7 @@ import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { REPO_URL } from '../deployment-status';
 import { runVercelCli } from './vercel-cli';
+import { applyMigrations, readEnvValue } from './apply-migrations';
 
 const ROOT_DIRECTORY = 'apps/web';
 const INSTALL_COMMAND = 'cd ../.. && pnpm install --frozen-lockfile';
@@ -87,6 +88,22 @@ export async function provisionSchoolInstance(
     await runVercelCli(['integration', 'add', 'neon', '--plan', 'free_v3', '--no-claim'], {
       cwd: scratchDir,
     });
+
+    // The Neon integration only creates an empty database - without this,
+    // the new instance 500s on its very first request ("relation
+    // installer_state does not exist"), confirmed against a real deployed
+    // school before this was added. `--environment production` (not the
+    // `--environment` flag's own default of `development`) matters here:
+    // it's what actually confirms the connection string the DEPLOYED app
+    // will use, not a separate environment's value (verified they happen to
+    // be the same Neon database on the free plan, but production is the
+    // correct one to ask for regardless).
+    const envFile = path.join(scratchDir, '.env.production.local');
+    await runVercelCli(
+      ['env', 'pull', envFile, '--environment', 'production', '--project', projectName, '--yes'],
+      { cwd: scratchDir },
+    );
+    await applyMigrations(readEnvValue(envFile, 'DATABASE_URL'));
   } finally {
     await rm(scratchDir, { recursive: true, force: true });
   }
@@ -113,7 +130,16 @@ export async function provisionSchoolInstance(
     'main',
   ]);
   const hook = JSON.parse(hookResult.stdout) as { hook: { url: string } };
-  await fetch(hook.hook.url, { method: 'POST' });
+  const deployResponse = await fetch(hook.hook.url, { method: 'POST' });
+  if (!deployResponse.ok) {
+    // fetch() only rejects on a network-level failure, never on a non-2xx
+    // response - without this check, a rejected deploy-hook call (bad URL,
+    // hook already consumed, etc.) would silently leave provisioningStatus
+    // at 'ready' with no actual deployment ever triggered.
+    throw new Error(
+      `Deploy hook returned HTTP ${deployResponse.status}: ${await deployResponse.text()}`,
+    );
+  }
 
   return { vercelProjectId: projectName };
 }

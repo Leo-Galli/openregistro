@@ -126,6 +126,14 @@ const nextConfig: NextConfig = {
       '../../node_modules/undici/**/*',
       '../../node_modules/uuid/**/*',
       '../../node_modules/zod/**/*',
+      // apps/web/lib/provisioning/apply-migrations.ts reads these .sql files
+      // directly off disk (same process.cwd()-relative pattern as the vercel
+      // CLI above, for the same reason: drizzle's own migrate() resolves its
+      // migrations folder via import.meta.url, which breaks once this code
+      // is webpack-bundled). @openregistro/db is linked directly inside
+      // apps/web's own node_modules (not hoisted to the workspace root like
+      // the vercel-related packages above), so no `../../` prefix here.
+      'node_modules/@openregistro/db/src/postgres/drizzle/**/*',
     ],
   },
   // This same codebase is deployed to multiple Vercel projects under

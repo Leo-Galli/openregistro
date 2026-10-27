@@ -28,6 +28,7 @@
     "next-auth": "5.0.0-beta.32",
     "nodemailer": "10.2.1",
     "otpauth": "9.5.2",
+    "postgres": "3.4.5",
     "qrcode": "1.5.4",
     "react": "19.3.1",
     "react-dom": "19.3.1",

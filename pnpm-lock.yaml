@@ -83,6 +83,9 @@ importers:
       otpauth:
         specifier: 9.5.2
         version: 9.5.2
+      postgres:
+        specifier: 3.4.5
+        version: 3.4.5
       qrcode:
         specifier: 1.5.4
         version: 1.5.4
