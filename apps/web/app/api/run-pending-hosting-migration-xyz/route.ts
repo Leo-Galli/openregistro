@@ -77,3 +77,24 @@ export async function POST(request: NextRequest) {
     );
   }
 }
+
+/** Removes the throwaway rows created while verifying the migration above. */
+export async function DELETE(request: NextRequest) {
+  const { VERCEL_PROVISIONING_TOKEN } = getEnv();
+  if (
+    !VERCEL_PROVISIONING_TOKEN ||
+    request.headers.get('x-migration-token') !== VERCEL_PROVISIONING_TOKEN
+  ) {
+    return NextResponse.json({ ok: false, error: 'unauthorized' }, { status: 401 });
+  }
+
+  const db = getHostingDb();
+  if (!db) {
+    return NextResponse.json({ ok: false, error: 'no hosting db configured' }, { status: 503 });
+  }
+
+  const deleted = await db.execute(
+    sql`DELETE FROM "hosting_requests" WHERE "school_name" LIKE 'CI Verification Test%' RETURNING "id"`,
+  );
+  return NextResponse.json({ ok: true, deletedCount: deleted.length });
+}
