@@ -24,7 +24,7 @@
     "@vercel/analytics": "^2.0.1",
     "geist": "1.8.2",
     "lucide-react": "0.61.0",
-    "next": "16.4.2",
+    "next": "16.4.5",
     "next-auth": "5.0.0-beta.32",
     "nodemailer": "10.2.1",
     "otpauth": "9.5.2",
