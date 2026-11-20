@@ -80,10 +80,10 @@ importers:
         version: 16.4.2(@babel/core@7.29.7)(@playwright/test@1.64.1)(@types/node@24.19.2)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
       next-auth:
         specifier: 5.0.0-beta.32
-        version: 5.0.0-beta.32(next@16.4.2(@babel/core@7.29.7)(@playwright/test@1.64.1)(@types/node@24.19.2)(react-dom@19.3.1(react@19.3.1))(react@19.3.1))(nodemailer@10.2.1)(react@19.3.1)
+        version: 5.0.0-beta.32(next@16.4.2(@babel/core@7.29.7)(@playwright/test@1.64.1)(@types/node@24.19.2)(react-dom@19.3.1(react@19.3.1))(react@19.3.1))(nodemailer@10.6.0)(react@19.3.1)
       nodemailer:
-        specifier: 10.2.1
-        version: 10.2.1
+        specifier: 10.6.0
+        version: 10.6.0
       otpauth:
         specifier: 9.5.2
         version: 9.5.2
@@ -111,7 +111,7 @@ importers:
     devDependencies:
       '@auth/core':
         specifier: 0.41.3
-        version: 0.41.3(nodemailer@10.2.1)
+        version: 0.41.3(nodemailer@10.6.0)
       '@openregistro/config':
         specifier: workspace:*
         version: link:../../packages/config
@@ -492,6 +492,10 @@ packages:
 
   '@babel/runtime@7.29.10':
     resolution: {integrity: sha512-NpugTzbKgGrNe45Ui32cN8vCFFMxVtP/9rtfwv0nP5FRDAjvYBxJcLVpYA9mr1jxP6cnIT7x9LUzuDTbWYYNRA==}
+    engines: {node: '>=6.9.0'}
+
+  '@babel/runtime@7.29.14':
+    resolution: {integrity: sha512-Y5tqevQaUAZhhj82BpYMNC1ssvLQTVAfwKdm8iy8qwmhvC2/CpcAu8OC+QEtjM7pMk7knx83u1Qj8gzkicyelw==}
     engines: {node: '>=6.9.0'}
 
   '@babel/template@7.29.7':
@@ -5452,8 +5456,8 @@ packages:
     resolution: {integrity: sha512-OmO8+GM1JUZqXET720VrJCwkjUCXmCMQm0Z3UDDRbfNLHS4NEAvY60j5jiFv0tkKw2PNNlqOLhahVmwJIOLDIQ==}
     engines: {node: '>=18'}
 
-  nodemailer@10.2.1:
-    resolution: {integrity: sha512-ZrDNsPFoDMwefNs7sJwrYiEJ/CG4ClJWDZv05iNJsEBWa8GRDry1QJHTJxsuTAY9eDDKjX4k+q3SxslXJOao7w==}
+  nodemailer@10.6.0:
+    resolution: {integrity: sha512-jWanL7D9GD3jvUDYKmoC5rWTiG8MnBgnN2yV68bgMKip1zUJhiSTyz7Eg+18y8sk5OvdVDzws5nZK5arSI4f5Q==}
     engines: {node: '>=20.0.0'}
 
   nopt@8.1.0:
@@ -6699,7 +6703,7 @@ snapshots:
       '@csstools/css-tokenizer': 3.0.4
       lru-cache: 10.4.3
 
-  '@auth/core@0.41.3(nodemailer@10.2.1)':
+  '@auth/core@0.41.3(nodemailer@10.6.0)':
     dependencies:
       '@panva/hkdf': 1.2.1
       jose: 6.2.13
@@ -6707,7 +6711,7 @@ snapshots:
       preact: 10.24.3
       preact-render-to-string: 6.5.11(preact@10.24.3)
     optionalDependencies:
-      nodemailer: 10.2.1
+      nodemailer: 10.6.0
 
   '@babel/code-frame@7.29.7':
     dependencies:
@@ -6787,6 +6791,8 @@ snapshots:
       '@babel/types': 7.29.8
 
   '@babel/runtime@7.29.10': {}
+
+  '@babel/runtime@7.29.14': {}
 
   '@babel/template@7.29.7':
     dependencies:
@@ -8376,7 +8382,7 @@ snapshots:
   '@testing-library/dom@10.4.2':
     dependencies:
       '@babel/code-frame': 7.29.7
-      '@babel/runtime': 7.29.10
+      '@babel/runtime': 7.29.14
       '@types/aria-query': 5.0.4
       aria-query: 5.3.0
       dom-accessibility-api: 0.5.16
@@ -11820,13 +11826,13 @@ snapshots:
 
   natural-compare@1.4.0: {}
 
-  next-auth@5.0.0-beta.32(next@16.4.2(@babel/core@7.29.7)(@playwright/test@1.64.1)(@types/node@24.19.2)(react-dom@19.3.1(react@19.3.1))(react@19.3.1))(nodemailer@10.2.1)(react@19.3.1):
+  next-auth@5.0.0-beta.32(next@16.4.2(@babel/core@7.29.7)(@playwright/test@1.64.1)(@types/node@24.19.2)(react-dom@19.3.1(react@19.3.1))(react@19.3.1))(nodemailer@10.6.0)(react@19.3.1):
     dependencies:
-      '@auth/core': 0.41.3(nodemailer@10.2.1)
+      '@auth/core': 0.41.3(nodemailer@10.6.0)
       next: 16.4.2(@babel/core@7.29.7)(@playwright/test@1.64.1)(@types/node@24.19.2)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
       react: 19.3.1
     optionalDependencies:
-      nodemailer: 10.2.1
+      nodemailer: 10.6.0
 
   next@16.4.2(@babel/core@7.29.7)(@playwright/test@1.64.1)(@types/node@24.19.2)(react-dom@19.3.1(react@19.3.1))(react@19.3.1):
     dependencies:
@@ -11903,7 +11909,7 @@ snapshots:
 
   node-releases@2.0.60: {}
 
-  nodemailer@10.2.1: {}
+  nodemailer@10.6.0: {}
 
   nopt@8.1.0:
     dependencies:
