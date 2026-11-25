@@ -20,6 +20,19 @@ export default async function DashboardLayout({ children }: { children: ReactNod
       className="min-h-screen bg-background"
       style={themeStyle(school?.themeId, school?.primaryColor)}
     >
+      {/*
+        Hidden bridge for the official mobile WebView: the native shell reads
+        these data-* attributes after navigation so it can show school + role
+        without a separate auth API.
+      */}
+      <div
+        id="openregistro-mobile-session"
+        hidden
+        data-role={session.user.role}
+        data-name={session.user.name ?? session.user.email ?? ''}
+        data-school={school?.name ?? ''}
+        data-school-id={session.user.schoolId}
+      />
       {isDemoMode() ? <DemoBanner /> : null}
       <AppHeader name={session.user.name ?? session.user.email ?? ''} role={session.user.role} />
       <DashboardNav role={session.user.role} />

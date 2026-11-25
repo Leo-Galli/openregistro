@@ -26,6 +26,9 @@ export function SiteFooter() {
           <Link href="/host" className="hover:text-cream">
             Free hosting
           </Link>
+          <Link href="/#download" className="hover:text-cream">
+            Android app
+          </Link>
           <Button asChild size="sm" variant="secondary">
             <a href={PAYPAL_DONATE_URL} target="_blank" rel="noreferrer">
               <Heart className="h-4 w-4" />

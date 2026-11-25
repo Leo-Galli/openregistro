@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import type { Session } from 'next-auth';
 import type { Grade, SubjectId, UserId } from '@openregistro/core';
-import { weightedAverage } from '@openregistro/core';
+import { gradeTone, weightedAverage } from '@openregistro/core';
 import {
   Badge,
   Card,
@@ -16,8 +16,16 @@ import {
   TableHeader,
   TableRow,
 } from '@openregistro/ui';
+import { GradeValue } from '@/components/grade-value';
 import { userIdOf } from '@/lib/authz';
 import { getStorage } from '@/lib/storage';
+
+const AVERAGE_TEXT: Record<ReturnType<typeof gradeTone>, string> = {
+  success: 'text-success-600',
+  warning: 'text-warning-600',
+  destructive: 'text-danger-600',
+  secondary: 'text-muted-foreground',
+};
 
 type SubjectAverage = {
   subjectId: SubjectId;
@@ -174,7 +182,9 @@ function StudentSnapshotCards({
         <Card>
           <CardHeader>
             <CardDescription>Overall average</CardDescription>
-            <CardTitle className="font-ui text-4xl tabular-nums">
+            <CardTitle
+              className={`font-ui text-4xl tabular-nums ${AVERAGE_TEXT[gradeTone(snapshot.overallAverage)]}`}
+            >
               {snapshot.overallAverage !== null ? snapshot.overallAverage.toFixed(2) : '-'}
             </CardTitle>
           </CardHeader>
@@ -226,8 +236,8 @@ function StudentSnapshotCards({
                     <TableRow key={subject.subjectId}>
                       <TableCell className="font-medium">{subject.subjectName}</TableCell>
                       <TableCell className="tabular-nums">{subject.gradeCount}</TableCell>
-                      <TableCell className="tabular-nums">
-                        {subject.average !== null ? subject.average.toFixed(2) : '-'}
+                      <TableCell>
+                        <GradeValue value={subject.average} digits={2} />
                       </TableCell>
                     </TableRow>
                   ))}

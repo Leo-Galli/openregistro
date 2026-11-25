@@ -1,8 +1,11 @@
 name: Mobile APK
 
-# Builds a sideloadable Android APK and attaches it to GitHub Releases for
-# every version tag. shortcut: debug-signed APK (installable now); Play Store
-# / App Store publication needs a proper signing keystore via EAS later.
+# Builds a sideloadable Android APK.
+# - On v* tags: attaches to that GitHub Release
+# - On workflow_dispatch: publishes/updates the rolling "apk-latest" prerelease
+#   so the marketing site download link stays fresh.
+#
+# shortcut: debug-signed APK (installable now); Play Store needs EAS + a keystore later.
 on:
   push:
     tags:
@@ -34,9 +37,11 @@ jobs:
 
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
+        with:
+          packages: platform-tools platforms;android-35 build-tools;35.0.0
 
       - name: Install mobile dependencies
-        run: npm install
+        run: npm ci
 
       - name: Prebuild native Android project
         run: npx expo prebuild --platform android --non-interactive
@@ -57,10 +62,24 @@ jobs:
           name: OpenRegistro-apk
           path: apps/mobile/dist/OpenRegistro.apk
 
-      - name: Attach APK to GitHub Release
+      - name: Attach APK to version release
         if: startsWith(github.ref, 'refs/tags/v')
         uses: softprops/action-gh-release@v2
         with:
+          files: apps/mobile/dist/OpenRegistro.apk
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Publish rolling apk-latest prerelease
+        if: github.event_name == 'workflow_dispatch' || startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: apk-latest
+          name: Latest Android APK
+          prerelease: true
+          body: |
+            Sideloadable OpenRegistro Android build (debug-signed).
+            Pick your school in the app, then sign in - your role is detected automatically.
           files: apps/mobile/dist/OpenRegistro.apk
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

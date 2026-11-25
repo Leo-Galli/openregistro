@@ -1,6 +1,9 @@
 export const REPO_URL = 'https://github.com/Leo-Galli/openregistro';
 export const DEMO_URL = 'https://demo.openregistro.another-horizon.eu';
 export const PAYPAL_DONATE_URL = 'https://www.paypal.com/paypalme/LeonardoGalliITA';
+/** Rolling prerelease from .github/workflows/mobile-apk.yml */
+export const ANDROID_APK_URL = `${REPO_URL}/releases/download/apk-latest/OpenRegistro.apk`;
+export const ANDROID_RELEASES_URL = `${REPO_URL}/releases/tag/apk-latest`;
 
 /**
  * The marketing site is a static export with no server of its own (see

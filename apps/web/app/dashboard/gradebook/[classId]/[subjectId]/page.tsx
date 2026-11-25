@@ -1,7 +1,6 @@
 import { notFound, redirect } from 'next/navigation';
 import { classIdSchema, subjectIdSchema, weightedAverage } from '@openregistro/core';
 import {
-  Badge,
   Card,
   CardContent,
   CardDescription,
@@ -15,9 +14,10 @@ import {
   TableRow,
 } from '@openregistro/ui';
 import { auth } from '@/auth';
+import { AddGradeDialog } from '@/components/gradebook/add-grade-dialog';
+import { GradeValue } from '@/components/grade-value';
 import { requirePermission, schoolIdOf, userIdOf } from '@/lib/authz';
 import { getStorage } from '@/lib/storage';
-import { AddGradeDialog } from '@/components/gradebook/add-grade-dialog';
 
 export const dynamic = 'force-dynamic';
 
@@ -128,17 +128,17 @@ export default async function GradebookSubjectPage({
                       <TableCell>
                         <div className="flex flex-wrap gap-1">
                           {studentGrades.map((grade) => (
-                            <Badge
+                            <GradeValue
                               key={grade.id}
-                              variant="outline"
+                              value={grade.value}
                               title={GRADE_TYPE_LABELS[grade.type]}
-                            >
-                              {grade.value}
-                            </Badge>
+                            />
                           ))}
                         </div>
                       </TableCell>
-                      <TableCell>{average !== null ? average.toFixed(2) : '-'}</TableCell>
+                      <TableCell>
+                        <GradeValue value={average} digits={2} />
+                      </TableCell>
                       <TableCell>
                         <AddGradeDialog
                           classId={klass.id}
