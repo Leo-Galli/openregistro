@@ -1,8 +1,16 @@
 <div align="center">
-  <img src="./docs/assets/readme/banner.svg" alt="OpenRegistro - a school register you run yourself, not one you rent." width="100%" />
-</div>
 
-<div align="center">
+<a href="https://github.com/Leo-Galli/openregistro"><img src="https://capsule-render.vercel.app/api?type=waving&height=200&color=0:151b32,45:2350e7,100:ffcd29&text=OpenRegistro&fontColor=fffbeb&fontSize=54&fontAlignY=45&animation=twinkling" alt="OpenRegistro" width="100%" /></a>
+
+<img src="https://readme-typing-svg.demolab.com?font=IBM+Plex+Mono&weight=500&size=16&color=2350E7&center=true&vCenter=true&width=640&height=34&duration=2800&pause=1200&lines=A+school+register+you+run+yourself;Self-hosted.+Open+source.+AGPL-3.0;Grades.+Attendance.+Families.+One+app;No+ads.+No+paywall.+No+vendor+lock-in." alt="A school register you run yourself" />
+
+<p>
+  <a href="https://github.com/Leo-Galli/openregistro/tree/main/apps/web"><img src="https://skillicons.dev/icons?i=next&theme=light" width="44" height="44" alt="web" /></a>&nbsp;
+  <a href="https://github.com/Leo-Galli/openregistro/tree/main/apps/website"><img src="https://skillicons.dev/icons?i=ts&theme=light" width="44" height="44" alt="website" /></a>&nbsp;
+  <a href="https://github.com/Leo-Galli/openregistro/tree/main/packages/db"><img src="https://skillicons.dev/icons?i=postgres&theme=light" width="44" height="44" alt="db" /></a>&nbsp;
+  <a href="https://github.com/Leo-Galli/openregistro/tree/main/docker"><img src="https://skillicons.dev/icons?i=docker&theme=light" width="44" height="44" alt="docker" /></a>&nbsp;
+  <a href="https://github.com/Leo-Galli/openregistro"><img src="https://skillicons.dev/icons?i=github&theme=light" width="44" height="44" alt="GitHub" /></a>
+</p>
 
 <p>
   <a href="https://github.com/Leo-Galli/openregistro/actions/workflows/ci.yml"><img src="https://github.com/Leo-Galli/openregistro/actions/workflows/ci.yml/badge.svg" alt="CI" /></a>
@@ -19,139 +27,116 @@
 
 </div>
 
-Open source, self-hosted school electronic register (gradebook) for K-12 schools - roles for
-staff, students and families, a daily class register, a weighted gradebook, and an online
-absence-justification workflow. Install it on your own server or a single container; your
-students' data never leaves your infrastructure.
+<br/>
 
-> Status: core feature set complete (school records, register, gradebook, absence
-> justifications, homework, announcements, report cards, audit log, timetable, disciplinary
-> notes, calendar, and parent-teacher meeting booking) and running behind CI. See `docs/`
-> for installation and architecture, and [CHANGELOG.md](./CHANGELOG.md) for what's shipped
-> so far and what's deliberately still a gap.
+OpenRegistro is a free, open source, self-hosted school electronic register for K-12 schools: roles for staff, students and families, a daily class register, a weighted gradebook, absence justifications, homework, announcements, report cards, timetable, and parent-teacher meetings. Install it on your own server - student data never leaves your infrastructure.
 
-## How it works
+<img src="https://capsule-render.vercel.app/api?type=rect&height=3&color=0:151b32,35:2350e7,70:ffcd29,100:151b32" width="100%" alt="" />
 
-<table>
-<tr>
-<td align="center" width="33%">
-  <img src="./docs/assets/readme/icon-download.svg" width="56" height="56" alt="" /><br />
-  <strong>Install, or get hosted free</strong><br />
-  <sub>One Docker command on your own server, or a dedicated instance we host for you at no cost.</sub>
-</td>
-<td align="center" width="33%">
-  <img src="./docs/assets/readme/icon-school.svg" width="56" height="56" alt="" /><br />
-  <strong>Set up your school</strong><br />
-  <sub>A first-run wizard walks you through classes, subjects, staff, and student accounts.</sub>
-</td>
-<td align="center" width="33%">
-  <img src="./docs/assets/readme/icon-calendar-check.svg" width="56" height="56" alt="" /><br />
-  <strong>Run your register</strong><br />
-  <sub>Teachers take attendance and grade; families see progress in real time, on your infrastructure.</sub>
-</td>
-</tr>
-</table>
-
-## Screenshots
+<br/>
 
 <div align="center">
-  <img src="./docs/assets/readme/website-hero.png" alt="OpenRegistro marketing site hero section" width="100%" />
-  <p><sub>Marketing site - <a href="https://openregistro.another-horizon.eu">openregistro.another-horizon.eu</a></sub></p>
-  <br />
-  <img src="./docs/assets/readme/dashboard.png" alt="OpenRegistro dashboard overview" width="100%" />
-  <p><sub>Dashboard overview on the live demo - <a href="https://demo.openregistro.another-horizon.eu">demo.openregistro.another-horizon.eu</a></sub></p>
+  <img src="./docs/assets/readme/banner.svg" alt="OpenRegistro - a school register you run yourself, not one you rent." width="100%" />
 </div>
 
-The entire app - not just the marketing site - uses the same light-only "Pop Ledger" design
-system (`packages/ui`): hard offset shadows, thick ink borders, and one base theme that any
-school can accent with its own brand color from `/dashboard/school/branding`. Additional base
-themes are welcome as pull requests - see [`docs/theming.md`](./docs/theming.md).
+<img src="https://capsule-render.vercel.app/api?type=rect&height=3&color=0:151b32,35:2350e7,70:ffcd29,100:151b32" width="100%" alt="" />
 
-## Features
+<br/>
 
-<table>
-<tr>
-<td width="56"><img src="./docs/assets/readme/icon-roles.svg" width="44" height="44" alt="" /></td>
-<td><strong>Role-based access</strong><br />School admins, secretary staff, principals, teachers, students, and guardians - enforced server-side on every action, not just hidden in the UI.</td>
-</tr>
-<tr>
-<td width="56"><img src="./docs/assets/readme/icon-register.svg" width="44" height="44" alt="" /></td>
-<td><strong>Class register</strong><br />Lesson logs with sign-off, attendance tracking (present / absent / late / early leave), and online absence justifications.</td>
-</tr>
-<tr>
-<td width="56"><img src="./docs/assets/readme/icon-gradebook.svg" width="44" height="44" alt="" /></td>
-<td><strong>Gradebook &amp; report cards</strong><br />Weighted grade averages, separate end-of-term evaluations, and PDF report card generation.</td>
-</tr>
-<tr>
-<td width="56"><img src="./docs/assets/readme/icon-calendar.svg" width="44" height="44" alt="" /></td>
-<td><strong>Homework, announcements &amp; calendar</strong><br />Read receipts on announcements, a weekly timetable, disciplinary notes, a shared calendar, and parent-teacher meeting booking.</td>
-</tr>
-<tr>
-<td width="56"><img src="./docs/assets/readme/icon-shield.svg" width="44" height="44" alt="" /></td>
-<td><strong>Audit log, 2FA &amp; data export</strong><br />An audit log for sensitive changes, TOTP two-factor authentication, and a self-service personal data export.</td>
-</tr>
-<tr>
-<td width="56"><img src="./docs/assets/readme/icon-database.svg" width="44" height="44" alt="" /></td>
-<td><strong>Your choice of storage</strong><br />JSON files with zero infrastructure, or PostgreSQL when you need to scale - same application, same data model, selected at install time.</td>
-</tr>
-</table>
+<p align="center"><img src="https://readme-typing-svg.demolab.com?font=IBM+Plex+Mono&weight=700&size=18&color=2350E7&center=true&vCenter=true&width=420&height=40&duration=1&pause=1000000&letterSpacing=6px&lines=PACKAGES" alt="Packages" /></p>
 
-## Monorepo layout
+| Package                          | Role                                               |
+| -------------------------------- | -------------------------------------------------- |
+| [apps/web](./apps/web)           | Register application (self-hosted by schools)      |
+| [apps/website](./apps/website)   | Marketing site and rendered docs                   |
+| [packages/ui](./packages/ui)     | Design system: tokens, components, base themes     |
+| [packages/core](./packages/core) | Domain types, Zod schemas, RBAC, storage interface |
+| [packages/db](./packages/db)     | Storage drivers: JSON files and PostgreSQL         |
+| [docker/](./docker)              | Dockerfile and compose stacks                      |
+| [scripts/](./scripts)            | Setup, seed, backup, restore, migrate              |
+| [docs/](./docs)                  | Installation, architecture, GDPR, API reference    |
 
-<table>
-<tr><td><code>apps/web</code></td><td>the register application (self-hosted by schools)</td></tr>
-<tr><td><code>apps/website</code></td><td>marketing and documentation site</td></tr>
-<tr><td><code>packages/ui</code></td><td>design system - tokens, components, base themes</td></tr>
-<tr><td><code>packages/core</code></td><td>domain types, validation, RBAC, storage driver interface</td></tr>
-<tr><td><code>packages/db</code></td><td>storage drivers (<code>json</code>, <code>postgres</code>)</td></tr>
-<tr><td><code>docker/</code>, <code>scripts/</code>, <code>docs/</code></td><td>deployment, operations, documentation</td></tr>
-</table>
+<img src="https://capsule-render.vercel.app/api?type=rect&height=3&color=0:151b32,35:2350e7,70:ffcd29,100:151b32" width="100%" alt="" />
 
-## Quick start
+<br/>
+
+<p align="center"><img src="https://readme-typing-svg.demolab.com?font=IBM+Plex+Mono&weight=700&size=18&color=2350E7&center=true&vCenter=true&width=420&height=40&duration=1&pause=1000000&letterSpacing=6px&lines=FEATURES" alt="Features" /></p>
+
+|                              |                                                                                        |
+| ---------------------------- | -------------------------------------------------------------------------------------- |
+| **Role-based access**        | Admin, secretary, principal, teacher, student, guardian - enforced server-side         |
+| **Class register**           | Lesson logs, attendance (present / absent / late / early leave), online justifications |
+| **Gradebook & report cards** | Weighted averages, term evaluations, PDF export                                        |
+| **Homework & announcements** | Due dates for classes; school-wide or class-scoped posts with read receipts            |
+| **Timetable & calendar**     | Weekly schedule, school events, parent-teacher meeting booking                         |
+| **Discipline & audit**       | Immutable disciplinary notes; audit log for sensitive mutations                        |
+| **Security & GDPR**          | TOTP 2FA, personal data export, account deactivation                                   |
+| **Your storage**             | JSON (zero infra) or PostgreSQL - same app, same model                                 |
+
+<img src="https://capsule-render.vercel.app/api?type=rect&height=3&color=0:151b32,35:2350e7,70:ffcd29,100:151b32" width="100%" alt="" />
+
+<br/>
+
+<p align="center"><img src="https://readme-typing-svg.demolab.com?font=IBM+Plex+Mono&weight=700&size=18&color=2350E7&center=true&vCenter=true&width=420&height=40&duration=1&pause=1000000&letterSpacing=6px&lines=QUICK+START" alt="Quick start" /></p>
 
 ```bash
 pnpm install
 pnpm dev:json
 ```
 
-No database required for `dev:json` - data is stored as JSON files under `data/`.
-
-For a production-like stack with PostgreSQL:
+No database required - data lives under `data/`. Production-like with Postgres:
 
 ```bash
 docker compose up
 ```
 
-Or a database-free Docker setup using the JSON driver:
+JSON-only Docker:
 
 ```bash
 docker compose -f docker-compose.json.yml up
 ```
 
-## Documentation
+<img src="https://capsule-render.vercel.app/api?type=rect&height=3&color=0:151b32,35:2350e7,70:ffcd29,100:151b32" width="100%" alt="" />
 
-Rendered at [openregistro.another-horizon.eu/docs](https://openregistro.another-horizon.eu/docs), straight from
-the markdown files below - pick whichever is more convenient to read.
+<br/>
 
-<table>
-<tr><td><a href="https://openregistro.another-horizon.eu/docs/installation">Installation</a></td><td><a href="./docs/installation.md"><code>docs/installation.md</code></a></td><td>self-hosting from scratch, Docker or Node</td></tr>
-<tr><td><a href="https://openregistro.another-horizon.eu/docs/configuration">Configuration</a></td><td><a href="./docs/configuration.md"><code>docs/configuration.md</code></a></td><td>environment variables and the setup wizard</td></tr>
-<tr><td><a href="https://openregistro.another-horizon.eu/docs/architecture">Architecture</a></td><td><a href="./docs/architecture.md"><code>docs/architecture.md</code></a></td><td>monorepo layout, the StorageDriver abstraction</td></tr>
-<tr><td><a href="https://openregistro.another-horizon.eu/docs/theming">Theming</a></td><td><a href="./docs/theming.md"><code>docs/theming.md</code></a></td><td>the base theme system and how to contribute one</td></tr>
-<tr><td><a href="https://openregistro.another-horizon.eu/docs/backups">Backups</a></td><td><a href="./docs/backups.md"><code>docs/backups.md</code></a></td><td>backing up and restoring both storage drivers</td></tr>
-<tr><td><a href="https://openregistro.another-horizon.eu/docs/gdpr">GDPR / data protection</a></td><td><a href="./docs/gdpr.md"><code>docs/gdpr.md</code></a></td><td>what personal data is stored and how to export or erase it</td></tr>
-<tr><td><a href="https://openregistro.another-horizon.eu/docs/api-reference">Server actions reference</a></td><td><a href="./docs/api-reference.md"><code>docs/api-reference.md</code></a></td><td>every mutating server action, by feature area</td></tr>
-</table>
+<p align="center"><img src="https://readme-typing-svg.demolab.com?font=IBM+Plex+Mono&weight=700&size=18&color=2350E7&center=true&vCenter=true&width=420&height=40&duration=1&pause=1000000&letterSpacing=6px&lines=DOCS" alt="Docs" /></p>
+
+| Guide                                                                        | Source                                             |
+| ---------------------------------------------------------------------------- | -------------------------------------------------- |
+| [Installation](https://openregistro.another-horizon.eu/docs/installation)    | [`docs/installation.md`](./docs/installation.md)   |
+| [Configuration](https://openregistro.another-horizon.eu/docs/configuration)  | [`docs/configuration.md`](./docs/configuration.md) |
+| [Architecture](https://openregistro.another-horizon.eu/docs/architecture)    | [`docs/architecture.md`](./docs/architecture.md)   |
+| [Theming](https://openregistro.another-horizon.eu/docs/theming)              | [`docs/theming.md`](./docs/theming.md)             |
+| [Backups](https://openregistro.another-horizon.eu/docs/backups)              | [`docs/backups.md`](./docs/backups.md)             |
+| [GDPR](https://openregistro.another-horizon.eu/docs/gdpr)                    | [`docs/gdpr.md`](./docs/gdpr.md)                   |
+| [Server actions](https://openregistro.another-horizon.eu/docs/api-reference) | [`docs/api-reference.md`](./docs/api-reference.md) |
+
+<img src="https://capsule-render.vercel.app/api?type=rect&height=3&color=0:151b32,35:2350e7,70:ffcd29,100:151b32" width="100%" alt="" />
+
+<br/>
+
+<p align="center"><img src="https://readme-typing-svg.demolab.com?font=IBM+Plex+Mono&weight=700&size=18&color=2350E7&center=true&vCenter=true&width=420&height=40&duration=1&pause=1000000&letterSpacing=6px&lines=PRINCIPLES" alt="Principles" /></p>
+
+- Self-hosted by default: your school, your server, your data
+- Free forever: no ads, no paywall, no per-student SaaS fee
+- Open source under AGPL-3.0: run it, fork it, contribute back
+- Privacy by design: no trackers, export and deactivation built in
+- Same app for demo and production: JSON or Postgres, one codebase
+
+<img src="https://capsule-render.vercel.app/api?type=rect&height=3&color=0:151b32,35:2350e7,70:ffcd29,100:151b32" width="100%" alt="" />
+
+<br/>
+
+<p align="center">
+  <a href="./CONTRIBUTING.md"><img src="https://readme-typing-svg.demolab.com?font=IBM+Plex+Mono&weight=700&size=14&color=FFFBEB&center=true&vCenter=true&width=220&height=40&duration=1&pause=1000000&background=2350E7&lines=Contributing" alt="Contributing" /></a>&nbsp;
+  <a href="./SECURITY.md"><img src="https://readme-typing-svg.demolab.com?font=IBM+Plex+Mono&weight=700&size=14&color=151B32&center=true&vCenter=true&width=220&height=40&duration=1&pause=1000000&background=FFCD29&lines=Security" alt="Security" /></a>
+</p>
+
+<p align="center"><sub><i>A register you run yourself, not one you rent.</i></sub></p>
 
 ## License
 
 AGPL-3.0-only. See [LICENSE](./LICENSE).
 
-## Contributing
-
-See [CONTRIBUTING.md](./CONTRIBUTING.md) - including [`docs/theming.md`](./docs/theming.md) if
-you want to contribute a new base theme.
-
-<div align="center">
-  <sub>Built with Next.js, Tailwind CSS, and Drizzle ORM - no telemetry, no vendor lock-in.</sub>
-</div>
+<img src="https://capsule-render.vercel.app/api?type=waving&section=footer&height=110&color=0:151b32,45:2350e7,100:ffcd29" alt="" width="100%" />

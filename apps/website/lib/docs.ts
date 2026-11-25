@@ -1,11 +1,32 @@
 import { readFile } from 'node:fs/promises';
 import path from 'node:path';
 
+export type DocCategory = 'getting-started' | 'operations' | 'reference';
+
 export interface DocEntry {
   slug: string;
   title: string;
   description: string;
+  category: DocCategory;
 }
+
+export const DOC_CATEGORIES: { id: DocCategory; title: string; description: string }[] = [
+  {
+    id: 'getting-started',
+    title: 'Getting started',
+    description: 'Install the app and walk through the first-run wizard.',
+  },
+  {
+    id: 'operations',
+    title: 'Operations',
+    description: 'Keep a production instance healthy, backed up, and themed.',
+  },
+  {
+    id: 'reference',
+    title: 'Reference',
+    description: 'Architecture notes, GDPR details, and every mutating server action.',
+  },
+];
 
 /**
  * The single source of truth for which docs/*.md files become pages here,
@@ -18,36 +39,43 @@ export const DOCS: DocEntry[] = [
     slug: 'installation',
     title: 'Installation',
     description: 'Self-hosting from scratch with Docker or Node, both storage drivers.',
+    category: 'getting-started',
   },
   {
     slug: 'configuration',
     title: 'Configuration',
     description: 'Environment variables and what the setup wizard asks for.',
-  },
-  {
-    slug: 'architecture',
-    title: 'Architecture',
-    description: 'Monorepo layout, the StorageDriver abstraction, RBAC, and request flow.',
-  },
-  {
-    slug: 'theming',
-    title: 'Theming',
-    description: 'The base theme system and how to contribute a new one.',
+    category: 'getting-started',
   },
   {
     slug: 'backups',
     title: 'Backups',
     description: 'Backing up and restoring both storage drivers.',
+    category: 'operations',
+  },
+  {
+    slug: 'theming',
+    title: 'Theming',
+    description: 'The base theme system and how to contribute a new one.',
+    category: 'operations',
+  },
+  {
+    slug: 'architecture',
+    title: 'Architecture',
+    description: 'Monorepo layout, the StorageDriver abstraction, RBAC, and request flow.',
+    category: 'reference',
   },
   {
     slug: 'gdpr',
     title: 'GDPR / data protection',
     description: 'What personal data is stored, and how to export or erase it.',
+    category: 'reference',
   },
   {
     slug: 'api-reference',
     title: 'Server actions reference',
     description: 'Every mutating server action, grouped by feature area.',
+    category: 'reference',
   },
 ];
 
@@ -61,6 +89,10 @@ const DOCS_DIR = path.join(process.cwd(), '..', '..', 'docs');
 
 export function getDoc(slug: string): DocEntry | undefined {
   return DOCS.find((doc) => doc.slug === slug);
+}
+
+export function getDocsByCategory(category: DocCategory): DocEntry[] {
+  return DOCS.filter((doc) => doc.category === category);
 }
 
 /**
