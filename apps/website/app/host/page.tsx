@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { Server, ShieldCheck, Zap } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, IconBadge } from '@openregistro/ui';
+import { DonateSection } from '@/components/donate-section';
 import { HostRequestForm } from '@/components/host-request-form';
 
 export const metadata: Metadata = {
@@ -29,43 +30,46 @@ const POINTS = [
 
 export default function HostPage() {
   return (
-    <section className="mx-auto max-w-5xl px-6 py-20">
-      <div className="max-w-2xl">
-        <h1 className="font-display text-4xl font-semibold tracking-tight">
-          Get a free hosted instance
-        </h1>
-        <p className="mt-4 text-muted-foreground">
-          OpenRegistro is free and open source to self-host. If your school would rather not run its
-          own server, we also offer free managed hosting - tell us about your school below.
-        </p>
-      </div>
-
-      <div className="mt-12 grid gap-10 lg:grid-cols-[1fr_1.2fr]">
-        <div className="flex flex-col gap-4">
-          {POINTS.map((point) => (
-            <Card key={point.title}>
-              <CardHeader>
-                <IconBadge>
-                  <point.icon className="h-5 w-5" />
-                </IconBadge>
-                <CardTitle className="mt-3">{point.title}</CardTitle>
-              </CardHeader>
-              <CardContent className="-mt-2 text-sm text-muted-foreground">
-                {point.description}
-              </CardContent>
-            </Card>
-          ))}
+    <>
+      <section className="mx-auto max-w-5xl px-6 py-20">
+        <div className="max-w-2xl">
+          <h1 className="font-display text-4xl font-semibold tracking-tight">
+            Get a free hosted instance
+          </h1>
+          <p className="mt-4 text-muted-foreground">
+            OpenRegistro is free and open source to self-host. If your school would rather not run
+            its own server, we also offer free managed hosting - tell us about your school below.
+          </p>
         </div>
 
-        <Card>
-          <CardHeader>
-            <CardTitle>Tell us about your school</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <HostRequestForm />
-          </CardContent>
-        </Card>
-      </div>
-    </section>
+        <div className="mt-12 grid gap-10 lg:grid-cols-[1fr_1.2fr]">
+          <div className="flex flex-col gap-4">
+            {POINTS.map((point) => (
+              <Card key={point.title}>
+                <CardHeader>
+                  <IconBadge>
+                    <point.icon className="h-5 w-5" />
+                  </IconBadge>
+                  <CardTitle className="mt-3">{point.title}</CardTitle>
+                </CardHeader>
+                <CardContent className="-mt-2 text-sm text-muted-foreground">
+                  {point.description}
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+
+          <Card>
+            <CardHeader>
+              <CardTitle>Tell us about your school</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <HostRequestForm />
+            </CardContent>
+          </Card>
+        </div>
+      </section>
+      <DonateSection />
+    </>
   );
 }

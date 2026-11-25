@@ -1,12 +1,14 @@
 import Link from 'next/link';
-import { REPO_URL } from '@/lib/constants';
+import { Heart } from 'lucide-react';
+import { Button } from '@openregistro/ui';
+import { PAYPAL_DONATE_URL, REPO_URL } from '@/lib/constants';
 
 export function SiteFooter() {
   return (
     <footer className="border-t-2 border-border bg-ink text-cream">
-      <div className="mx-auto flex max-w-6xl flex-col gap-4 px-6 py-10 text-sm font-semibold text-cream/70 sm:flex-row sm:items-center sm:justify-between">
+      <div className="mx-auto flex max-w-6xl flex-col gap-6 px-6 py-10 text-sm font-semibold text-cream/70 sm:flex-row sm:items-center sm:justify-between">
         <p>OpenRegistro is open source software, licensed under AGPL-3.0.</p>
-        <div className="flex items-center gap-6">
+        <div className="flex flex-wrap items-center gap-4 sm:gap-6">
           <a href={REPO_URL} target="_blank" rel="noreferrer" className="hover:text-cream">
             GitHub
           </a>
@@ -24,6 +26,12 @@ export function SiteFooter() {
           <Link href="/host" className="hover:text-cream">
             Free hosting
           </Link>
+          <Button asChild size="sm" variant="secondary">
+            <a href={PAYPAL_DONATE_URL} target="_blank" rel="noreferrer">
+              <Heart className="h-4 w-4" />
+              Donate
+            </a>
+          </Button>
         </div>
       </div>
       <p

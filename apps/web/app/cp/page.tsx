@@ -17,6 +17,7 @@ import {
 import { BarChart3, ExternalLink, GitCommit, Globe, Mail } from 'lucide-react';
 import {
   listHostingRequests,
+  listDirectorySchools,
   getPlatformSettings,
   type HostingRequestStatus,
   type ProvisioningStatus,
@@ -39,7 +40,14 @@ import { ProvisionRequestButton } from '@/components/cp/provision-request-button
 import { NotifyReadyDialog } from '@/components/cp/notify-ready-dialog';
 import { NotificationEmailRow } from '@/components/cp/notification-email-row';
 import { AddNotificationEmailForm } from '@/components/cp/add-notification-email-form';
-import { setHostingRequestStatus, logoutCp } from './actions';
+import { AddDirectorySchoolForm } from '@/components/cp/add-directory-school-form';
+import {
+  setHostingRequestStatus,
+  logoutCp,
+  toggleHostingListedInApp,
+  toggleDirectorySchoolListed,
+  removeDirectorySchool,
+} from './actions';
 
 export const dynamic = 'force-dynamic';
 
@@ -138,12 +146,16 @@ export default async function CpPage() {
 
   const db = getHostingDb();
   const running = getRunningVersion();
-  const [requests, platformSettings, latest, commitsBehind] = await Promise.all([
+  const [requests, directorySchools, platformSettings, latest, commitsBehind] = await Promise.all([
     db ? listHostingRequests(db) : Promise.resolve([]),
+    db ? listDirectorySchools(db) : Promise.resolve([]),
     db ? getPlatformSettings(db) : Promise.resolve({ notificationEmails: [] }),
     getLatestMainCommit(),
     running.commitSha ? getCommitsBehindMain(running.commitSha) : Promise.resolve(null),
   ]);
+  const hostedReady = requests.filter(
+    (req) => req.provisioningStatus === 'ready' && Boolean(req.subdomain),
+  );
   const version = describeVersion(running.commitSha, latest?.sha ?? null, commitsBehind);
   const { CP_DEMO_DEPLOY_HOOK_URL, VERCEL_PROVISIONING_TOKEN } = getEnv();
 
@@ -453,6 +465,132 @@ export default async function CpPage() {
               </ol>
             </CardContent>
           )}
+        </Card>
+      </section>
+
+      <section className="flex flex-col gap-4">
+        <h2 className="font-display text-lg font-semibold">Mobile app directory</h2>
+        <Card>
+          <CardHeader>
+            <IconBadge>
+              <Globe className="h-5 w-5" />
+            </IconBadge>
+            <CardTitle className="mt-3">Schools visible in the app</CardTitle>
+            <CardDescription>
+              The Android/iOS app loads this list so users can pick their school before signing in.
+              Platform-hosted schools appear when their instance is live; add self-hosted schools
+              below so they show up too. Toggle &quot;Listed&quot; to hide without deleting.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="flex flex-col gap-8">
+            <div className="flex flex-col gap-3">
+              <h3 className="text-sm font-extrabold uppercase tracking-wide text-muted-foreground">
+                Platform-hosted
+              </h3>
+              {hostedReady.length === 0 ? (
+                <p className="text-sm text-muted-foreground">No live hosted schools yet.</p>
+              ) : (
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>School</TableHead>
+                      <TableHead>URL</TableHead>
+                      <TableHead>Listed</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {hostedReady.map((req) => (
+                      <TableRow key={req.id}>
+                        <TableCell className="font-medium">{req.schoolName}</TableCell>
+                        <TableCell>
+                          <a
+                            href={`https://${req.subdomain}.openregistro.another-horizon.eu`}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="font-mono text-xs underline"
+                          >
+                            {req.subdomain}.openregistro.another-horizon.eu
+                          </a>
+                        </TableCell>
+                        <TableCell>
+                          <form action={toggleHostingListedInApp}>
+                            <input type="hidden" name="id" value={req.id} />
+                            <input
+                              type="hidden"
+                              name="listed"
+                              value={req.listedInApp ? 'false' : 'true'}
+                            />
+                            <Button type="submit" size="sm" variant="outline">
+                              {req.listedInApp ? 'Listed - hide' : 'Hidden - show'}
+                            </Button>
+                          </form>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              )}
+            </div>
+
+            <div className="flex flex-col gap-3">
+              <h3 className="text-sm font-extrabold uppercase tracking-wide text-muted-foreground">
+                Self-hosted
+              </h3>
+              {directorySchools.length === 0 ? (
+                <p className="text-sm text-muted-foreground">No self-hosted schools registered.</p>
+              ) : (
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>School</TableHead>
+                      <TableHead>URL</TableHead>
+                      <TableHead>Listed</TableHead>
+                      <TableHead />
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {directorySchools.map((school) => (
+                      <TableRow key={school.id}>
+                        <TableCell className="font-medium">{school.name}</TableCell>
+                        <TableCell>
+                          <a
+                            href={school.baseUrl}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="font-mono text-xs underline"
+                          >
+                            {school.baseUrl}
+                          </a>
+                        </TableCell>
+                        <TableCell>
+                          <form action={toggleDirectorySchoolListed}>
+                            <input type="hidden" name="id" value={school.id} />
+                            <input
+                              type="hidden"
+                              name="listed"
+                              value={school.listedInApp ? 'false' : 'true'}
+                            />
+                            <Button type="submit" size="sm" variant="outline">
+                              {school.listedInApp ? 'Listed - hide' : 'Hidden - show'}
+                            </Button>
+                          </form>
+                        </TableCell>
+                        <TableCell className="text-right">
+                          <form action={removeDirectorySchool}>
+                            <input type="hidden" name="id" value={school.id} />
+                            <Button type="submit" size="sm" variant="destructive">
+                              Remove
+                            </Button>
+                          </form>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              )}
+              <AddDirectorySchoolForm />
+            </div>
+          </CardContent>
         </Card>
       </section>
 

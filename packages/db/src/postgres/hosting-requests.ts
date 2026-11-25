@@ -26,6 +26,7 @@ export interface HostingRequest extends Omit<CreateHostingRequestInput, 'request
   vercelProjectId: string | null;
   provisioningStatus: ProvisioningStatus;
   provisioningError: string | null;
+  listedInApp: boolean;
   createdAt: string;
   updatedAt: string;
 }
