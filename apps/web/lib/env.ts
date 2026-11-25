@@ -33,6 +33,13 @@ const envSchema = z.object({
   // string "true" counts.
   PLATFORM_HOSTED: z.preprocess((value) => value === 'true', z.boolean()),
   /*
+   * Set to the literal string "true" only on the shared public demo deployment.
+   * Makes StorageDriver mutations no-ops (explore freely, nothing persists) and
+   * enables /api/demo/login one-click role entry. Leave unset on every real
+   * school install - including platform-hosted ones.
+   */
+  DEMO_MODE: z.preprocess((value) => value === 'true', z.boolean()),
+  /*
    * Deliberately separate from DATABASE_URL (the per-school StorageDriver
    * connection): hosting-request leads are the operator's own business data,
    * not a school's data, and must stay available (and the hidden admin page

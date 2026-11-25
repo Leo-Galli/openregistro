@@ -12,7 +12,7 @@
   "dependencies": {
     "@openregistro/ui": "workspace:*",
     "@vercel/analytics": "^2.0.1",
-    "geist": "1.8.2",
+    "geist": "1.9.2",
     "lucide-react": "0.61.0",
     "mermaid": "12.2.0",
     "motion": "^14.6.0",

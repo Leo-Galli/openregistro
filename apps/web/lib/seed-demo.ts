@@ -1,7 +1,6 @@
 import type { StorageDriver } from '@openregistro/core';
+import { DEMO_PASSWORD } from './demo';
 import { hashPassword } from './password';
-
-const DEMO_PASSWORD = 'DemoPassword123!';
 
 /**
  * Realistic but clearly fictional data: every person uses a @demo.openregistro.local

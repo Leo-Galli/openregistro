@@ -47,6 +47,19 @@ export function weightedAverage(grades: readonly Pick<Grade, 'value' | 'weight'>
   return weightedSum / totalWeight;
 }
 
+/**
+ * Traffic-light tone for a 0-10 grade (Italian pass threshold is 6).
+ * Used by Badge variants and any other UI that colors a grade value.
+ */
+export type GradeTone = 'success' | 'warning' | 'destructive' | 'secondary';
+
+export function gradeTone(value: number | null | undefined): GradeTone {
+  if (value === null || value === undefined || Number.isNaN(value)) return 'secondary';
+  if (value >= 8) return 'success';
+  if (value >= 6) return 'warning';
+  return 'destructive';
+}
+
 export const disciplinaryNoteIdSchema = brandedId('DisciplinaryNoteId');
 export type DisciplinaryNoteId = z.infer<typeof disciplinaryNoteIdSchema>;
 

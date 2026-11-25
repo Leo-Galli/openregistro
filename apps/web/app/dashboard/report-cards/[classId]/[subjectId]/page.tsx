@@ -14,9 +14,10 @@ import {
   TableRow,
 } from '@openregistro/ui';
 import { auth } from '@/auth';
+import { GradeValue } from '@/components/grade-value';
+import { SaveEvaluationDialog } from '@/components/report-cards/save-evaluation-dialog';
 import { requirePermission, schoolIdOf, userIdOf } from '@/lib/authz';
 import { getStorage } from '@/lib/storage';
-import { SaveEvaluationDialog } from '@/components/report-cards/save-evaluation-dialog';
 
 export const dynamic = 'force-dynamic';
 
@@ -120,8 +121,12 @@ export default async function ReportCardSubjectPage({
                   return (
                     <TableRow key={student.id}>
                       <TableCell className="font-medium">{student.fullName}</TableCell>
-                      <TableCell>{average !== null ? average.toFixed(2) : '-'}</TableCell>
-                      <TableCell>{evaluation ? evaluation.finalGrade.toFixed(2) : '-'}</TableCell>
+                      <TableCell>
+                        <GradeValue value={average} digits={2} />
+                      </TableCell>
+                      <TableCell>
+                        <GradeValue value={evaluation?.finalGrade} digits={2} />
+                      </TableCell>
                       <TableCell>
                         <SaveEvaluationDialog
                           classId={klass.id}

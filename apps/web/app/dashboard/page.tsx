@@ -3,8 +3,9 @@ import type { SchoolId } from '@openregistro/core';
 import { hasPermission } from '@openregistro/core';
 import { Card, CardDescription, CardHeader, CardTitle, IconBadge } from '@openregistro/ui';
 import { auth } from '@/auth';
-import { getStorage } from '@/lib/storage';
+import { StudentHome } from '@/components/dashboard/student-home';
 import { NAV_ITEMS } from '@/lib/nav-items';
+import { getStorage } from '@/lib/storage';
 
 async function getOverview(rawSchoolId: string) {
   const schoolId = rawSchoolId as SchoolId;
@@ -27,6 +28,23 @@ async function getOverview(rawSchoolId: string) {
 
 export default async function DashboardPage() {
   const session = await auth();
+  const role = session!.user.role;
+  const isStudentOrGuardian = role === 'student' || role === 'guardian';
+
+  if (isStudentOrGuardian) {
+    const storage = await getStorage();
+    const school = await storage.schools.findById(session!.user.schoolId as SchoolId);
+    return (
+      <div className="flex flex-col gap-6">
+        <div>
+          <h1 className="font-display text-2xl font-semibold">{school?.name ?? 'Your school'}</h1>
+          <p className="text-sm text-muted-foreground">Welcome back</p>
+        </div>
+        <StudentHome session={session!} />
+      </div>
+    );
+  }
+
   const overview = await getOverview(session!.user.schoolId);
   const quickLinks = NAV_ITEMS.filter(
     (item) => item.href !== '/dashboard' && hasPermission(session!.user.role, item.permission),

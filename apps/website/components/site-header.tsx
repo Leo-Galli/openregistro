@@ -5,6 +5,7 @@ import { REPO_URL } from '@/lib/constants';
 
 const NAV_LINKS = [
   { href: '/#features', label: 'Features' },
+  { href: '/#download', label: 'Android app' },
   { href: '/#install', label: 'Install' },
   { href: '/host', label: 'Free hosting' },
   { href: '/#faq', label: 'FAQ' },

@@ -25,3 +25,15 @@ export {
   setNotificationEmails,
   type PlatformSettings,
 } from './postgres/platform-settings';
+export {
+  listDirectorySchools,
+  createDirectorySchool,
+  setDirectorySchoolListed,
+  deleteDirectorySchool,
+  setHostingListedInApp,
+  listPublicDirectorySchools,
+  type DirectorySchoolKind,
+  type DirectorySchoolPublic,
+  type DirectorySchoolRecord,
+  type CreateDirectorySchoolInput,
+} from './postgres/directory-schools';
