@@ -1,6 +1,8 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   ActivityIndicator,
+  Animated,
+  Easing,
   FlatList,
   Pressable,
   SafeAreaView,
@@ -11,15 +13,37 @@ import {
   View,
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { LinearGradient } from 'expo-linear-gradient';
 import { WebView, type WebViewMessageEvent, type WebViewNavigation } from 'react-native-webview';
 import { fetchDirectorySchools, type DirectorySchool } from './src/api';
 
 const STORAGE_KEY = 'openregistro.selectedSchool';
 
+const COLORS = {
+  ink: '#151b32',
+  cream: '#fffbeb',
+  yellow: '#ffcd29',
+  yellowDeep: '#ffc300',
+  cobalt: '#2350e7',
+  cobaltSoft: '#e8edfc',
+  pink: '#f67996',
+  muted: '#5a5f72',
+  white: '#ffffff',
+  success: '#20b657',
+  danger: '#d41f32',
+  orange: '#f9911a',
+};
+
 const KIND_LABEL: Record<DirectorySchool['kind'], string> = {
   demo: 'Demo',
-  hosted: 'Hosted by us',
+  hosted: 'Hosted',
   self_hosted: 'Self-hosted',
+};
+
+const KIND_COLOR: Record<DirectorySchool['kind'], string> = {
+  demo: COLORS.pink,
+  hosted: COLORS.cobaltSoft,
+  self_hosted: '#fff3cc',
 };
 
 const ROLE_LABEL: Record<string, string> = {
@@ -32,11 +56,11 @@ const ROLE_LABEL: Record<string, string> = {
 };
 
 const ROLE_ACCENT: Record<string, string> = {
-  school_admin: '#2350e7',
-  secretary: '#2350e7',
-  principal: '#2350e7',
-  teacher: '#20b657',
-  student: '#f9911a',
+  school_admin: COLORS.cobalt,
+  secretary: COLORS.cobalt,
+  principal: COLORS.cobalt,
+  teacher: COLORS.success,
+  student: COLORS.orange,
   guardian: '#ef5478',
 };
 
@@ -71,6 +95,81 @@ const SESSION_BRIDGE_JS = `
 })();
 `;
 
+function SchoolCard({
+  school,
+  index,
+  onPress,
+}: {
+  school: DirectorySchool;
+  index: number;
+  onPress: () => void;
+}) {
+  const appear = useRef(new Animated.Value(0)).current;
+  const scale = useRef(new Animated.Value(1)).current;
+
+  useEffect(() => {
+    Animated.timing(appear, {
+      toValue: 1,
+      duration: 420,
+      delay: 80 + index * 70,
+      easing: Easing.out(Easing.cubic),
+      useNativeDriver: true,
+    }).start();
+  }, [appear, index]);
+
+  const handlePressIn = () => {
+    Animated.spring(scale, { toValue: 0.97, useNativeDriver: true, friction: 6 }).start();
+  };
+  const handlePressOut = () => {
+    Animated.spring(scale, { toValue: 1, useNativeDriver: true, friction: 6 }).start();
+  };
+
+  return (
+    <Animated.View
+      style={{
+        opacity: appear,
+        transform: [
+          {
+            translateY: appear.interpolate({
+              inputRange: [0, 1],
+              outputRange: [18, 0],
+            }),
+          },
+          { scale },
+        ],
+      }}
+    >
+      <Pressable
+        onPress={onPress}
+        onPressIn={handlePressIn}
+        onPressOut={handlePressOut}
+        accessibilityRole="button"
+        accessibilityLabel={`Open ${school.name}`}
+        style={styles.card}
+      >
+        <View style={styles.cardAccent} />
+        <View style={styles.cardBody}>
+          <View style={styles.cardTop}>
+            <Text style={styles.cardTitle} numberOfLines={2}>
+              {school.name}
+            </Text>
+            <View style={[styles.badge, { backgroundColor: KIND_COLOR[school.kind] }]}>
+              <Text style={styles.badgeText}>{KIND_LABEL[school.kind]}</Text>
+            </View>
+          </View>
+          <Text style={styles.cardUrl} numberOfLines={1}>
+            {school.baseUrl.replace(/^https?:\/\//, '')}
+          </Text>
+          <View style={styles.cardFooter}>
+            <Text style={styles.cardCta}>Continue</Text>
+            <Text style={styles.cardArrow}>→</Text>
+          </View>
+        </View>
+      </Pressable>
+    </Animated.View>
+  );
+}
+
 export default function App() {
   const [schools, setSchools] = useState<DirectorySchool[]>([]);
   const [query, setQuery] = useState('');
@@ -79,6 +178,8 @@ export default function App() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const webRef = useRef<WebView>(null);
+  const heroAnim = useRef(new Animated.Value(0)).current;
+  const pulse = useRef(new Animated.Value(0)).current;
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -104,6 +205,34 @@ export default function App() {
   useEffect(() => {
     void load();
   }, [load]);
+
+  useEffect(() => {
+    Animated.timing(heroAnim, {
+      toValue: 1,
+      duration: 550,
+      easing: Easing.out(Easing.cubic),
+      useNativeDriver: true,
+    }).start();
+
+    const loop = Animated.loop(
+      Animated.sequence([
+        Animated.timing(pulse, {
+          toValue: 1,
+          duration: 1800,
+          easing: Easing.inOut(Easing.quad),
+          useNativeDriver: true,
+        }),
+        Animated.timing(pulse, {
+          toValue: 0,
+          duration: 1800,
+          easing: Easing.inOut(Easing.quad),
+          useNativeDriver: true,
+        }),
+      ]),
+    );
+    loop.start();
+    return () => loop.stop();
+  }, [heroAnim, pulse]);
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -145,12 +274,16 @@ export default function App() {
   };
 
   if (selected) {
-    const accent = session ? (ROLE_ACCENT[session.role] ?? '#2350e7') : '#ffcd29';
+    const accent = session ? (ROLE_ACCENT[session.role] ?? COLORS.cobalt) : COLORS.yellow;
     const roleLabel = session ? (ROLE_LABEL[session.role] ?? session.role) : null;
+    const headerLight = !session;
 
     return (
       <SafeAreaView style={styles.safe}>
-        <StatusBar barStyle="dark-content" backgroundColor={accent} />
+        <StatusBar
+          barStyle={headerLight ? 'dark-content' : 'light-content'}
+          backgroundColor={accent}
+        />
         <View style={[styles.webHeader, { backgroundColor: accent }]}>
           <Pressable
             onPress={handleChangeSchool}
@@ -161,10 +294,16 @@ export default function App() {
             <Text style={styles.changeButtonText}>Schools</Text>
           </Pressable>
           <View style={styles.webHeaderText}>
-            <Text style={styles.webTitle} numberOfLines={1}>
+            <Text
+              style={[styles.webTitle, !headerLight && styles.webTitleOnColor]}
+              numberOfLines={1}
+            >
               {session?.school || selected.name}
             </Text>
-            <Text style={styles.webSubtitle} numberOfLines={1}>
+            <Text
+              style={[styles.webSubtitle, !headerLight && styles.webSubtitleOnColor]}
+              numberOfLines={1}
+            >
               {session
                 ? `${session.name}${roleLabel ? ` · ${roleLabel}` : ''}`
                 : 'Sign in to continue'}
@@ -185,7 +324,7 @@ export default function App() {
           onLoadEnd={() => webRef.current?.injectJavaScript(SESSION_BRIDGE_JS)}
           renderLoading={() => (
             <View style={styles.centered}>
-              <ActivityIndicator size="large" color="#2350e7" />
+              <ActivityIndicator size="large" color={COLORS.cobalt} />
             </View>
           )}
           style={styles.webview}
@@ -196,70 +335,113 @@ export default function App() {
 
   return (
     <SafeAreaView style={styles.safe}>
-      <StatusBar barStyle="dark-content" backgroundColor="#ffcd29" />
-      <View style={styles.hero}>
-        <Text style={styles.brand}>OpenRegistro</Text>
-        <Text style={styles.subtitle}>Pick your school, then sign in with your account</Text>
-        <Text style={styles.heroHint}>
-          Hosted and self-hosted schools appear here. Your role (teacher, student, guardian, …) is
-          detected after login.
-        </Text>
-      </View>
+      <StatusBar barStyle="dark-content" backgroundColor={COLORS.yellow} />
+      <Animated.View
+        style={[
+          styles.heroWrap,
+          {
+            opacity: heroAnim,
+            transform: [
+              {
+                translateY: heroAnim.interpolate({
+                  inputRange: [0, 1],
+                  outputRange: [-16, 0],
+                }),
+              },
+            ],
+          },
+        ]}
+      >
+        <LinearGradient
+          colors={[COLORS.yellow, COLORS.yellowDeep, '#ffe799']}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
+          style={styles.hero}
+        >
+          <Animated.View
+            pointerEvents="none"
+            style={[
+              styles.blob,
+              styles.blobOne,
+              {
+                transform: [
+                  {
+                    scale: pulse.interpolate({
+                      inputRange: [0, 1],
+                      outputRange: [1, 1.08],
+                    }),
+                  },
+                ],
+              },
+            ]}
+          />
+          <Animated.View
+            pointerEvents="none"
+            style={[
+              styles.blob,
+              styles.blobTwo,
+              {
+                opacity: pulse.interpolate({
+                  inputRange: [0, 1],
+                  outputRange: [0.35, 0.55],
+                }),
+              },
+            ]}
+          />
+          <Text style={styles.brandMark}>OR</Text>
+          <Text style={styles.brand}>OpenRegistro</Text>
+          <Text style={styles.subtitle}>Your school register, in your pocket</Text>
+          <Text style={styles.heroHint}>
+            Pick a hosted or self-hosted school. After you sign in, we detect your role
+            automatically.
+          </Text>
+        </LinearGradient>
+      </Animated.View>
 
       <View style={styles.body}>
-        <TextInput
-          value={query}
-          onChangeText={setQuery}
-          placeholder="Search by school name or URL"
-          placeholderTextColor="#5a5f72"
-          accessibilityLabel="Search schools"
-          style={styles.search}
-          autoCorrect={false}
-          autoCapitalize="none"
-        />
+        <View style={styles.searchWrap}>
+          <Text style={styles.searchIcon}>⌕</Text>
+          <TextInput
+            value={query}
+            onChangeText={setQuery}
+            placeholder="Search schools"
+            placeholderTextColor={COLORS.muted}
+            accessibilityLabel="Search schools"
+            style={styles.search}
+            autoCorrect={false}
+            autoCapitalize="none"
+          />
+        </View>
 
         {loading ? (
           <View style={styles.centered}>
-            <ActivityIndicator size="large" color="#2350e7" />
+            <ActivityIndicator size="large" color={COLORS.cobalt} />
+            <Text style={styles.loadingText}>Loading schools…</Text>
           </View>
         ) : error ? (
           <View style={styles.centered}>
-            <Text style={styles.error}>{error}</Text>
-            <Pressable onPress={load} style={styles.retry} accessibilityRole="button">
-              <Text style={styles.retryText}>Retry</Text>
-            </Pressable>
+            <View style={styles.errorCard}>
+              <Text style={styles.errorTitle}>Could not load schools</Text>
+              <Text style={styles.error}>{error}</Text>
+              <Pressable
+                onPress={load}
+                style={styles.retry}
+                accessibilityRole="button"
+                accessibilityLabel="Retry loading schools"
+              >
+                <Text style={styles.retryText}>Try again</Text>
+              </Pressable>
+            </View>
           </View>
         ) : (
           <FlatList
             data={filtered}
             keyExtractor={(item) => item.id}
             contentContainerStyle={styles.list}
+            showsVerticalScrollIndicator={false}
             ListEmptyComponent={<Text style={styles.empty}>No schools match that search.</Text>}
-            renderItem={({ item }) => (
-              <Pressable
-                onPress={() => void handleSelect(item)}
-                accessibilityRole="button"
-                accessibilityLabel={`Open ${item.name}`}
-                style={styles.card}
-              >
-                <View style={styles.cardTop}>
-                  <Text style={styles.cardTitle}>{item.name}</Text>
-                  <View
-                    style={[
-                      styles.badge,
-                      item.kind === 'demo'
-                        ? styles.badgeDemo
-                        : item.kind === 'hosted'
-                          ? styles.badgeHosted
-                          : styles.badgeSelf,
-                    ]}
-                  >
-                    <Text style={styles.badgeText}>{KIND_LABEL[item.kind]}</Text>
-                  </View>
-                </View>
-                <Text style={styles.cardUrl}>{item.baseUrl}</Text>
-                <Text style={styles.cardCta}>Continue to sign in</Text>
-              </Pressable>
+            renderItem={({ item, index }) => (
+              <SchoolCard school={item} index={index} onPress={() => void handleSelect(item)} />
             )}
           />
         )}
@@ -269,97 +451,169 @@ export default function App() {
 }
 
 const styles = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: '#fffbeb' },
+  safe: { flex: 1, backgroundColor: COLORS.cream },
+  heroWrap: {
+    borderBottomWidth: 3,
+    borderBottomColor: COLORS.ink,
+  },
   hero: {
-    backgroundColor: '#ffcd29',
-    borderBottomWidth: 2,
-    borderBottomColor: '#151b32',
-    paddingHorizontal: 20,
-    paddingTop: 16,
-    paddingBottom: 20,
+    paddingHorizontal: 22,
+    paddingTop: 22,
+    paddingBottom: 26,
+    overflow: 'hidden',
+  },
+  blob: {
+    position: 'absolute',
+    borderRadius: 999,
+    borderWidth: 2,
+    borderColor: COLORS.ink,
+  },
+  blobOne: {
+    width: 140,
+    height: 140,
+    right: -36,
+    top: -40,
+    backgroundColor: 'rgba(255,255,255,0.35)',
+  },
+  blobTwo: {
+    width: 90,
+    height: 90,
+    left: -28,
+    bottom: -24,
+    backgroundColor: COLORS.pink,
+  },
+  brandMark: {
+    alignSelf: 'flex-start',
+    marginBottom: 10,
+    borderWidth: 2,
+    borderColor: COLORS.ink,
+    backgroundColor: COLORS.white,
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 10,
+    overflow: 'hidden',
+    fontSize: 13,
+    fontWeight: '900',
+    color: COLORS.ink,
+    letterSpacing: 1,
   },
   brand: {
-    fontSize: 30,
-    fontWeight: '800',
-    color: '#151b32',
+    fontSize: 34,
+    fontWeight: '900',
+    color: COLORS.ink,
+    letterSpacing: -0.5,
   },
   subtitle: {
-    marginTop: 6,
-    fontSize: 16,
-    fontWeight: '700',
-    color: '#151b32',
+    marginTop: 8,
+    fontSize: 17,
+    fontWeight: '800',
+    color: COLORS.ink,
   },
   heroHint: {
-    marginTop: 8,
+    marginTop: 10,
     fontSize: 13,
     fontWeight: '600',
-    color: '#151b32',
-    opacity: 0.75,
-    lineHeight: 18,
+    color: COLORS.ink,
+    opacity: 0.78,
+    lineHeight: 19,
+    maxWidth: 340,
   },
   body: { flex: 1, paddingHorizontal: 16, paddingTop: 16 },
-  search: {
+  searchWrap: {
+    flexDirection: 'row',
+    alignItems: 'center',
     borderWidth: 2,
-    borderColor: '#151b32',
-    borderRadius: 12,
-    backgroundColor: '#ffffff',
-    paddingHorizontal: 14,
+    borderColor: COLORS.ink,
+    borderRadius: 14,
+    backgroundColor: COLORS.white,
+    paddingHorizontal: 12,
+    marginBottom: 14,
+    shadowColor: COLORS.ink,
+    shadowOffset: { width: 3, height: 3 },
+    shadowOpacity: 1,
+    shadowRadius: 0,
+    elevation: 3,
+  },
+  searchIcon: {
+    fontSize: 18,
+    color: COLORS.muted,
+    marginRight: 8,
+    fontWeight: '700',
+  },
+  search: {
+    flex: 1,
     paddingVertical: 12,
     fontSize: 16,
-    color: '#151b32',
-    marginBottom: 12,
+    color: COLORS.ink,
+    fontWeight: '600',
   },
-  list: { paddingBottom: 32, gap: 12 },
+  list: { paddingBottom: 36, gap: 14 },
   card: {
+    flexDirection: 'row',
     borderWidth: 2,
-    borderColor: '#151b32',
-    borderRadius: 14,
-    backgroundColor: '#ffffff',
-    padding: 14,
-    shadowColor: '#151b32',
+    borderColor: COLORS.ink,
+    borderRadius: 16,
+    backgroundColor: COLORS.white,
+    overflow: 'hidden',
+    shadowColor: COLORS.ink,
     shadowOffset: { width: 4, height: 4 },
     shadowOpacity: 1,
     shadowRadius: 0,
     elevation: 4,
   },
+  cardAccent: {
+    width: 8,
+    backgroundColor: COLORS.cobalt,
+  },
+  cardBody: {
+    flex: 1,
+    padding: 14,
+  },
   cardTop: {
     flexDirection: 'row',
-    alignItems: 'center',
+    alignItems: 'flex-start',
     justifyContent: 'space-between',
-    gap: 8,
+    gap: 10,
   },
   cardTitle: {
     flex: 1,
-    fontSize: 17,
-    fontWeight: '800',
-    color: '#151b32',
+    fontSize: 18,
+    fontWeight: '900',
+    color: COLORS.ink,
   },
   badge: {
     borderWidth: 2,
-    borderColor: '#151b32',
+    borderColor: COLORS.ink,
     borderRadius: 999,
-    paddingHorizontal: 8,
-    paddingVertical: 2,
+    paddingHorizontal: 9,
+    paddingVertical: 3,
   },
-  badgeDemo: { backgroundColor: '#f67996' },
-  badgeHosted: { backgroundColor: '#e8edfc' },
-  badgeSelf: { backgroundColor: '#fff3cc' },
   badgeText: {
     fontSize: 11,
     fontWeight: '800',
-    color: '#151b32',
+    color: COLORS.ink,
   },
   cardUrl: {
     marginTop: 8,
     fontSize: 12,
     fontFamily: 'monospace',
-    color: '#5a5f72',
+    color: COLORS.muted,
+  },
+  cardFooter: {
+    marginTop: 12,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
   },
   cardCta: {
-    marginTop: 10,
-    fontSize: 13,
-    fontWeight: '800',
-    color: '#2350e7',
+    fontSize: 14,
+    fontWeight: '900',
+    color: COLORS.cobalt,
+  },
+  cardArrow: {
+    fontSize: 18,
+    fontWeight: '900',
+    color: COLORS.cobalt,
   },
   centered: {
     flex: 1,
@@ -368,37 +622,64 @@ const styles = StyleSheet.create({
     gap: 12,
     padding: 24,
   },
-  error: { color: '#d41f32', textAlign: 'center', fontWeight: '600' },
-  retry: {
+  loadingText: {
+    color: COLORS.muted,
+    fontWeight: '700',
+  },
+  errorCard: {
+    width: '100%',
     borderWidth: 2,
-    borderColor: '#151b32',
-    borderRadius: 10,
-    backgroundColor: '#2350e7',
+    borderColor: COLORS.ink,
+    borderRadius: 16,
+    backgroundColor: COLORS.white,
+    padding: 18,
+    gap: 10,
+    shadowColor: COLORS.ink,
+    shadowOffset: { width: 4, height: 4 },
+    shadowOpacity: 1,
+    shadowRadius: 0,
+    elevation: 4,
+  },
+  errorTitle: {
+    fontSize: 17,
+    fontWeight: '900',
+    color: COLORS.ink,
+  },
+  error: { color: COLORS.danger, fontWeight: '600', lineHeight: 20 },
+  retry: {
+    marginTop: 4,
+    alignSelf: 'flex-start',
+    borderWidth: 2,
+    borderColor: COLORS.ink,
+    borderRadius: 12,
+    backgroundColor: COLORS.cobalt,
     paddingHorizontal: 16,
     paddingVertical: 10,
   },
-  retryText: { color: '#fffbeb', fontWeight: '800' },
-  empty: { textAlign: 'center', color: '#5a5f72', marginTop: 24 },
+  retryText: { color: COLORS.cream, fontWeight: '900' },
+  empty: { textAlign: 'center', color: COLORS.muted, marginTop: 28, fontWeight: '600' },
   webHeader: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 12,
-    borderBottomWidth: 2,
-    borderBottomColor: '#151b32',
+    borderBottomWidth: 3,
+    borderBottomColor: COLORS.ink,
     paddingHorizontal: 12,
-    paddingVertical: 10,
+    paddingVertical: 12,
   },
   changeButton: {
     borderWidth: 2,
-    borderColor: '#151b32',
-    borderRadius: 10,
-    backgroundColor: '#ffffff',
-    paddingHorizontal: 10,
-    paddingVertical: 6,
+    borderColor: COLORS.ink,
+    borderRadius: 12,
+    backgroundColor: COLORS.white,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
   },
-  changeButtonText: { fontWeight: '800', color: '#151b32', fontSize: 13 },
+  changeButtonText: { fontWeight: '900', color: COLORS.ink, fontSize: 13 },
   webHeaderText: { flex: 1 },
-  webTitle: { fontWeight: '800', color: '#151b32', fontSize: 15 },
-  webSubtitle: { marginTop: 2, fontWeight: '600', color: '#151b32', opacity: 0.85, fontSize: 12 },
+  webTitle: { fontWeight: '900', color: COLORS.ink, fontSize: 15 },
+  webTitleOnColor: { color: COLORS.white },
+  webSubtitle: { marginTop: 2, fontWeight: '700', color: COLORS.ink, opacity: 0.85, fontSize: 12 },
+  webSubtitleOnColor: { color: COLORS.white, opacity: 0.92 },
   webview: { flex: 1 },
 });

@@ -26,6 +26,7 @@ export {
   type PlatformSettings,
 } from './postgres/platform-settings';
 export {
+  DEMO_SCHOOL,
   listDirectorySchools,
   createDirectorySchool,
   setDirectorySchoolListed,

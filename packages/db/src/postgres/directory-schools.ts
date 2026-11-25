@@ -117,10 +117,16 @@ export async function setHostingListedInApp(
 /**
  * Public mobile-app directory: always includes the shared demo, then every
  * ready hosted school still listed, then every listed self-hosted entry.
+ *
+ * Each query is isolated so a missing migration (e.g. directory_schools /
+ * listed_in_app) still returns at least the demo entry instead of 500.
  */
 export async function listPublicDirectorySchools(db: Database): Promise<DirectorySchoolPublic[]> {
-  const [hostedRows, selfHosted] = await Promise.all([
-    db
+  let hosted: DirectorySchoolPublic[] = [];
+  let selfHostedPublic: DirectorySchoolPublic[] = [];
+
+  try {
+    const hostedRows = await db
       .select({
         id: hostingRequestsTable.id,
         name: hostingRequestsTable.schoolName,
@@ -128,36 +134,45 @@ export async function listPublicDirectorySchools(db: Database): Promise<Director
         listedInApp: hostingRequestsTable.listedInApp,
         provisioningStatus: hostingRequestsTable.provisioningStatus,
       })
-      .from(hostingRequestsTable),
-    db
+      .from(hostingRequestsTable);
+
+    hosted = hostedRows
+      .filter(
+        (row) =>
+          row.listedInApp &&
+          row.provisioningStatus === 'ready' &&
+          typeof row.subdomain === 'string' &&
+          row.subdomain.length > 0,
+      )
+      .map((row) => ({
+        id: row.id,
+        name: row.name,
+        baseUrl: `https://${row.subdomain}.${HOSTED_BASE_DOMAIN}`,
+        kind: 'hosted' as const,
+      }))
+      .sort((a, b) => a.name.localeCompare(b.name));
+  } catch (error) {
+    console.error('listPublicDirectorySchools: hosted query failed', error);
+  }
+
+  try {
+    const selfHosted = await db
       .select()
       .from(directorySchoolsTable)
       .where(eq(directorySchoolsTable.listedInApp, true))
-      .orderBy(asc(directorySchoolsTable.name)),
-  ]);
+      .orderBy(asc(directorySchoolsTable.name));
 
-  const hosted: DirectorySchoolPublic[] = hostedRows
-    .filter(
-      (row) =>
-        row.listedInApp &&
-        row.provisioningStatus === 'ready' &&
-        typeof row.subdomain === 'string' &&
-        row.subdomain.length > 0,
-    )
-    .map((row) => ({
+    selfHostedPublic = selfHosted.map((row) => ({
       id: row.id,
       name: row.name,
-      baseUrl: `https://${row.subdomain}.${HOSTED_BASE_DOMAIN}`,
-      kind: 'hosted' as const,
-    }))
-    .sort((a, b) => a.name.localeCompare(b.name));
-
-  const selfHostedPublic: DirectorySchoolPublic[] = selfHosted.map((row) => ({
-    id: row.id,
-    name: row.name,
-    baseUrl: row.baseUrl,
-    kind: 'self_hosted' as const,
-  }));
+      baseUrl: row.baseUrl,
+      kind: 'self_hosted' as const,
+    }));
+  } catch (error) {
+    console.error('listPublicDirectorySchools: self-hosted query failed', error);
+  }
 
   return [DEMO_SCHOOL, ...hosted, ...selfHostedPublic];
 }
+
+export { DEMO_SCHOOL };
