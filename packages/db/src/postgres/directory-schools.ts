@@ -43,8 +43,14 @@ function nowIso(): string {
 }
 
 export function normalizeDirectoryBaseUrl(raw: string): string {
-  const trimmed = raw.trim().replace(/\/+$/, '');
-  const withProtocol = /^https?:\/\//i.test(trimmed) ? trimmed : `https://${trimmed}`;
+  let trimmed = raw.trim();
+  while (trimmed.endsWith('/')) {
+    trimmed = trimmed.slice(0, -1);
+  }
+  const withProtocol =
+    trimmed.startsWith('http://') || trimmed.startsWith('https://')
+      ? trimmed
+      : `https://${trimmed}`;
   const url = new URL(withProtocol);
   if (url.protocol !== 'https:' && url.protocol !== 'http:') {
     throw new Error('baseUrl must be http or https');
