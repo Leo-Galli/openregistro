@@ -1,5 +1,5 @@
-import { getStorage } from '../lib/storage';
 import { getEnv } from '../lib/env';
+import { getWritableStorage } from '../lib/storage';
 
 /**
  * Marks the first-run installer wizard as complete without going through the
@@ -9,7 +9,7 @@ import { getEnv } from '../lib/env';
  * same thing after seeding; see app/setup/demo/actions.ts).
  */
 async function main(): Promise<void> {
-  const storage = await getStorage();
+  const storage = await getWritableStorage();
   const env = getEnv();
   const state = await storage.installer.get();
   if (state.completed) {

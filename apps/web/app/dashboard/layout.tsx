@@ -2,8 +2,10 @@ import type { ReactNode } from 'react';
 import { themeStyle } from '@openregistro/ui';
 import { AppHeader } from '@/components/app-header';
 import { DashboardNav } from '@/components/dashboard-nav';
+import { DemoBanner } from '@/components/demo-banner';
 import { requireSession } from '@/lib/guards';
 import { schoolIdOf } from '@/lib/authz';
+import { isDemoMode } from '@/lib/demo';
 import { getStorage } from '@/lib/storage';
 
 export const dynamic = 'force-dynamic';
@@ -18,6 +20,7 @@ export default async function DashboardLayout({ children }: { children: ReactNod
       className="min-h-screen bg-background"
       style={themeStyle(school?.themeId, school?.primaryColor)}
     >
+      {isDemoMode() ? <DemoBanner /> : null}
       <AppHeader name={session.user.name ?? session.user.email ?? ''} role={session.user.role} />
       <DashboardNav role={session.user.role} />
       <main className="mx-auto max-w-6xl px-6 py-8">{children}</main>

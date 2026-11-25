@@ -3,7 +3,7 @@
 import { ArrowRight, ExternalLink, Github } from 'lucide-react';
 import { motion } from 'motion/react';
 import { Button, StickerBadge } from '@openregistro/ui';
-import { REPO_URL, DEMO_URL } from '@/lib/constants';
+import { REPO_URL } from '@/lib/constants';
 import { WavyEdge } from './wavy-edge';
 
 const HEADLINE = ['A register', 'you run', 'yourself.'];
@@ -39,7 +39,7 @@ export function Hero() {
 
         <div className="flex flex-wrap items-center gap-3 sm:justify-center">
           <Button asChild variant="secondary" size="lg">
-            <a href={DEMO_URL} target="_blank" rel="noreferrer">
+            <a href="#demo">
               <ExternalLink className="h-4 w-4" />
               Try the live demo
             </a>

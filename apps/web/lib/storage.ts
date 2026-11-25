@@ -1,5 +1,7 @@
 import type { StorageDriver } from '@openregistro/core';
 import { createJsonStorageDriver, createPostgresStorageDriver } from '@openregistro/db';
+import { isDemoMode } from './demo';
+import { createDemoReadOnlyStorage } from './demo-read-only-storage';
 import { getEnv } from './env';
 
 /**
@@ -7,7 +9,10 @@ import { getEnv } from './env';
  * instance (and, for Postgres, the same connection pool) across module
  * reloads instead of leaking a new one on every edit.
  */
-const globalForStorage = globalThis as unknown as { storageDriver?: Promise<StorageDriver> };
+const globalForStorage = globalThis as unknown as {
+  storageDriver?: Promise<StorageDriver>;
+  writableStorageDriver?: Promise<StorageDriver>;
+};
 
 function createDriver(): StorageDriver {
   const env = getEnv();
@@ -26,9 +31,26 @@ async function connectDriver(): Promise<StorageDriver> {
   return driver;
 }
 
+/**
+ * App-facing storage. When DEMO_MODE=true, mutations are no-ops so the shared
+ * public demo never persists visitor edits.
+ */
 export function getStorage(): Promise<StorageDriver> {
   if (!globalForStorage.storageDriver) {
-    globalForStorage.storageDriver = connectDriver();
+    globalForStorage.storageDriver = connectDriver().then((driver) =>
+      isDemoMode() ? createDemoReadOnlyStorage(driver) : driver,
+    );
   }
   return globalForStorage.storageDriver;
+}
+
+/**
+ * Unwrapped driver for operational scripts (seed, installer complete, migrate).
+ * Always writes for real, even when DEMO_MODE=true on the running app.
+ */
+export function getWritableStorage(): Promise<StorageDriver> {
+  if (!globalForStorage.writableStorageDriver) {
+    globalForStorage.writableStorageDriver = connectDriver();
+  }
+  return globalForStorage.writableStorageDriver;
 }
