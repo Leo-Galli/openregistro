@@ -42,7 +42,9 @@ jobs:
           packages: platform-tools platforms;android-35 build-tools;35.0.0
 
       - name: Install mobile dependencies
-        run: npm ci
+        # npm install (not ci): overrides in package.json can desync lock metadata
+        # across npm major versions between local Node and the runner.
+        run: npm install --no-fund --no-audit
 
       - name: Prebuild native Android project
         run: npx expo prebuild --platform android --non-interactive

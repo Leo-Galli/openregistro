@@ -31,7 +31,7 @@
     "@xmldom/xmldom@0.7": "0.8.15",
     "postcss": "8.5.23",
     "image-size": "2.0.3",
-    "minimatch@9": "11.0.1",
+    "minimatch@9": "11.0.9",
     "glob@10": "14.0.2",
     "uuid": "11.1.1"
   }
