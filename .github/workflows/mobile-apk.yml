@@ -47,7 +47,11 @@ jobs:
         run: npm install --no-fund --no-audit
 
       - name: Prebuild native Android project
-        run: npx expo prebuild --platform android --non-interactive
+        env:
+          CI: '1'
+        run: |
+          npx expo prebuild --platform android
+          test -d android -a -f android/gradlew
 
       - name: Assemble release APK
         working-directory: apps/mobile/android
