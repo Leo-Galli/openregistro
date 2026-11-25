@@ -1,3 +1,6 @@
 packages:
   - 'apps/*'
   - 'packages/*'
+  # Expo pins React 18; keep it out of the workspace so it cannot clash with
+  # React 19 types used by apps/web, apps/website, and packages/ui.
+  - '!apps/mobile'

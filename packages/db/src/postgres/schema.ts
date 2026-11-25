@@ -465,6 +465,27 @@ export const hostingRequestsTable = pgTable('hosting_requests', {
     .notNull()
     .default('not_started'),
   provisioningError: text('provisioning_error'),
+  /**
+   * When true (default), a ready hosted school appears in the mobile app
+   * school picker. Operators can hide a school from /cp without taking the
+   * instance offline.
+   */
+  listedInApp: boolean('listed_in_app').notNull().default(true),
+  createdAt: timestamp('created_at', { withTimezone: true, mode: 'string' }).notNull(),
+  updatedAt: timestamp('updated_at', { withTimezone: true, mode: 'string' }).notNull(),
+});
+
+/**
+ * Self-hosted schools the operator has registered so the mobile app can
+ * discover them alongside platform-hosted instances. Lives in
+ * HOSTING_DATABASE_URL (same DB as hosting_requests), managed from /cp.
+ */
+export const directorySchoolsTable = pgTable('directory_schools', {
+  id: uuid('id').primaryKey(),
+  name: text('name').notNull(),
+  baseUrl: text('base_url').notNull().unique(),
+  listedInApp: boolean('listed_in_app').notNull().default(true),
+  notes: text('notes'),
   createdAt: timestamp('created_at', { withTimezone: true, mode: 'string' }).notNull(),
   updatedAt: timestamp('updated_at', { withTimezone: true, mode: 'string' }).notNull(),
 });

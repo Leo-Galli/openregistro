@@ -1,8 +1,8 @@
-import { getStorage } from '../lib/storage';
 import { seedDemoData } from '../lib/seed-demo';
+import { getWritableStorage } from '../lib/storage';
 
 async function main(): Promise<void> {
-  const storage = await getStorage();
+  const storage = await getWritableStorage();
   await seedDemoData(storage);
   console.warn('Demo data seeded.');
 }

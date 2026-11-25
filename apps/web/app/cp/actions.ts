@@ -15,6 +15,10 @@ import {
   setProvisioningState,
   getPlatformSettings,
   setNotificationEmails,
+  createDirectorySchool,
+  setDirectorySchoolListed,
+  deleteDirectorySchool,
+  setHostingListedInApp,
   type HostingRequestStatus,
 } from '@openregistro/db';
 import { requireCpAdmin, verifyCpCredentials, CP_ADMIN_COOKIE } from '@/lib/cp-admin';
@@ -444,4 +448,67 @@ async function sendNotificationAddedEmail(to: string): Promise<boolean> {
     text,
     html,
   });
+}
+
+export interface DirectorySchoolFormState {
+  ok: boolean;
+  error?: string;
+}
+
+export async function addDirectorySchool(
+  _prev: DirectorySchoolFormState,
+  formData: FormData,
+): Promise<DirectorySchoolFormState> {
+  await requireCpAdmin();
+  const db = getHostingDb();
+  if (!db) return { ok: false, error: 'Hosting database is not configured.' };
+
+  const name = String(formData.get('name') ?? '').trim();
+  const baseUrl = String(formData.get('baseUrl') ?? '').trim();
+  const notes = String(formData.get('notes') ?? '').trim() || null;
+  if (!name || !baseUrl) return { ok: false, error: 'Name and base URL are required.' };
+
+  try {
+    await createDirectorySchool(db, { name, baseUrl, notes });
+  } catch (error) {
+    return {
+      ok: false,
+      error: error instanceof Error ? error.message : 'Could not add that school.',
+    };
+  }
+
+  revalidatePath('/cp');
+  return { ok: true };
+}
+
+export async function toggleDirectorySchoolListed(formData: FormData): Promise<void> {
+  await requireCpAdmin();
+  const db = getHostingDb();
+  if (!db) return;
+  const id = String(formData.get('id') ?? '');
+  const listed = formData.get('listed') === 'true';
+  if (!id) return;
+  await setDirectorySchoolListed(db, id, listed);
+  revalidatePath('/cp');
+}
+
+export async function removeDirectorySchool(formData: FormData): Promise<void> {
+  await requireCpAdmin();
+  const db = getHostingDb();
+  if (!db) return;
+  const id = String(formData.get('id') ?? '');
+  if (!id) return;
+  await deleteDirectorySchool(db, id);
+  revalidatePath('/cp');
+}
+
+export async function toggleHostingListedInApp(formData: FormData): Promise<void> {
+  await requireCpAdmin();
+  const db = getHostingDb();
+  if (!db) return;
+  const id = String(formData.get('id') ?? '');
+  const listed = formData.get('listed') === 'true';
+  if (!id) return;
+  await setHostingListedInApp(db, id, listed);
+  revalidatePath('/cp');
 }

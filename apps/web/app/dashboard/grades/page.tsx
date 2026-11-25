@@ -3,7 +3,6 @@ import type { Session } from 'next-auth';
 import type { Grade, SubjectId, UserId } from '@openregistro/core';
 import { weightedAverage } from '@openregistro/core';
 import {
-  Badge,
   Card,
   CardContent,
   CardDescription,
@@ -17,6 +16,7 @@ import {
   TableRow,
 } from '@openregistro/ui';
 import { auth } from '@/auth';
+import { GradeValue } from '@/components/grade-value';
 import { can, requirePermission, userIdOf } from '@/lib/authz';
 import { getStorage } from '@/lib/storage';
 
@@ -107,14 +107,14 @@ async function StudentGrades({ studentId, showName }: { studentId: UserId; showN
                           <span className="text-sm text-muted-foreground">-</span>
                         ) : (
                           subjectGrades.map((grade) => (
-                            <Badge key={grade.id} variant="outline">
-                              {grade.value}
-                            </Badge>
+                            <GradeValue key={grade.id} value={grade.value} title={grade.type} />
                           ))
                         )}
                       </div>
                     </TableCell>
-                    <TableCell>{average !== null ? average.toFixed(2) : '-'}</TableCell>
+                    <TableCell>
+                      <GradeValue value={average} digits={2} />
+                    </TableCell>
                   </TableRow>
                 );
               })}
