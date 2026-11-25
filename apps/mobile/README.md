@@ -14,6 +14,8 @@ npm install
 npx expo start
 ```
 
+Dev client / `expo run:android` needs Metro on `:8081`. The published APK does not.
+
 ## School directory
 
 The picker loads `https://api.openregistro.another-horizon.eu/api/directory/schools`.
@@ -21,5 +23,6 @@ Operators manage hosted + self-hosted visibility from `/cp` (Mobile app director
 
 ## APK
 
-Every `v*` git tag builds `OpenRegistro.apk` in CI and attaches it to the GitHub
-Release. See `.github/workflows/mobile-apk.yml`.
+CI builds a **release** APK (`assembleRelease`) with the JS bundle embedded, so
+installing from the site works offline from Metro. Trigger via `v*` tags or
+`workflow_dispatch` on `.github/workflows/mobile-apk.yml`.

@@ -1,11 +1,12 @@
 name: Mobile APK
 
-# Builds a sideloadable Android APK.
+# Builds a sideloadable Android release APK (JS bundle embedded; no Metro).
 # - On v* tags: attaches to that GitHub Release
 # - On workflow_dispatch: publishes/updates the rolling "apk-latest" prerelease
 #   so the marketing site download link stays fresh.
 #
-# shortcut: debug-signed APK (installable now); Play Store needs EAS + a keystore later.
+# shortcut: release build signed with the debug keystore (installable now);
+# Play Store needs EAS + a real upload keystore later.
 on:
   push:
     tags:
@@ -46,14 +47,19 @@ jobs:
       - name: Prebuild native Android project
         run: npx expo prebuild --platform android --non-interactive
 
-      - name: Assemble debug APK
+      - name: Assemble release APK
         working-directory: apps/mobile/android
-        run: chmod +x gradlew && ./gradlew assembleDebug --no-daemon
+        run: |
+          chmod +x gradlew
+          # Expo's default release signingConfig is the debug keystore, which is
+          # enough for sideloading. assembleRelease embeds the JS bundle so the
+          # APK does not try to reach Metro on localhost:8081.
+          ./gradlew assembleRelease --no-daemon
 
       - name: Stage APK
         run: |
           mkdir -p dist
-          cp android/app/build/outputs/apk/debug/app-debug.apk dist/OpenRegistro.apk
+          cp android/app/build/outputs/apk/release/app-release.apk dist/OpenRegistro.apk
           ls -lh dist/OpenRegistro.apk
 
       - name: Upload APK artifact
@@ -78,7 +84,7 @@ jobs:
           name: Latest Android APK
           prerelease: true
           body: |
-            Sideloadable OpenRegistro Android build (debug-signed).
+            Sideloadable OpenRegistro Android release build (standalone; no Metro/dev server).
             Pick your school in the app, then sign in - your role is detected automatically.
           files: apps/mobile/dist/OpenRegistro.apk
         env:
