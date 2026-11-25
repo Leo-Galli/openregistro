@@ -24,6 +24,6 @@
       "bundleIdentifier": "eu.anotherhorizon.openregistro",
       "supportsTablet": true
     },
-    "plugins": ["expo-system-ui"]
+    "plugins": ["expo-system-ui", "expo-asset"]
   }
 }
