@@ -24,12 +24,12 @@
   },
   "devDependencies": {
     "@openregistro/config": "workspace:*",
-    "@types/node": "24.19.2",
+    "@types/node": "26.6.7",
     "drizzle-kit": "0.31.11",
-    "eslint": "9.39.5",
+    "eslint": "10.15.0",
     "tsx": "4.23.15",
-    "typescript": "5.7.3",
-    "vite": "8.3.5",
-    "vitest": "4.1.12"
+    "typescript": "7.0.2",
+    "vite": "8.3.8",
+    "vitest": "5.1.1"
   }
 }
