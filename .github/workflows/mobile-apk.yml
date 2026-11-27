@@ -76,7 +76,7 @@ jobs:
 
       - name: Attach APK to version release
         if: startsWith(github.ref, 'refs/tags/v')
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@v3
         with:
           files: apps/mobile/dist/OpenRegistro.apk
         env:
@@ -84,7 +84,7 @@ jobs:
 
       - name: Publish rolling apk-latest prerelease
         if: github.event_name == 'workflow_dispatch' || startsWith(github.ref, 'refs/tags/v')
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@v3
         with:
           tag_name: apk-latest
           name: Latest Android APK
