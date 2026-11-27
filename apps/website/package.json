@@ -24,13 +24,13 @@
   },
   "devDependencies": {
     "@openregistro/config": "workspace:*",
-    "@tailwindcss/postcss": "4.3.3",
-    "@types/node": "22.10.5",
-    "@types/react": "19.3.0",
+    "@tailwindcss/postcss": "4.3.5",
+    "@types/node": "26.6.7",
+    "@types/react": "19.3.1",
     "@types/react-dom": "19.3.0",
-    "eslint": "9.39.5",
+    "eslint": "10.15.0",
     "eslint-config-next": "16.4.6",
-    "tailwindcss": "4.3.3",
-    "typescript": "5.7.3"
+    "tailwindcss": "4.3.5",
+    "typescript": "7.0.2"
   }
 }
